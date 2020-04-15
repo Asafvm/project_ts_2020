@@ -6,18 +6,18 @@ class Field {
   final double _minWidth = 20;
   final double _minHeight = 20;
 
-  final String defaultSValue;
-  final int defaultIValue;
+  String defaultSValue;
+  int defaultIValue;
   final int index;
-  final String hint;
+  String hint;
   final int page;
   Offset offset;
   Size size;
-  final bool isText;
-  final RegExp regexp;
-  final String prefix;
-  final String suffix;
-  final bool isMandatory;
+  bool isText;
+  RegExp regexp;
+  String prefix;
+  String suffix;
+  bool isMandatory;
 
   Field(
       {@required this.index,
@@ -37,7 +37,10 @@ class Field {
     Size _tmp = this.size + o;
     if (_tmp.width > _minWidth && _tmp.height > _minHeight)
       this.size = _tmp;
-    else
-      this.size = Size(_minWidth, _minHeight);
+    else {
+      if (_tmp.width < _minWidth) this.size = Size(_minWidth, this.size.height);
+      if (_tmp.height < _minHeight)
+        this.size = Size(this.size.width, _minHeight);
+    }
   }
 }

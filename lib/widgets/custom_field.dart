@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/models/field.dart';
 
 class CustomField extends StatefulWidget {
-  Field field;
+  final Field field;
   final MediaQueryData mqd;
-  CustomField(this.field, this.mqd);
+  final Function editFunction;
+  CustomField(this.field, this.mqd, this.editFunction);
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -25,6 +26,10 @@ class _CustomFieldState extends State<CustomField> {
           decoration: BoxDecoration(
             border: Border.all(width: w, color: color),
           ),
+          child: Text(
+            "(" + widget.field.index.toString() + ") " + widget.field.hint,
+            style: TextStyle(fontSize: 16), //TODO: fix style while dragging
+          ),
         ),
       );
     }
@@ -35,10 +40,13 @@ class _CustomFieldState extends State<CustomField> {
       child: GestureDetector(
         onTap: () => setState(() {
           _selected = !_selected;
+          if (_selected) {
+            widget.editFunction(context, widget.field);
+          }
         }),
-        onLongPress: () {}, //ignore long press TODO:change long press to drag with animation
-        onPanUpdate: (details) =>
-            {if (_selected) _resize(details.delta)},
+        onLongPress:
+            () {}, //ignore long press TODO:change long press to drag with animation
+        onPanUpdate: (details) => {if (_selected) _resize(details.delta)},
         child: _selected
             ? _createRect(Colors.deepOrange, 2, rectSize)
             : Draggable(
@@ -56,12 +64,12 @@ class _CustomFieldState extends State<CustomField> {
   }
 
   void _relocate(Offset offset) {
-    
     setState(() {
       widget.field.offset = offset -
           widget.mqd.viewPadding.topLeft -
-          widget.mqd.viewPadding.topLeft -
-          widget.mqd.padding.topLeft; //consider space outside of main Stack view
+          widget.mqd.viewInsets.topLeft -
+          widget
+              .mqd.padding.topLeft; //consider space outside of main Stack view
     });
   }
 

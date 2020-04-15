@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/file_provider.dart';
 import 'package:teamshare/widgets/add_field_form.dart';
 import 'package:teamshare/widgets/custom_appbar.dart';
 import 'package:teamshare/widgets/custom_field.dart';
@@ -37,14 +39,15 @@ class _PDFScreenState extends State<PDFScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      appBar: CustomAppBar('Creating Form', Icon(Icons.save), () {}),
-      body: Flex(
-        direction: Axis.vertical,
+      appBar: CustomAppBar('Creating Form', Icon(Icons.save), _savePDF),
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Flexible(
             flex: 9,
-            child: Container(decoration: BoxDecoration(border: Border.all(width: 2,color: Colors.black)),
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: Colors.black)),
               child: Stack(
                 children: <Widget>[
                   PositionedTapDetector(
@@ -52,11 +55,22 @@ class _PDFScreenState extends State<PDFScreen> {
                     onLongPress: (pos) => _addField(context, pos),
                     child: PDFView(
                       filePath: widget.pathPDF,
-                      onError: (e) => print('PDF: Error!'),
-                      onViewCreated: (_pdfView) => {},
+                      onError: (error) {
+                        print(error.toString());
+                      },
+                      onPageError: (page, error) {
+                        print('$page: ${error.toString()}');
+                      },
+                      onViewCreated: (PDFViewController pdfViewController) {
+                        _controller.complete(pdfViewController);
+                      },
                       onPageChanged: _updateLists,
-                      onPageError: (e1, e2) => print('PDF: Page Error!'),
-                      onRender: (e) => print('PDF: Render!'),
+                      onRender: (_pages) {
+                        setState(() {
+                          // pages = _pages;
+                          // isReady = true;
+                        });
+                      },
                     ),
                   ),
 
@@ -64,19 +78,20 @@ class _PDFScreenState extends State<PDFScreen> {
                     builder: (BuildContext context,
                         List<CustomField> candidateData,
                         List<dynamic> rejectedData) {
-                      return Expanded(child: Container());
+                      return Container();
                     },
                   ),
                   //add rects here
                   for (Field i in _fieldsInPage)
-                    CustomField(i, MediaQuery.of(context)),
+                    CustomField(i, MediaQuery.of(context), _editField),
                 ],
               ),
             ),
           ),
           Flexible(
             flex: 1,
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 FlatButton.icon(
@@ -107,12 +122,7 @@ class _PDFScreenState extends State<PDFScreen> {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
-          //TODO: send required fields!
-          return AddFieldForm(
-            _fieldIndex,
-            _pageIndex,
-            pos.relative,
-          );
+          return AddFieldForm(_fieldIndex, _pageIndex, pos.relative);
         });
     if (f != null)
       setState(() {
@@ -122,11 +132,30 @@ class _PDFScreenState extends State<PDFScreen> {
       });
   }
 
+  Future<void> _editField(BuildContext context, Field field) async {
+    final Field f = await showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return AddFieldForm.fromField(field);
+        });
+    if (f != null)
+      setState(() {
+        _fields.removeWhere((rm) => rm.index == f.index);
+        _fields.add(f);
+      });
+  }
+
   void _updateLists(int page, int total) {
     setState(() {
       _pageIndex = page;
       _fieldsInPage.clear();
       _fieldsInPage.addAll(_fields.where((f) => f.page == page));
     });
+  }
+
+  void _savePDF() {
+    //TODO: encode fields and pdf and upload
+    FileProvider.writeFile(new File(widget.pathPDF));
+    //_fields.forEach((f) => {});
   }
 }
