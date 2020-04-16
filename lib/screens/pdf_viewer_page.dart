@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
@@ -12,7 +13,8 @@ import 'package:teamshare/widgets/custom_field.dart';
 
 class PDFScreen extends StatefulWidget {
   final String pathPDF;
-  PDFScreen(this.pathPDF);
+  final String deviceID;
+  PDFScreen(this.pathPDF, this.deviceID);
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -153,9 +155,18 @@ class _PDFScreenState extends State<PDFScreen> {
     });
   }
 
-  void _savePDF() {
+  Future<void> _savePDF() async {
     //TODO: encode fields and pdf and upload
-    FileProvider.writeFile(new File(widget.pathPDF));
+    //FileProvider.writeFile(new File(widget.pathPDF));
     //_fields.forEach((f) => {});
+    await CloudFunctions.instance
+        .getHttpsCallable(functionName: "addDeviceReport")
+        .call(<String, dynamic>{
+          "device_id": widget.deviceID,
+          "file_path": "path",
+          "fields": "field",
+        })
+        .then((val) => print(val))
+        .catchError((e) => print(e));
   }
 }

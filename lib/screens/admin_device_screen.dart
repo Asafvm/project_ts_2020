@@ -70,7 +70,11 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => PDFScreen(filePath)),
+                      builder: (context) => PDFScreen(
+                          filePath,
+                          document
+                              .documentID), //documentID = device document id
+                    ),
 
                     //print(filePath);
                   );
