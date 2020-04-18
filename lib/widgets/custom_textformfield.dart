@@ -14,14 +14,11 @@ class CustomTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 100,
-      child: TextFormField(
-        decoration: InputDecoration(labelText: label),
-        keyboardType: keyType,
-        onSaved: onSavedFunction,
-        //validator: RegExp(regExp),
-      ),
+    return TextFormField(
+      decoration: InputDecoration(labelText: label),
+      keyboardType: keyType,
+      onSaved: onSavedFunction,
+      //validator: RegExp(regExp),
     );
   }
 }

@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
-import 'package:teamshare/providers/file_provider.dart';
 import 'package:teamshare/widgets/add_field_form.dart';
 import 'package:teamshare/widgets/custom_appbar.dart';
 import 'package:teamshare/widgets/custom_field.dart';
@@ -26,8 +24,6 @@ class _PDFScreenState extends State<PDFScreen> {
   List<Field> _fields = [];
   List<Field> _fieldsInPage = [];
   Completer<PDFViewController> _controller = Completer<PDFViewController>();
-
-  PDFViewController _pdfView;
 
   @override
   void didChangeDependencies() {
