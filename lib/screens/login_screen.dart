@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class LoginScreen extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                               blurRadius: 8,
-                              color: Colors.grey,
+                              color: Colors.lightBlue,
                               offset: Offset(0, 2))
                         ]),
                     child: Text(
@@ -134,6 +135,6 @@ class _AuthFormState extends State<AuthForm> {
 
 
     //skip for now
-    Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
+    //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
   }
 }
