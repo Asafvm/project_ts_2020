@@ -45,3 +45,4 @@ pubspec.lock
 .gitignore
 pubspec.lock
 node_modules
+pubspec.lock

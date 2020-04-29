@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:path/path.dart' as path;
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -155,14 +156,18 @@ class _PDFScreenState extends State<PDFScreen> {
     //TODO: encode fields and pdf and upload
     //FileProvider.writeFile(new File(widget.pathPDF));
     //_fields.forEach((f) => {});
+
+    List<Map<String, dynamic>> fields = [];
+    _fields.forEach((f) => fields.add(f.toJson()));
+
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addDeviceReport")
         .call(<String, dynamic>{
           "device_id": widget.deviceID,
-          "file_path": "path",
-          "fields": "field",
+          "file_path": path.basenameWithoutExtension(widget.pathPDF),
+          "fields": fields,
         })
-        .then((val) => print(val))
-        .catchError((e) => print(e));
+        .then((val) => print("completed: " + val.data.toString()))
+        .catchError((e) => print("error: " + e.toString()));
   }
 }
