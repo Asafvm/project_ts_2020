@@ -45,4 +45,8 @@ pubspec.lock
 .gitignore
 pubspec.lock
 node_modules
+<<<<<<< HEAD
 android/.settings/org.eclipse.buildship.core.prefs
+=======
+pubspec.lock
+>>>>>>> b392422b9f7078e382158b097d735eed88f513da

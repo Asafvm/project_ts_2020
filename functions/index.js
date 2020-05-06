@@ -11,13 +11,7 @@ exports.addDevice = functions.https.onCall((data, context) => {
 
   return new Promise(async (resolve, reject) => {
     try {
-      const msg = await devices.add({
-        manifacturer: data["manifacturer"],
-        codeName: data["codeName"],
-        codeNumber: data["codeNumber"],
-        model: data["model"],
-        price: data["price"],
-      });
+      await devices.add(data["device"]);
       return resolve({
         success: true,
       });
@@ -28,23 +22,23 @@ exports.addDevice = functions.https.onCall((data, context) => {
 });
 
 exports.addDeviceReport = functions.https.onCall((data, context) => {
-  const devices = admin
+  const devicereports = admin
     .firestore()
     .collection("test")
-    .collection(data["device_id"])
-    .collection("reports");
+    .doc(data["device_id"])
+    .collection("reports")
+    .doc(data["file_path"]);
 
-  return new Promise((resolve, reject) => {
-    return devices
-      .add({
-        file_path: data["file_path"],
-        fields: data["fields"],
-      })
-      .then((msg) => {
-        return resolve({
-          success: true,
-        });
-      })
-      .catch(reject);
+  return new Promise(async (resolve, reject) => {
+    try {
+      await devicereports.set(
+        Object.assign({}, data["fields"]) //map every list item to index number
+      );
+      return resolve({
+        success: true,
+      });
+    } catch (reason) {
+      return reject(reason);
+    }
   });
 });

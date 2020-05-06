@@ -6,7 +6,6 @@ import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/firebase_auth.dart';
 import 'package:teamshare/screens/main_screen.dart';
-import 'package:teamshare/widgets/custom_appbar.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login';
@@ -15,7 +14,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: CustomAppBar('Login', null, null),
+      appBar: AppBar(title: Text('Login'),),
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -30,7 +29,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     transform: Matrix4.rotationZ(-8 * pi / 180)
                       ..translate(-20.0, 120),
                     decoration: BoxDecoration(
@@ -43,9 +42,9 @@ class LoginScreen extends StatelessWidget {
                               offset: Offset(0, 2))
                         ]),
                     child: Text(
-                      'Team Share Login!',
+                      'Team Share',
                       style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 52, fontWeight: FontWeight.bold),
                     ),
                   ),
                   CircularProgressIndicator(),
@@ -128,13 +127,13 @@ class _AuthFormState extends State<AuthForm> {
 
     // });
     //auth using firebase
-    var response = await Provider.of<FirebaseAuth>(context, listen: false).signup(
+    await Provider.of<FirebaseAuth>(context, listen: false).signup(
       _authData['email'],
       _authData['password'],
     );
 
-
+    //TODO: fix login first!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<=== DO THIS!
     //skip for now
-    //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
+    Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
   }
 }

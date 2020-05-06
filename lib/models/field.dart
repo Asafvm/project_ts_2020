@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 
 class Field {
@@ -14,7 +13,7 @@ class Field {
   Offset offset;
   Size size;
   bool isText;
-  RegExp regexp;
+  String regexp;
   String prefix;
   String suffix;
   bool isMandatory;
@@ -43,4 +42,37 @@ class Field {
         this.size = Size(this.size.width, _minHeight);
     }
   }
+
+  Field.fromJson(Map<String, dynamic> data) :
+      defaultSValue= data['defaultSValue'],
+      defaultIValue= data['defaultIValue'],
+      index= data['index'],
+      hint= data['hint'],
+      page= data['page'],
+      offset= Offset(data['offsetX'], data['offsetY']),
+      size= Size(data['sizeW'].toDouble(), data['sizeH'].toDouble()),
+      isText= data['isText'],
+      regexp= data['regexp'],
+      prefix= data['prefix'],
+      suffix= data['suffix'],
+      isMandatory= data['isMandatory'];
+    
+  
+
+  Map<String, dynamic> toJson() => {
+        'defaultSValue': defaultSValue,
+        'defaultIValue': defaultIValue,
+        'index': index,
+        'hint': hint,
+        'page': page,
+        'offsetX': offset.dx,
+        'offsetY': offset.dy,
+        'sizeW': size.width,
+        'sizeH': size.height,
+        'isText': isText,
+        'regexp': regexp,
+        'prefix': prefix,
+        'suffix': suffix,
+        'isMandatory': isMandatory,
+      };
 }

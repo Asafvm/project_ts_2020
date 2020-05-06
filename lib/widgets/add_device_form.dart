@@ -183,14 +183,9 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
   Future<void> _uploadDevice() async {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addDevice")
-        .call(<String, dynamic>{
-          "manifacturer": _newDevice.manifacturer,
-          "codeName": _newDevice.codeName,
-          "codeNumber": _newDevice.codeNumber,
-          "model": _newDevice.model,
-          "price": _newDevice.price,
-        })
+        .call(<String, dynamic>{"device": _newDevice.toJson()})
         .then((value) => print("then: " + value.data.toString()))
-        .catchError((e) => print("error: " + e.toString()));
+        .catchError((e) => print("error: " + e.toString()))
+        .whenComplete(() => Navigator.of(context).pop()); //close pop up window
   }
 }
