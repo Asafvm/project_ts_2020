@@ -52,7 +52,7 @@ class _PDFScreenState extends State<PDFScreen> {
       appBar: AppBar(
         title: Text('Creating Form'),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.save), onPressed: () => _savePDF)
+          IconButton(icon: Icon(Icons.save), onPressed: _savePDF)
         ],
       ),
       body: _uploading
@@ -188,6 +188,7 @@ class _PDFScreenState extends State<PDFScreen> {
     //TODO: encode fields and pdf and upload
     //FileProvider.writeFile(new File(widget.pathPDF));
     //_fields.forEach((f) => {});
+    print("saving");
     try {
       setState(() {
         _uploading = true;
