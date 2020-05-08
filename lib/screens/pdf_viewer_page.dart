@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
+
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -197,6 +200,7 @@ class _PDFScreenState extends State<PDFScreen> {
       List<Map<String, dynamic>> fields = [];
       _fields.forEach((f) => fields.add(f.toJson()));
 
+      StorageReference storageReference;
       await CloudFunctions.instance
           .getHttpsCallable(functionName: "addDeviceReport")
           .call(<String, dynamic>{
@@ -204,14 +208,18 @@ class _PDFScreenState extends State<PDFScreen> {
             "file_path": path.basenameWithoutExtension(widget.pathPDF),
             "fields": fields,
           })
-          .then((_) => showDialog(
-              context: context,
-              builder: (_) =>
-                  _buildAlertDialog("Upload completed successfuly")))
+          .then((_) => {
+                storageReference = FirebaseStorage().ref().child("test"),
+
+                // showDialog(
+                //     context: context,
+                //     builder: (_) =>
+                //         _buildAlertDialog("Upload completed successfuly")))
+              })
           .catchError((_) => showDialog(
               context: context,
               builder: (_) => _buildAlertDialog("Upload failed")))
-          .whenComplete(() => Navigator.of(context).pop());
+          .whenComplete(() => Navigator.of(context).pop()); //close pdf view
 
       setState(() {
         _uploading = false;
@@ -222,4 +230,21 @@ class _PDFScreenState extends State<PDFScreen> {
       });
     }
   }
-}
+
+//TOOD: finish uploading
+//   Future<void> _uploadFile() async {
+//     //final String uuid = Uuid().v1();
+//     final Directory systemTempDir = Directory.systemTemp;
+//     final File file = await File('${systemTempDir.path}/foo$uuid.txt').create();
+//     await file.writeAsString(kTestString);
+//     assert(await file.readAsString() == kTestString);
+//     final StorageReference ref =
+//         widget.storage.ref().child('text').child('foo$uuid.txt');
+//     final StorageUploadTask uploadTask = ref.putFile(
+//       file,
+//       StorageMetadata(
+//         contentLanguage: 'en',
+//         customMetadata: <String, String>{'activity': 'test'},
+//       ),
+//     );
+// }
