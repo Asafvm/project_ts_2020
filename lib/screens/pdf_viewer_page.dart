@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
 
-
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -24,6 +23,8 @@ class PDFScreen extends StatefulWidget {
 
 class _PDFScreenState extends State<PDFScreen> {
   bool _uploading = false;
+  double _progressValue = 0.0;
+  AlwaysStoppedAnimation<Color> _progressColor;
   int _fieldIndex = 0;
   int _pageIndex = 0;
   List<Field> _fields = [];
@@ -36,7 +37,6 @@ class _PDFScreenState extends State<PDFScreen> {
       _fields = widget._fields == null ? [] : widget._fields;
     });
     _updateLists(0, 0);
-
     super.initState();
   }
 
@@ -59,7 +59,13 @@ class _PDFScreenState extends State<PDFScreen> {
         ],
       ),
       body: _uploading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+              valueColor: _progressColor,
+              strokeWidth: 5,
+              backgroundColor: Colors.grey,
+              value: _progressValue,
+            ))
           : Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -199,27 +205,7 @@ class _PDFScreenState extends State<PDFScreen> {
 
       List<Map<String, dynamic>> fields = [];
       _fields.forEach((f) => fields.add(f.toJson()));
-
-      StorageReference storageReference;
-      await CloudFunctions.instance
-          .getHttpsCallable(functionName: "addDeviceReport")
-          .call(<String, dynamic>{
-            "device_id": widget.deviceID,
-            "file_path": path.basenameWithoutExtension(widget.pathPDF),
-            "fields": fields,
-          })
-          .then((_) => {
-                storageReference = FirebaseStorage().ref().child("test"),
-
-                // showDialog(
-                //     context: context,
-                //     builder: (_) =>
-                //         _buildAlertDialog("Upload completed successfuly")))
-              })
-          .catchError((_) => showDialog(
-              context: context,
-              builder: (_) => _buildAlertDialog("Upload failed")))
-          .whenComplete(() => Navigator.of(context).pop()); //close pdf view
+      await _uploadFile(fields);
 
       setState(() {
         _uploading = false;
@@ -231,20 +217,61 @@ class _PDFScreenState extends State<PDFScreen> {
     }
   }
 
-//TOOD: finish uploading
-//   Future<void> _uploadFile() async {
-//     //final String uuid = Uuid().v1();
-//     final Directory systemTempDir = Directory.systemTemp;
-//     final File file = await File('${systemTempDir.path}/foo$uuid.txt').create();
-//     await file.writeAsString(kTestString);
-//     assert(await file.readAsString() == kTestString);
-//     final StorageReference ref =
-//         widget.storage.ref().child('text').child('foo$uuid.txt');
-//     final StorageUploadTask uploadTask = ref.putFile(
-//       file,
-//       StorageMetadata(
-//         contentLanguage: 'en',
-//         customMetadata: <String, String>{'activity': 'test'},
-//       ),
-//     );
-// }
+  //TOOD: finish uploading
+  Future<void> _uploadFile(List<Map<String, dynamic>> fields) async {
+    //TODO: make this a 2 part cloud functions
+    _updateProgress(0);
+    //final String uuid = Uuid().v1();
+    //final Directory systemTempDir = Directory.systemTemp;
+    final File file = await File(widget.pathPDF).create();
+    //await file.writeAsString(kTestString);
+    //assert(await file.readAsString() == kTestString);
+    //final StorageReference ref =
+    await FirebaseStorage.instance
+        .ref()
+        .child('test')
+        .child(path.basenameWithoutExtension(widget.pathPDF))
+        .putFile(
+          file,
+          StorageMetadata(
+            contentLanguage: 'en',
+            customMetadata: <String, String>{'activity': 'test2'},
+          ),
+        )
+        .onComplete
+        .then((value) async => {
+              print('file uploaded'),
+              await CloudFunctions.instance
+                  .getHttpsCallable(functionName: "addDeviceReport")
+                  .call(<String, dynamic>{
+                    "device_id": widget.deviceID,
+                    "file_path": path.basenameWithoutExtension(widget.pathPDF),
+                    "fields": fields,
+                  })
+                  .then((_) async => {
+                        print('fields uploaded'),
+                        _updateProgress(100),
+                        await showDialog(
+                            context: context,
+                            builder: (_) => _buildAlertDialog(
+                                "Upload completed successfuly"))
+                      })
+                  .catchError(
+                    (_) async => _updateProgress(
+                      await showDialog(
+                          context: context,
+                          builder: (_) => _buildAlertDialog("Upload failed")),
+                    ),
+                  )
+                  .whenComplete(
+                      () => Navigator.of(context).pop()) //close pdf view},
+            })
+        .catchError((e) => print("Error uploading: " + e.toString()));
+  }
+
+  _updateProgress(double p) {
+    setState(() {
+      _progressValue = p;
+    });
+  }
+}
