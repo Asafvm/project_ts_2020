@@ -1,20 +1,20 @@
-import 'dart:convert';
-import 'dart:math';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/firebase_auth.dart';
-import 'package:teamshare/screens/main_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login';
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = MediaQuery.of(context).size;
+    bool _loading = false;
     return Scaffold(
-      appBar: AppBar(title: Text('Login'),),
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -30,24 +30,27 @@ class LoginScreen extends StatelessWidget {
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    transform: Matrix4.rotationZ(-8 * pi / 180)
-                      ..translate(-20.0, 120),
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 2, color: Colors.black),
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 8,
-                              color: Colors.lightBlue,
-                              offset: Offset(0, 2))
-                        ]),
-                    child: Text(
-                      'Team Share',
-                      style:
-                          TextStyle(fontSize: 52, fontWeight: FontWeight.bold),
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text: 'Team Share\n',
+                        style: TextStyle(
+                            fontSize: 52,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                        children: [
+                          TextSpan(
+                            text: 'Anytime,\tAnywhere',
+                            style: TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                  CircularProgressIndicator(),
+                  if (_loading) CircularProgressIndicator(),
                   Padding(padding: EdgeInsets.all(10), child: AuthForm()),
                 ],
               ),
@@ -84,6 +87,14 @@ class _AuthFormState extends State<AuthForm> {
                 hintText: 'Enter eMail',
                 labelText: 'eMail',
               ),
+              validator: (value) {
+                RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
+                //RegExp regExp = RegExp(r'^[a-zA-Z0-9]+@.[a-zA-Z]+.[a-zA-Z]+', caseSensitive: false, multiLine: false);
+
+                if (value.isEmpty || !regExp.hasMatch(value))
+                  return 'Insert a valid eMail address';
+                return null;
+              },
               onSaved: (val) {
                 _authData['email'] = val.trim();
               },
@@ -94,25 +105,32 @@ class _AuthFormState extends State<AuthForm> {
                 hintText: 'Enter Password',
                 labelText: 'Password',
               ),
+              validator: (value) {
+                if (value.isEmpty) return 'Password cannot be empty';
+                return null;
+              },
               onSaved: (val) {
                 _authData['password'] = val;
               },
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  elevation: 10,
-                  child: Text('Log Me In'),
-                  onPressed: () => _authUser(context),
-                ),
-                GoogleSignInButton(
-                  onPressed: () => _authUser(context),
-                  darkMode: false,
-                  text: 'Sign in with Google',
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  RaisedButton(
+                    color: Theme.of(context).accentColor,
+                    elevation: 10,
+                    child: Text('Log Me In'),
+                    onPressed: () => _authUser(context),
+                  ),
+                  GoogleSignInButton(
+                    onPressed: () => {},//_authUserWithGoogle(context),
+                    darkMode: false,
+                    text: 'Sign in with Google',
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -121,19 +139,33 @@ class _AuthFormState extends State<AuthForm> {
   }
 
   Future<void> _authUser(BuildContext context) async {
-    //TODO: do more error handling
     _loginKey.currentState.save();
-    // setState(() {
+    if (_loginKey.currentState.validate()) {
+      await Provider.of<FirebaseAuth>(context, listen: false).signup(
+        _authData['email'],
+        _authData['password'],
+      ).then((value) => print('Success')).catchError((e)  => print('Failed'));
 
-    // });
-    //auth using firebase
-    await Provider.of<FirebaseAuth>(context, listen: false).signup(
-      _authData['email'],
-      _authData['password'],
-    );
+      //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
 
-    //TODO: fix login first!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<===<=== DO THIS!
-    //skip for now
-    Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
+    }
   }
+
+  // Future<void> _authUserWithGoogle(BuildContext context) async {
+  //   GoogleSignIn _googleSignIn = GoogleSignIn(clientId: '181561501538-51ph5llcgp6gm2pj6mte0jeqeg1dpgps.apps.googleusercontent.com',signInOption: SignInOption.standard,
+  //     scopes: [
+  //       'email',
+  //       'https://www.googleapis.com/auth/contacts.readonly',
+  //     ],
+  //   );
+  //   Future<void> _handleSignIn() async {
+  //     try {
+  //       await _googleSignIn.signIn().then((value) => print('Success!'));
+  //     } catch (error) {
+  //       print(error);
+  //     }
+  //   }
+
+  //   //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
+  // }
 }

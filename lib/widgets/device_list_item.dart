@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/screens/device_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
 
 class DeviceListItem extends StatefulWidget {
@@ -21,7 +22,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
 
   @override
   void initState() {
-    deviceDoc = widget.document.data;
+    deviceDoc = widget.document;
     super.initState();
   }
 
@@ -45,8 +46,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
               leading: CircleAvatar(
                 child: Icon(widget.icon),
               ),
-              title: Text(deviceDoc['codeName']),
-              subtitle: Text(deviceDoc['codeNumber']),
+              title: Text(deviceDoc.data['codeName']),
+              subtitle: Text(deviceDoc.data['codeNumber']),
               trailing: FittedBox(
                 child: Row(
                   //buttons
@@ -54,7 +55,10 @@ class _DeviceListItemState extends State<DeviceListItem> {
                     IconButton(
                       icon: Icon(Icons.add_to_queue),
                       tooltip: 'Add new device',
-                      onPressed: () {},
+                      onPressed: () {
+                          //TODO: build add device form
+
+                      },
                     ),
                     IconButton(
                       icon: Icon(Icons.picture_as_pdf),
@@ -68,6 +72,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                             builder: (context) => PDFScreen(
                                 filePath,
                                 widget.document.documentID,
+                                "devices/"+deviceDoc.data["codeName"]+"/"+deviceDoc.documentID,
                                 null), //documentID = device document id
                           ),
                         );
@@ -76,7 +81,18 @@ class _DeviceListItemState extends State<DeviceListItem> {
                     IconButton(
                         tooltip: 'Show All',
                         icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: () {})
+                        onPressed: () {
+                          //TODO: build devices list screen
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeviceListScreen(
+                                widget.document.documentID,
+                            ), //documentID = device document id
+                          ),
+                        );
+
+                        })
                   ],
                 ),
               ),
@@ -117,6 +133,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                                     snapshot.data[index].documentID +
                                         ".pdf", //TODO: get file path from device automaticly,
                                     widget.document.documentID,
+                                    "devices/"+deviceDoc.data["codeName"]+"/"+deviceDoc.documentID,
                                     snapshot.data[index].data.entries
                                         .map((e) => Field.fromJson(
                                             e.value.cast<String, dynamic>()))

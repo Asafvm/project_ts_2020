@@ -15,7 +15,8 @@ class PDFScreen extends StatefulWidget {
   final List<Field> _fields;
   final String pathPDF;
   final String deviceID;
-  PDFScreen(this.pathPDF, this.deviceID, this._fields);
+  final String devCode;
+  PDFScreen(this.pathPDF, this.deviceID, this.devCode, this._fields);
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -194,9 +195,6 @@ class _PDFScreenState extends State<PDFScreen> {
   }
 
   Future<void> _savePDF() async {
-    //TODO: encode fields and pdf and upload
-    //FileProvider.writeFile(new File(widget.pathPDF));
-    //_fields.forEach((f) => {});
     print("saving");
     try {
       setState(() {
@@ -221,15 +219,11 @@ class _PDFScreenState extends State<PDFScreen> {
   Future<void> _uploadFile(List<Map<String, dynamic>> fields) async {
     //TODO: make this a 2 part cloud functions
     _updateProgress(0);
-    //final String uuid = Uuid().v1();
-    //final Directory systemTempDir = Directory.systemTemp;
     final File file = await File(widget.pathPDF).create();
-    //await file.writeAsString(kTestString);
-    //assert(await file.readAsString() == kTestString);
-    //final StorageReference ref =
     await FirebaseStorage.instance
         .ref()
         .child('test')
+        .child(widget.devCode)
         .child(path.basenameWithoutExtension(widget.pathPDF))
         .putFile(
           file,

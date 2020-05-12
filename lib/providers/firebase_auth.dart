@@ -23,13 +23,14 @@ class FirebaseAuth with ChangeNotifier {
         },
       ),
     );
-    print(json.decode(respose.body));
+    //print(json.decode(respose.body));
   }
 
-    Future<void> signin(String email, String password) async {
+  Future<void> signin(String email, String password) async {
     const key = 'AIzaSyAfy1vsq7uZuBvrFH831MAqtRh1zywnJ68';
     const url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + key;
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' +
+            key;
 
     final respose = await http.post(
       url,

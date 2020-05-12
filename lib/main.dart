@@ -6,13 +6,16 @@ import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'models/device.dart';
+
+
 
 void main() {
   runApp(TeamShare());
 }
 
 class TeamShare extends StatelessWidget {
+  //get domain from user
+  //final domain = 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
