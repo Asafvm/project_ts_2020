@@ -6,39 +6,41 @@ import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 
-
-
-
 void main() {
   runApp(TeamShare());
 }
 
 class TeamShare extends StatelessWidget {
   //get domain from user
-  //final domain = 
+  //final domain =
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: FirebaseAuth()),
+        ChangeNotifierProvider.value(
+          value: FirebaseAuth(),
+        ),
         StreamProvider<List<DocumentSnapshot>>.value(
-          value: Firestore.instance.collection('test').snapshots().map(
-                (list) => list.documents
-              ),
-              //updateShouldNotify: (previous, current) => previous != current,
+          value: Firestore.instance
+              .collection('test')
+              .snapshots()
+              .map((list) => list.documents),
+          //updateShouldNotify: (previous, current) => previous != current,
         ),
       ],
-      child: MaterialApp(
-        title: 'Team Share',
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-          accentColor: Colors.lightGreen,
+      child: Consumer<FirebaseAuth>(
+        builder: (ctx, auth, _) => MaterialApp(
+          title: 'Team Share',
+          theme: ThemeData(
+            primarySwatch: Colors.green,
+            accentColor: Colors.lightGreen,
+          ),
+          home: auth.isAuth ? MainScreen() : LoginScreen(),
+          routes: {
+            MainScreen.routeName: (ctx) => MainScreen(),
+            AdminMenuScreen.routeName: (ctx) => AdminMenuScreen(),
+          },
         ),
-        home: SafeArea(child: LoginScreen()),
-        routes: {
-          MainScreen.routeName: (ctx) => MainScreen(),
-          AdminMenuScreen.routeName: (ctx) => AdminMenuScreen(),
-        },
       ),
     );
   }
