@@ -56,8 +56,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                       icon: Icon(Icons.add_to_queue),
                       tooltip: 'Add new device',
                       onPressed: () {
-                          //TODO: build add device form
-
+                        //TODO: build add device form
                       },
                     ),
                     IconButton(
@@ -71,8 +70,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
                           MaterialPageRoute(
                             builder: (context) => PDFScreen(
                                 filePath,
-                                widget.document.documentID,
-                                "devices/"+deviceDoc.data["codeName"]+"/"+deviceDoc.documentID,
+                                deviceDoc.documentID,
+                                deviceDoc.data["codeName"],
                                 null), //documentID = device document id
                           ),
                         );
@@ -84,14 +83,13 @@ class _DeviceListItemState extends State<DeviceListItem> {
                         onPressed: () {
                           //TODO: build devices list screen
                           Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DeviceListScreen(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DeviceListScreen(
                                 widget.document.documentID,
-                            ), //documentID = device document id
-                          ),
-                        );
-
+                              ), //documentID = device document id
+                            ),
+                          );
                         })
                   ],
                 ),
@@ -132,15 +130,15 @@ class _DeviceListItemState extends State<DeviceListItem> {
                                 builder: (context) => PDFScreen(
                                     snapshot.data[index].documentID +
                                         ".pdf", //TODO: get file path from device automaticly,
-                                    widget.document.documentID,
-                                    "devices/"+deviceDoc.data["codeName"]+"/"+deviceDoc.documentID,
+                                    deviceDoc.documentID,
+                                    deviceDoc.data["codeName"],
                                     snapshot.data[index].data.entries
                                         .map((e) => Field.fromJson(
                                             e.value.cast<String, dynamic>()))
                                         .toList()),
                               ),
                             ),
-                          ), //TODO: edit fields
+                          ),
                         ],
                       ),
                     ),

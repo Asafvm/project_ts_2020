@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/models/field.dart';
 import 'package:teamshare/widgets/device_list_item.dart';
-import 'pdf_viewer_page.dart';
 import 'package:teamshare/models/device.dart';
 import 'package:teamshare/widgets/add_device_form.dart';
 

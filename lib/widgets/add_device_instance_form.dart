@@ -8,9 +8,8 @@ class AddDeviceInstanceForm extends StatefulWidget {
 class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
   //TODO: fix everything
 
+  bool _uploading = false;
 
-    bool _uploading = false;
-    
   final _deviceForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
@@ -21,6 +20,7 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
       onSaved: onSave,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return _uploading

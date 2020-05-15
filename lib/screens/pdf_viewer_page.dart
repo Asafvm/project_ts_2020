@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart' as path;
-
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/widgets/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
+import 'package:path/path.dart' as path;
 
 class PDFScreen extends StatefulWidget {
   final List<Field> _fields;
@@ -34,6 +33,13 @@ class _PDFScreenState extends State<PDFScreen> {
 
   @override
   void initState() {
+    File(widget.pathPDF).exists().catchError((e) async => {
+          await showDialog(
+                  context: context,
+                  builder: (_) => _buildAlertDialog("Error opening file"))
+              .then((_) => Navigator.of(context).pop())
+        });
+
     setState(() {
       _fields = widget._fields == null ? [] : widget._fields;
     });
@@ -183,7 +189,7 @@ class _PDFScreenState extends State<PDFScreen> {
 
   _buildAlertDialog(String msg) {
     return AlertDialog(
-      title: Text("Upload status"),
+      title: Text("Status Update"),
       content: Text(msg),
       actions: <Widget>[
         FlatButton(
@@ -196,6 +202,7 @@ class _PDFScreenState extends State<PDFScreen> {
 
   Future<void> _savePDF() async {
     print("saving");
+    _updateProgress(0);
     try {
       setState(() {
         _uploading = true;
@@ -203,7 +210,37 @@ class _PDFScreenState extends State<PDFScreen> {
 
       List<Map<String, dynamic>> fields = [];
       _fields.forEach((f) => fields.add(f.toJson()));
-      await _uploadFile(fields);
+      File file = File(widget.pathPDF);
+      if (file != null)
+        await FirebaseStorageProvider()
+            .uploadFile(file, "devices/" + widget.deviceID + "/")
+            .then((val) async => {
+                  _updateProgress(50),
+                  await FirebaseFirestoreProvider()
+                      .uploadFields(
+                          fields,
+                          path.basenameWithoutExtension(file.path),
+                          widget.deviceID)
+                      .then((val) async => {
+                            _updateProgress(100),
+                            await showDialog(
+                                    context: context,
+                                    builder: (_) => _buildAlertDialog(
+                                        "Upload completed successfuly"))
+                                .then((_) => Navigator.of(context).pop())
+                          })
+                      .catchError((e) async => {
+                            await showDialog(
+                                context: context,
+                                builder: (_) => _buildAlertDialog(
+                                    "Upload Failed: " + e.toString()))
+                          })
+                })
+            .catchError((e) async => {
+                  await showDialog(
+                      context: context,
+                      builder: (_) => _buildAlertDialog("Upload Failed: File"))
+                });
 
       setState(() {
         _uploading = false;
@@ -216,52 +253,6 @@ class _PDFScreenState extends State<PDFScreen> {
   }
 
   //TOOD: finish uploading
-  Future<void> _uploadFile(List<Map<String, dynamic>> fields) async {
-    //TODO: make this a 2 part cloud functions
-    _updateProgress(0);
-    final File file = await File(widget.pathPDF).create();
-    await FirebaseStorage.instance
-        .ref()
-        .child('test')
-        .child(widget.devCode)
-        .child(path.basenameWithoutExtension(widget.pathPDF))
-        .putFile(
-          file,
-          StorageMetadata(
-            contentLanguage: 'en',
-            customMetadata: <String, String>{'activity': 'test2'},
-          ),
-        )
-        .onComplete
-        .then((value) async => {
-              print('file uploaded'),
-              await CloudFunctions.instance
-                  .getHttpsCallable(functionName: "addDeviceReport")
-                  .call(<String, dynamic>{
-                    "device_id": widget.deviceID,
-                    "file_path": path.basenameWithoutExtension(widget.pathPDF),
-                    "fields": fields,
-                  })
-                  .then((_) async => {
-                        print('fields uploaded'),
-                        _updateProgress(100),
-                        await showDialog(
-                            context: context,
-                            builder: (_) => _buildAlertDialog(
-                                "Upload completed successfuly"))
-                      })
-                  .catchError(
-                    (_) async => _updateProgress(
-                      await showDialog(
-                          context: context,
-                          builder: (_) => _buildAlertDialog("Upload failed")),
-                    ),
-                  )
-                  .whenComplete(
-                      () => Navigator.of(context).pop()) //close pdf view},
-            })
-        .catchError((e) => print("Error uploading: " + e.toString()));
-  }
 
   _updateProgress(double p) {
     setState(() {

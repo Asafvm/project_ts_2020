@@ -29,7 +29,7 @@ exports.addDeviceReport = functions.https.onCall((data, context) => {
     .collection("test")
     .doc(data["device_id"])
     .collection("reports")
-    .doc(data["file_path"]);
+    .doc(data["file_name"]);
 
   return new Promise(async (resolve, reject) => {
     try {
