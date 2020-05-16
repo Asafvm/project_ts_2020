@@ -13,6 +13,10 @@ class FirebaseAuth with ChangeNotifier {
     return token != null;
   }
 
+  String get userId {
+    return isAuth ? _userId : null;
+  }
+
   String get token {
     if (_expiryDate != null &&
         _expiryDate.isAfter(DateTime.now()) &&

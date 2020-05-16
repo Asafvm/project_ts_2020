@@ -211,38 +211,29 @@ class _AuthFormState extends State<AuthForm> {
           errorMessage = 'Wrong password';
         else if (error.toString().contains('EMAIL_NOT_FOUND'))
           errorMessage = 'Wrong email';
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("An Error Occured!"),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('Confirm'),
-              ),
-            ],
-          ),
-        );
+        showMessage(errorMessage);
       } catch (error) {
         const errorMessage = 'Unknown problem occured. please try again later';
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("An Error Occured!"),
-            content: Text(errorMessage),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('Confirm'),
-              ),
-            ],
-          ),
-        );
+        showMessage(errorMessage);
       }
     }
   }
 
+  void showMessage(String errorMessage) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("An Error Occured!"),
+        content: Text(errorMessage),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+  }
   // Future<void> _authUserWithGoogle(BuildContext context) async {
   //   GoogleSignIn _googleSignIn = GoogleSignIn(clientId: '181561501538-51ph5llcgp6gm2pj6mte0jeqeg1dpgps.apps.googleusercontent.com',signInOption: SignInOption.standard,
   //     scopes: [
