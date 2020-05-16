@@ -1,7 +1,7 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamshare/models/device.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddDeviceForm extends StatefulWidget {
   @override
@@ -147,7 +147,23 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           });
                           //send to server
                           try {
-                            await _uploadDevice();
+                            await FirebaseFirestoreProvider()
+                                .uploadDevice(_newDevice)
+                                .then((_) async => await showDialog(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                              title: Text('Success!'),
+                                              content:
+                                                  Text('New device created!\n'),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  onPressed:
+                                                      Navigator.of(context).pop,
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            ))
+                                    .then((_) => Navigator.of(context).pop()));
                           } catch (error) {
                             showDialog(
                                 context: context,
@@ -164,6 +180,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                                     ));
                           } finally {
                             setState(() {
+                              _newDevice = null;
                               _uploading = false;
                             });
                           }
@@ -178,14 +195,5 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
               ),
             ),
           );
-  }
-
-  Future<void> _uploadDevice() async {
-    await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addDevice")
-        .call(<String, dynamic>{"device": _newDevice.toJson()})
-        .then((value) => print("then: " + value.data.toString()))
-        .catchError((e) => print("error: " + e.toString()))
-        .whenComplete(() => Navigator.of(context).pop()); //close pop up window
   }
 }

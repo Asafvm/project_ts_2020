@@ -9,7 +9,11 @@ const os = require("os");
 const fs = require("fs");
 
 exports.addDevice = functions.https.onCall((data, context) => {
-  const devices = admin.firestore().collection("test");
+  const devices = admin
+    .firestore()
+    .collection("username")
+    .doc("company")
+    .collection("devices");
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -23,10 +27,33 @@ exports.addDevice = functions.https.onCall((data, context) => {
   });
 });
 
+exports.addDeviceInstance = functions.https.onCall((data, context) => {
+  const devices = admin
+    .firestore()
+    .collection("username")
+    .doc("company")
+    .collection("devices")
+    .doc(data["device_id"])
+    .collection("instances")
+    .doc(data["device"]["serial"]);
+  return new Promise(async (resolve, reject) => {
+    try {
+      await devices.set(data["device"]);
+      return resolve({
+        success: true,
+      });
+    } catch (reason) {
+      return reject(reason);
+    }
+  });
+});
+
 exports.addDeviceReport = functions.https.onCall((data, context) => {
   const devicereports = admin
     .firestore()
-    .collection("test")
+    .collection("username")
+    .doc("company")
+    .collection("devices")
     .doc(data["device_id"])
     .collection("reports")
     .doc(data["file_name"]);

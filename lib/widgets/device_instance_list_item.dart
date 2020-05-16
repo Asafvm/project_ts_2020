@@ -5,17 +5,17 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/screens/device_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
 
-class DeviceListItem extends StatefulWidget {
+class DeviceInstanceListItem extends StatefulWidget {
   final IconData icon;
   final BuildContext ctx;
   final DocumentSnapshot document;
-  DeviceListItem(this.icon, this.ctx, this.document);
+  DeviceInstanceListItem(this.icon, this.ctx, this.document);
 
   @override
   _DeviceListItemState createState() => _DeviceListItemState();
 }
 
-class _DeviceListItemState extends State<DeviceListItem> {
+class _DeviceListItemState extends State<DeviceInstanceListItem> {
   var deviceDoc;
   Color _bgcolor = Colors.white;
   bool _selected = false;
@@ -99,7 +99,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
         ),
         StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
-              .document(widget.document.reference.path)
+              .collection('test')
+              .document(widget.document.documentID)
               .collection('reports')
               .snapshots()
               .map((list) => list.documents),

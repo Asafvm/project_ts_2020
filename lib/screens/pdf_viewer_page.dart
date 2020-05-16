@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
+import 'package:provider/provider.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/firebase_auth.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/widgets/add_field_form.dart';
@@ -207,11 +209,12 @@ class _PDFScreenState extends State<PDFScreen> {
       setState(() {
         _uploading = true;
       });
-
       List<Map<String, dynamic>> fields = [];
       _fields.forEach((f) => fields.add(f.toJson()));
       File file = File(widget.pathPDF);
-      if (file != null)
+
+      if (file != null) {
+        //TODO: check that user is authenticated
         await FirebaseStorageProvider()
             .uploadFile(file, "devices/" + widget.deviceID + "/")
             .then((val) async => {
@@ -241,6 +244,12 @@ class _PDFScreenState extends State<PDFScreen> {
                       context: context,
                       builder: (_) => _buildAlertDialog("Upload Failed: File"))
                 });
+      } else {
+        await showDialog(
+            context: context,
+            builder: (_) =>
+                _buildAlertDialog("Must be logged in to upload files"));
+      }
 
       setState(() {
         _uploading = false;

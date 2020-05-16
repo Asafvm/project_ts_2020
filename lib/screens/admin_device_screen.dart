@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,12 +31,21 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
+          key: new Key(randomString(20)),
           itemBuilder: (ctx, index) =>
               DeviceListItem(Icons.computer, ctx, deviceList[index]),
           itemCount: deviceList == null ? 0 : deviceList.length,
         ),
       ),
     );
+  }
+
+  String randomString(int length) {
+    var rand = new Random();
+    var codeUnits = new List.generate(length, (index) {
+      return rand.nextInt(33) + 89;
+    });
+    return new String.fromCharCodes(codeUnits);
   }
 
   void _openAddDevice(BuildContext ctx) {

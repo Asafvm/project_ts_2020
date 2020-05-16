@@ -6,7 +6,9 @@ class FirebaseStorageProvider {
   Future<void> uploadFile(File file, String path) async {
     await FirebaseStorage.instance
         .ref()
-        .child('test')
+        .child('username')
+        .child("company")
+        .child("devices")
         .child(path)
         .child(basenameWithoutExtension(file.path))
         .putFile(

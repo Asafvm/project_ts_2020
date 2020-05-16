@@ -1,13 +1,48 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:teamshare/widgets/add_device_instance_form.dart';
 
-class DeviceListScreen extends StatelessWidget {
-  DeviceListScreen(String documentID);
+class DeviceListScreen extends StatefulWidget {
+  final DocumentSnapshot deviceDoc;
+  DeviceListScreen(this.deviceDoc);
 
   @override
+  _DeviceListScreenState createState() => _DeviceListScreenState();
+}
+
+class _DeviceListScreenState extends State<DeviceListScreen> {
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      
+    final deviceList =
+        Provider.of<List<DocumentSnapshot>>(context, listen: true);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.deviceDoc.data['codeName']),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => _openAddDeviceInstance(context))
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListView.builder(
+          itemBuilder: (ctx, index) =>
+              Container(), //DeviceInstanceListItem(Icons.computer, ctx, deviceList[index]),
+          itemCount: deviceList == null ? 0 : deviceList.length,
+        ),
+      ),
     );
+  }
+
+  void _openAddDeviceInstance(BuildContext ctx) {
+    showModalBottomSheet(
+        context: ctx,
+        builder: (_) {
+          return AddDeviceInstanceForm(widget.deviceDoc.documentID);
+        });
+    setState(() {});
   }
 }

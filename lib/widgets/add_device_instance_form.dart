@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/device_instance.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddDeviceInstanceForm extends StatefulWidget {
+  final String deviceDocID;
+  AddDeviceInstanceForm(this.deviceDocID);
+
   @override
   _AddDeviceInstanceFormState createState() => _AddDeviceInstanceFormState();
 }
 
 class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
-  //TODO: fix everything
-
   bool _uploading = false;
+  DeviceInstance _newDevice = DeviceInstance("0");
 
   final _deviceForm = GlobalKey<FormState>();
 
@@ -41,99 +45,14 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
             child: Form(
               key: _deviceForm,
               child: Column(
-                // mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   _buildTextFormField(
-                    "Manifacturer",
+                    "Serial",
                     TextInputType.text,
                     (val) {
-                      // _newDevice = Device(
-                      //   manifacturer: val,
-                      //   codeName: _newDevice.codeName,
-                      //   codeNumber: _newDevice.codeNumber,
-                      //   model: _newDevice.model,
-                      //   price: _newDevice.price,
-                      //);
+                      _newDevice = DeviceInstance(val);
                     },
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Code Number",
-                          TextInputType.text,
-                          (val) {
-                            // _newDevice = Device(
-                            //   manifacturer: _newDevice.manifacturer,
-                            //   codeName: _newDevice.codeName,
-                            //   codeNumber: val,
-                            //   model: _newDevice.model,
-                            //   price: _newDevice.price,
-                            //);
-                          },
-                        ),
-                      ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          'Code Name',
-                          TextInputType.text,
-                          (val) {
-                            // _newDevice = Device(
-                            //   manifacturer: _newDevice.manifacturer,
-                            //   codeName: val,
-                            //   codeNumber: _newDevice.codeNumber,
-                            //   model: _newDevice.model,
-                            //   price: _newDevice.price,
-                            // );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Model",
-                          TextInputType.text,
-                          (val) {
-                            // _newDevice = Device(
-                            //   manifacturer: _newDevice.manifacturer,
-                            //   codeName: _newDevice.codeName,
-                            //   codeNumber: _newDevice.codeNumber,
-                            //   model: val,
-                            //   price: _newDevice.price,
-                            // );
-                          },
-                        ),
-                      ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "price",
-                          TextInputType.numberWithOptions(decimal: true),
-                          (val) {
-                            // _newDevice = Device(
-                            //   manifacturer: _newDevice.manifacturer,
-                            //   codeName: _newDevice.codeName,
-                            //   codeNumber: _newDevice.codeNumber,
-                            //   model: _newDevice.model,
-                            //   price: double.parse(val),
-                            // );
-                          },
-                        ),
-                      ),
-                    ],
                   ),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 20),
@@ -145,7 +64,10 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
                           });
                           //send to server
                           try {
-                            //await _uploadDevice();
+                            await FirebaseFirestoreProvider()
+                                .uploadDeviceInstance(
+                                    _newDevice, widget.deviceDocID)
+                                .then((_) => Navigator.of(context).pop());
                           } catch (error) {
                             showDialog(
                                 context: context,
@@ -177,13 +99,4 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
             ),
           );
   }
-
-  // Future<void> _uploadDevice() async {
-  //   await CloudFunctions.instance
-  //       .getHttpsCallable(functionName: "addDevice")
-  //       .call(<String, dynamic>{"device": _newDevice.toJson()})
-  //       .then((value) => print("then: " + value.data.toString()))
-  //       .catchError((e) => print("error: " + e.toString()))
-  //       .whenComplete(() => Navigator.of(context).pop()); //close pop up window
-  // }
 }

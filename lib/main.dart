@@ -22,10 +22,11 @@ class TeamShare extends StatelessWidget {
         ),
         StreamProvider<List<DocumentSnapshot>>.value(
           value: Firestore.instance
-              .collection('test')
+              .collection('username')
+              .document("company")
+              .collection("devices")
               .snapshots()
               .map((list) => list.documents),
-          //updateShouldNotify: (previous, current) => previous != current,
         ),
       ],
       child: Consumer<FirebaseAuth>(
