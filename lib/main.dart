@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:teamshare/providers/firebase_auth.dart';
+import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
@@ -18,7 +18,7 @@ class TeamShare extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(
-          value: FirebaseAuth(),
+          value: Authentication(),
         ),
         StreamProvider<List<DocumentSnapshot>>.value(
           value: Firestore.instance
@@ -29,7 +29,7 @@ class TeamShare extends StatelessWidget {
               .map((list) => list.documents),
         ),
       ],
-      child: Consumer<FirebaseAuth>(
+      child: Consumer<Authentication>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Team Share',
           theme: ThemeData(

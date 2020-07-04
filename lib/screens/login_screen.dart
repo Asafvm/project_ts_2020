@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/providers/firebase_auth.dart';
+import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/http_exception.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login';
@@ -36,9 +38,9 @@ class LoginScreen extends StatelessWidget {
                         color: Colors.white),
                     children: [
                       TextSpan(
-                        text: 'Anytime,\tAnywhere',
+                        text: 'Big Solution for Small Buisness',
                         style: TextStyle(
-                            fontSize: 36,
+                            fontSize: 20,
                             fontWeight: FontWeight.normal,
                             color: Colors.white),
                       )
@@ -62,6 +64,14 @@ class AuthForm extends StatefulWidget {
 
 class _AuthFormState extends State<AuthForm> {
   final _loginKey = GlobalKey<FormState>();
+
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>[
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ],
+  );
+
   Map<String, String> _authData = {
     'email': '',
     'password': '',
@@ -85,6 +95,7 @@ class _AuthFormState extends State<AuthForm> {
               hintText: 'Enter Email',
               labelText: 'Email',
             ),
+            keyboardType: TextInputType.emailAddress,
             validator: (value) {
               //RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
               RegExp regExp = RegExp(r'^[a-zA-Z0-9]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
@@ -100,6 +111,7 @@ class _AuthFormState extends State<AuthForm> {
           ),
           TextFormField(
             controller: _passwordController,
+            obscureText: true,
             decoration: const InputDecoration(
               icon: Icon(Icons.lock),
               hintText: 'Enter Password',
@@ -120,6 +132,7 @@ class _AuthFormState extends State<AuthForm> {
                 hintText: 'Confirm Password',
                 labelText: 'Confirm Password',
               ),
+              obscureText: true,
               validator: (value) {
                 if (value.isEmpty)
                   return 'Password cannot be empty';
@@ -138,29 +151,24 @@ class _AuthFormState extends State<AuthForm> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Expanded(
-                      child: RaisedButton(
-                        color: Theme.of(context).accentColor,
-                        elevation: 10,
-                        child: Text(_signup ? 'Signup' : 'Signin'),
-                        onPressed: () => _authUser(context),
-                      ),
-                    ),
-                    FlatButton(
-                        //color: Theme.of(context).accentColor,
-
-                        child: Text(
-                          _signup ? 'Signin' : 'Signup',
-                          style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                        onPressed: () => _setSigningMode() //_authUser(context),
-                        ),
+                    !_signup
+                        ? Expanded(
+                            child: getRaisedButton(
+                                'Signin', () => _authUser(context)),
+                          )
+                        : getFlatButton('Signin', _setSigningMode),
+                    _signup
+                        ? Expanded(
+                            child: getRaisedButton(
+                                'Signup', () => _authUser(context)),
+                          )
+                        : getFlatButton('Signup', _setSigningMode),
                   ],
                 ),
                 GoogleSignInButton(
-                  onPressed: () => {}, //_authUserWithGoogle(context),
+                  onPressed: () async => {
+                    await _googleSignIn.signIn()
+                  }, //_authUserWithGoogle(context),
                   darkMode: false,
                   text: 'Sign in with Google',
                 ),
@@ -183,14 +191,14 @@ class _AuthFormState extends State<AuthForm> {
     if (_loginKey.currentState.validate()) {
       try {
         if (_signup) {
-          await Provider.of<FirebaseAuth>(context, listen: false)
+          await Provider.of<Authentication>(context, listen: false)
               .signup(
                 _authData['email'],
                 _authData['password'],
               )
               .then((value) => print('Success'));
         } else {
-          await Provider.of<FirebaseAuth>(context, listen: false)
+          await Provider.of<Authentication>(context, listen: false)
               .signin(
                 _authData['email'],
                 _authData['password'],
@@ -205,15 +213,17 @@ class _AuthFormState extends State<AuthForm> {
           errorMessage = 'Email already in use';
         else if (error.toString().contains('INVALID_EMAIL'))
           errorMessage = 'Please use a valid email';
-        else if (error.toString().contains('WEAK_PASSWORD'))
-          errorMessage = 'Your password is too weak';
+        //else if (error.toString().contains('WEAK_PASSWORD'))
+//           errorMessage = 'Your password is too weak';
         else if (error.toString().contains('INVALID_PASSWORD'))
           errorMessage = 'Wrong password';
         else if (error.toString().contains('EMAIL_NOT_FOUND'))
           errorMessage = 'Wrong email';
         showMessage(errorMessage);
       } catch (error) {
-        const errorMessage = 'Unknown problem occured. please try again later';
+        PlatformException e = error;
+        final errorMessage =
+            'Unknown problem occured. ${e.code}: ${e.details} - ${e.message}';
         showMessage(errorMessage);
       }
     }
@@ -251,4 +261,28 @@ class _AuthFormState extends State<AuthForm> {
 
   //   //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
   // }
+
+  Widget getFlatButton(String text, Function action) {
+    return FlatButton(
+        //color: Theme.of(context).accentColor,
+
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Theme.of(context).accentColor,
+          ),
+        ),
+        onPressed: action //_authUser(context),
+        );
+  }
+
+  Widget getRaisedButton(String text, Function action) {
+    return RaisedButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: Theme.of(context).accentColor,
+      elevation: 10,
+      child: Text(text),
+      onPressed: action,
+    );
+  }
 }
