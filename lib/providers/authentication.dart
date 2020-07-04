@@ -28,79 +28,27 @@ class Authentication with ChangeNotifier {
     return null;
   }
 
-  Future<void> _authenticate(
-      String email, String password, String urlSegment) async {
-    // const key = 'AIzaSyAfy1vsq7uZuBvrFH831MAqtRh1zywnJ68';
-    // final url =
-    //     'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=' +
-    //         key;
-    // try {
-    //   final response = await http.post(
-    //     url,
-    //     body: jsonEncode(
-    //       {
-    //         'email': email,
-    //         'password': password,
-    //         'returnSecureToken': true,
-    //       },
-    //     ),
-    //   );
-    //   final responseData = json.decode(response.body);
-    //   if (responseData['error'] != null) {
-    //     throw HttpException(responseData['error']['message']);
-    //   }
-    //   _token = responseData['idToken'];
-    //   _userId = responseData['localId'];
-    //   _expiryDate = DateTime.now().add(
-    //     Duration(
-    //       seconds: int.parse(
-    //         responseData['expiresIn'],
-    //       ),
-    //     ),
-    //   );
-    //   notifyListeners();
-    // } catch (e) {
-    //   throw e;
-    // }
-  }
+  Future<void> authenticate(String email, String password, bool signup) async {
+    AuthResult result;
 
-  Future<void> signup(String email, String password) async {
     try {
-      AuthResult result = await firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      if (signup)
+        result = await firebaseAuth.createUserWithEmailAndPassword(
+            email: email, password: password);
+      else
+        result = await firebaseAuth.signInWithEmailAndPassword(
+            email: email, password: password);
+
       IdTokenResult usertoken = await result.user.getIdToken();
       _token = usertoken.token;
       _expiryDate = usertoken.expirationTime;
       _userId = result.user.uid;
 
       notifyListeners();
+    } on PlatformException catch (e) {
+      throw e.code;
     } catch (e) {
-      if (e.runtimeType == PlatformException) {
-        throw (e as PlatformException).code;
-      } else {
-        throw e;
-      }
+      throw e;
     }
-
-    //return _authenticate(email, password, "signUp");
-  }
-
-  Future<void> signin(String email, String password) async {
-    try {
-      AuthResult result = await firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      IdTokenResult usertoken = await result.user.getIdToken();
-      _token = usertoken.token;
-      _expiryDate = usertoken.expirationTime;
-      _userId = result.user.uid;
-      notifyListeners();
-    } catch (e) {
-      if (e.runtimeType == PlatformException) {
-        throw (e as PlatformException).code;
-      } else {
-        throw e;
-      }
-    }
-    //return _authenticate(email, password, "signInWithPassword");
   }
 }

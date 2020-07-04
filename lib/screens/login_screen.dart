@@ -62,8 +62,10 @@ class AuthForm extends StatefulWidget {
   _AuthFormState createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> {
+class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   final _loginKey = GlobalKey<FormState>();
+
+  AnimationController _animationController;
 
   GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>[
@@ -80,6 +82,13 @@ class _AuthFormState extends State<AuthForm> {
   bool _signup = false;
 
   @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+  }
+
+  @override
   Widget build(BuildContext context) {
     TextEditingController _passwordController = TextEditingController();
 
@@ -87,7 +96,7 @@ class _AuthFormState extends State<AuthForm> {
       key: _loginKey,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           TextFormField(
             decoration: const InputDecoration(
@@ -148,30 +157,29 @@ class _AuthFormState extends State<AuthForm> {
             padding: const EdgeInsets.all(12.0),
             child: Column(
               children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    !_signup
-                        ? Expanded(
-                            child: getRaisedButton(
-                                'Signin', () => _authUser(context)),
-                          )
-                        : getFlatButton('Signin', _setSigningMode),
-                    _signup
-                        ? Expanded(
-                            child: getRaisedButton(
-                                'Signup', () => _authUser(context)),
-                          )
-                        : getFlatButton('Signup', _setSigningMode),
-                  ],
+                AnimatedContainer(
+                  duration: Duration(seconds: 1),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                        child: getRaisedButton('Signin', !_signup),
+                      ),
+                      Expanded(
+                        child: getRaisedButton('Signup', _signup),
+                      )
+                    ],
+                  ),
                 ),
-                GoogleSignInButton(
-                  onPressed: () async => {
-                    await _googleSignIn.signIn()
-                  }, //_authUserWithGoogle(context),
-                  darkMode: false,
-                  text: 'Sign in with Google',
-                ),
+                // GoogleSignInButton(
+                //   onPressed: () async => {
+                //     await _googleSignIn.signIn()
+                //   }, //_authUserWithGoogle(context),
+                //   darkMode: false,
+                //   text: 'Sign in with Google',
+                // ),
               ],
             ),
           ),
@@ -184,46 +192,37 @@ class _AuthFormState extends State<AuthForm> {
     setState(() {
       _signup = !_signup;
     });
+    _animationController.forward();
   }
 
   Future<void> _authUser(BuildContext context) async {
     _loginKey.currentState.save();
     if (_loginKey.currentState.validate()) {
       try {
-        if (_signup) {
-          await Provider.of<Authentication>(context, listen: false)
-              .signup(
-                _authData['email'],
-                _authData['password'],
-              )
-              .then((value) => print('Success'));
-        } else {
-          await Provider.of<Authentication>(context, listen: false)
-              .signin(
-                _authData['email'],
-                _authData['password'],
-              )
-              .then((value) => print('Success'));
-        }
+        await Provider.of<Authentication>(context, listen: false)
+            .authenticate(_authData['email'], _authData['password'], _signup)
+            .then((value) => print('Success'));
+
         //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
 
-      } on HttpException catch (error) {
+      } catch (error) {
         var errorMessage = 'Authentication failed';
         if (error.toString().contains('EMAIL_EXISTS'))
           errorMessage = 'Email already in use';
+        else if (error.toString().contains('ERROR_EMAIL_ALREADY_IN_USE'))
+          errorMessage = 'This email already registered';
+        else if (error.toString().contains('ERROR_WRONG_PASSWORD'))
+          errorMessage = 'Wrong password';
         else if (error.toString().contains('INVALID_EMAIL'))
           errorMessage = 'Please use a valid email';
-        //else if (error.toString().contains('WEAK_PASSWORD'))
-//           errorMessage = 'Your password is too weak';
+        else if (error.toString().contains('WEAK_PASSWORD'))
+          errorMessage = 'Your password is too weak';
         else if (error.toString().contains('INVALID_PASSWORD'))
           errorMessage = 'Wrong password';
         else if (error.toString().contains('EMAIL_NOT_FOUND'))
-          errorMessage = 'Wrong email';
-        showMessage(errorMessage);
-      } catch (error) {
-        PlatformException e = error;
-        final errorMessage =
-            'Unknown problem occured. ${e.code}: ${e.details} - ${e.message}';
+          errorMessage = 'This email is not registered';
+        else
+          errorMessage = 'Unknown problem occured. $error';
         showMessage(errorMessage);
       }
     }
@@ -244,45 +243,18 @@ class _AuthFormState extends State<AuthForm> {
       ),
     );
   }
-  // Future<void> _authUserWithGoogle(BuildContext context) async {
-  //   GoogleSignIn _googleSignIn = GoogleSignIn(clientId: '181561501538-51ph5llcgp6gm2pj6mte0jeqeg1dpgps.apps.googleusercontent.com',signInOption: SignInOption.standard,
-  //     scopes: [
-  //       'email',
-  //       'https://www.googleapis.com/auth/contacts.readonly',
-  //     ],
-  //   );
-  //   Future<void> _handleSignIn() async {
-  //     try {
-  //       await _googleSignIn.signIn().then((value) => print('Success!'));
-  //     } catch (error) {
-  //       print(error);
-  //     }
-  //   }
 
-  //   //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
-  // }
-
-  Widget getFlatButton(String text, Function action) {
-    return FlatButton(
-        //color: Theme.of(context).accentColor,
-
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Theme.of(context).accentColor,
-          ),
-        ),
-        onPressed: action //_authUser(context),
-        );
-  }
-
-  Widget getRaisedButton(String text, Function action) {
+  Widget getRaisedButton(String text, bool signup) {
     return RaisedButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: Theme.of(context).accentColor,
-      elevation: 10,
+      animationDuration: Duration(milliseconds: 300),
+      textColor: signup ? Colors.black : Colors.white,
+      shape: signup
+          ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+          : RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+      color: signup ? Theme.of(context).accentColor : Colors.white24,
+      elevation: 12,
       child: Text(text),
-      onPressed: action,
+      onPressed: signup ? () => _authUser(context) : _setSigningMode,
     );
   }
 }

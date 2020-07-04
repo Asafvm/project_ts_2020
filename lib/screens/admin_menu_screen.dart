@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/screens/admin_device_screen.dart';
+import 'package:teamshare/screens/admin_part_screen.dart';
 
 class AdminMenuScreen extends StatelessWidget {
   static const String routeName = '/admin_menu_screen';
@@ -54,7 +55,11 @@ class AdminMenuScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: createButton(Icons.developer_board, null, 'Parts'),
+                  child: createButton(Icons.developer_board, () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => AdminPartScreen()),
+                    );
+                  }, 'Parts'),
                 ),
                 Expanded(
                     child: createButton(
