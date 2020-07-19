@@ -2,21 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Device {
   final String manifacturer;
-  final String codeNumber;
+  final String reference;
   final String codeName;
   final String model;
   final double price;
 
   Device(
       {this.manifacturer,
-      this.codeNumber,
+      this.reference,
       this.codeName,
-      this.model,
-      this.price});
+      this.model = "",
+      this.price = 0.0});
 
   Map<String, dynamic> toJson() => {
         'manifacturer': manifacturer,
-        'codeNumber': codeNumber,
+        'reference': reference,
         'codeName': codeName,
         'model': model,
         'price': price,
@@ -24,7 +24,7 @@ class Device {
 
   Device.fromJson(Map<String, dynamic> data)
       : manifacturer = data['manifacturer'],
-        codeNumber = data['codeNumber'],
+        reference = data['reference'],
         codeName = data['codeName'],
         model = data['model'],
         price = data['price'] as double;

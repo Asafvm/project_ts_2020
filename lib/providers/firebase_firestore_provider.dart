@@ -20,7 +20,9 @@ class FirebaseFirestoreProvider {
   Future<void> uploadDevice(Device _newDevice) async {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addDevice")
-        .call(<String, dynamic>{"device": _newDevice.toJson()});
+        .call(<String, dynamic>{"device": _newDevice.toJson()})
+        .then((value) => print("Upload Finished: ${value.data}"))
+        .catchError((e) => throw new Exception("${e.details["message"]}"));
   }
 
   Future<void> uploadDeviceInstance(

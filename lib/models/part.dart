@@ -1,36 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-import 'area.dart';
-
 class Part {
   final String manifacturer;
-  final String serial;
-  String altSerial;
+  final String reference;
+  String altreference;
   String description;
   String model;
   double price;
-  Area area;
-  int inStockMainStorage;
-  int inStockPersonalStorage;
-  int inStockMinReq;
+  int mainStockMin;
+  int personalStockMin;
   final String deviceId;
+  bool serialTracking;
   bool active;
 
   String getManifacturer() {
     return this.manifacturer;
   }
 
-  String getSerial() {
-    return this.serial;
+  String getreference() {
+    return this.reference;
   }
 
-  String getAltSerial() {
-    return this.altSerial;
+  String getAltreference() {
+    return this.altreference;
   }
 
-  void setAltSerial(String altSerial) {
-    this.altSerial = altSerial;
+  void setAltreference(String altreference) {
+    this.altreference = altreference;
   }
 
   String getDescription() {
@@ -57,40 +54,32 @@ class Part {
     this.price = price;
   }
 
-  Area getArea() {
-    return this.area;
+  int getmainStockMin() {
+    return this.mainStockMin;
   }
 
-  void setArea(Area area) {
-    this.area = area;
+  void setmainStockMin(int mainStockMin) {
+    this.mainStockMin = mainStockMin;
   }
 
-  int getInStockMainStorage() {
-    return this.inStockMainStorage;
+  int getpersonalStockMin() {
+    return this.personalStockMin;
   }
 
-  void setInStockMainStorage(int inStockMainStorage) {
-    this.inStockMainStorage = inStockMainStorage;
-  }
-
-  int getInStockPersonalStorage() {
-    return this.inStockPersonalStorage;
-  }
-
-  void setInStockPersonalStorage(int inStockPersonalStorage) {
-    this.inStockPersonalStorage = inStockPersonalStorage;
-  }
-
-  int getInStockMinReq() {
-    return this.inStockMinReq;
-  }
-
-  void setInStockMinReq(int inStockMinReq) {
-    this.inStockMinReq = inStockMinReq;
+  void setpersonalStockMin(int personalStockMin) {
+    this.personalStockMin = personalStockMin;
   }
 
   String getDeviceId() {
     return this.deviceId;
+  }
+
+  bool getSerialTracking() {
+    return this.serialTracking;
+  }
+
+  void setSerialTracking(bool serialTracking) {
+    this.serialTracking = serialTracking;
   }
 
   bool isActive() {
@@ -103,37 +92,44 @@ class Part {
 
   Part(
       {@required this.manifacturer,
-      @required this.serial,
+      @required this.reference,
+      this.altreference = "",
       @required this.deviceId,
-      this.model,
-      this.altSerial,
-      this.area,
+      this.model = "",
       @required this.description,
-      this.inStockMainStorage,
-      this.inStockPersonalStorage,
-      this.inStockMinReq,
-      this.price,
-      this.active});
+      this.price = 0.0,
+      this.mainStockMin = 0,
+      this.personalStockMin = 0,
+      this.serialTracking = false,
+      this.active = true});
 
 //TODO: complete this def
   Map<String, dynamic> toJson() => {
         'manifacturer': manifacturer,
-        'serial': serial,
-        'altSerial': altSerial,
-        'model': model,
+        'reference': reference,
+        'altreference': altreference,
         'deviceId': deviceId,
+        'model': model,
         'description': description,
         'price': price,
+        'mainStockMin': mainStockMin,
+        'personalStockMin': personalStockMin,
+        'serialTracking': serialTracking,
+        'active': active,
       };
 
   Part.fromJson(Map<String, dynamic> data)
       : manifacturer = data['manifacturer'],
-        altSerial = data['altSerial'],
-        serial = data['serial'],
-        model = data['model'],
+        reference = data['reference'],
+        altreference = data['altreference'] ?? "",
         deviceId = data['deviceId'],
+        model = data['model'] ?? "",
         description = data['description'],
-        price = data['price'] as double;
+        price = data['price'] as double ?? 0.0,
+        mainStockMin = data['mainStockMin'] ?? 0,
+        personalStockMin = data['personalStockMin'] ?? 0,
+        serialTracking = data['serialTracking'] ?? false,
+        active = data['active'] ?? true;
 
   factory Part.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Part.fromJson(documentSnapshot.data);

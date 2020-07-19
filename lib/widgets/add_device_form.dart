@@ -11,7 +11,7 @@ class AddDeviceForm extends StatefulWidget {
 class _AddDeviceFormState extends State<AddDeviceForm> {
   bool _uploading = false;
   Device _newDevice = Device(
-      manifacturer: "", codeName: "", codeNumber: "", model: "", price: 0.0);
+      manifacturer: "", codeName: "", reference: "", model: "", price: 0.0);
   final _deviceForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
@@ -53,7 +53,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                       _newDevice = Device(
                         manifacturer: val,
                         codeName: _newDevice.codeName,
-                        codeNumber: _newDevice.codeNumber,
+                        reference: _newDevice.reference,
                         model: _newDevice.model,
                         price: _newDevice.price,
                       );
@@ -70,7 +70,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                             _newDevice = Device(
                               manifacturer: _newDevice.manifacturer,
                               codeName: _newDevice.codeName,
-                              codeNumber: val,
+                              reference: val,
                               model: _newDevice.model,
                               price: _newDevice.price,
                             );
@@ -89,7 +89,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                             _newDevice = Device(
                               manifacturer: _newDevice.manifacturer,
                               codeName: val,
-                              codeNumber: _newDevice.codeNumber,
+                              reference: _newDevice.reference,
                               model: _newDevice.model,
                               price: _newDevice.price,
                             );
@@ -109,7 +109,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                             _newDevice = Device(
                               manifacturer: _newDevice.manifacturer,
                               codeName: _newDevice.codeName,
-                              codeNumber: _newDevice.codeNumber,
+                              reference: _newDevice.reference,
                               model: val,
                               price: _newDevice.price,
                             );
@@ -128,7 +128,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                             _newDevice = Device(
                               manifacturer: _newDevice.manifacturer,
                               codeName: _newDevice.codeName,
-                              codeNumber: _newDevice.codeNumber,
+                              reference: _newDevice.reference,
                               model: _newDevice.model,
                               price: double.parse(val),
                             );

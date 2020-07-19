@@ -158,12 +158,13 @@ class _PDFScreenState extends State<PDFScreen> {
         builder: (_) {
           return AddFieldForm(_fieldIndex, _pageIndex, pos.relative);
         });
-    if (f != null)
+    if (f != null) {
       setState(() {
         _fields.add(f);
         _fieldsInPage.add(f);
         _fieldIndex++;
       });
+    }
   }
 
   Future<void> _editField(BuildContext context, Field field) async {

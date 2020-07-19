@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/http_exception.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -24,7 +27,7 @@ class LoginScreen extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -48,7 +51,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SingleChildScrollView(child: AuthForm()),
+              AuthForm(),
             ],
           ),
         ),
@@ -92,98 +95,102 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     TextEditingController _passwordController = TextEditingController();
 
-    return Form(
-      key: _loginKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          TextFormField(
-            decoration: const InputDecoration(
-              icon: Icon(Icons.person),
-              hintText: 'Enter Email',
-              labelText: 'Email',
-            ),
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              //RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
-              RegExp regExp = RegExp(r'^[a-zA-Z0-9]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
-                  caseSensitive: false, multiLine: false);
-
-              if (value.isEmpty || !regExp.hasMatch(value))
-                return 'Insert a valid eMail address';
-              return null;
-            },
-            onSaved: (val) {
-              _authData['email'] = val.trim();
-            },
-          ),
-          TextFormField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              icon: Icon(Icons.lock),
-              hintText: 'Enter Password',
-              labelText: 'Enter Password',
-            ),
-            validator: (value) {
-              if (value.isEmpty) return 'Password cannot be empty';
-              return null;
-            },
-            onSaved: (val) {
-              _authData['password'] = val;
-            },
-          ),
-          if (_signup)
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      child: Form(
+        key: _loginKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
             TextFormField(
               decoration: const InputDecoration(
-                icon: Icon(Icons.lock),
-                hintText: 'Confirm Password',
-                labelText: 'Confirm Password',
+                icon: Icon(Icons.person),
+                hintText: 'Enter Email',
+                labelText: 'Email',
               ),
-              obscureText: true,
+              keyboardType: TextInputType.emailAddress,
               validator: (value) {
-                if (value.isEmpty)
-                  return 'Password cannot be empty';
-                else if (_passwordController.text.compareTo(value) != 0)
-                  return 'Passwords do not match';
+                //RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
+                RegExp regExp = RegExp(r'^[a-zA-Z0-9]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
+                    caseSensitive: false, multiLine: false);
+
+                if (value.isEmpty || !regExp.hasMatch(value))
+                  return 'Insert a valid eMail address';
+                return null;
+              },
+              onSaved: (val) {
+                _authData['email'] = val.trim();
+              },
+            ),
+            TextFormField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.lock),
+                hintText: 'Enter Password',
+                labelText: 'Enter Password',
+              ),
+              validator: (value) {
+                if (value.isEmpty) return 'Password cannot be empty';
                 return null;
               },
               onSaved: (val) {
                 _authData['password'] = val;
               },
             ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: <Widget>[
-                AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        child: getRaisedButton('Signin', !_signup),
-                      ),
-                      Expanded(
-                        child: getRaisedButton('Signup', _signup),
-                      )
-                    ],
-                  ),
+            if (_signup)
+              TextFormField(
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.lock),
+                  hintText: 'Confirm Password',
+                  labelText: 'Confirm Password',
                 ),
-                // GoogleSignInButton(
-                //   onPressed: () async => {
-                //     await _googleSignIn.signIn()
-                //   }, //_authUserWithGoogle(context),
-                //   darkMode: false,
-                //   text: 'Sign in with Google',
-                // ),
-              ],
+                obscureText: true,
+                validator: (value) {
+                  if (value.isEmpty)
+                    return 'Password cannot be empty';
+                  else if (_passwordController.text.compareTo(value) != 0)
+                    return 'Passwords do not match';
+                  return null;
+                },
+                onSaved: (val) {
+                  _authData['password'] = val;
+                },
+              ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                children: <Widget>[
+                  AnimatedContainer(
+                    duration: Duration(seconds: 1),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: getRaisedButton('Signin', !_signup),
+                        ),
+                        Expanded(
+                          child: getRaisedButton('Signup', _signup),
+                        )
+                      ],
+                    ),
+                  ),
+                  // GoogleSignInButton(
+                  //   onPressed: () async => {
+                  //     await _googleSignIn.signIn()
+                  //   }, //_authUserWithGoogle(context),
+                  //   darkMode: false,
+                  //   text: 'Sign in with Google',
+                  // ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

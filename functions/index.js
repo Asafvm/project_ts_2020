@@ -7,27 +7,27 @@ const spawn = require("child-process-promise").spawn;
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
+const { exception } = require("console");
 
-exports.addDevice = functions.https.onCall((data, context) => {
+exports.addDevice = functions.https.onCall(async (data, context) => {
   const devices = admin
     .firestore()
     .collection("username")
     .doc("company")
     .collection("devices");
 
-  return new Promise(async (resolve, reject) => {
-    try {
-      await devices.add(data["device"]);
-      return resolve({
-        success: true,
-      });
-    } catch (reason) {
-      return reject(reason);
-    }
+    var snapshot = await devices.get();
+    snapshot.forEach(doc => {
+      //check for duplicates
+      if (doc.data()["codeName"] === data["device"]["codeName"])
+        //throw error message if found
+        throw new functions.https.HttpsError('already-exists' ,'Device already exists', 'Duplicate code name');
+    });
+    //upload new device
+    await devices.add(data["device"]);
   });
-});
 
-exports.addDeviceInstance = functions.https.onCall((data, context) => {
+exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
   const devices = admin
     .firestore()
     .collection("username")
@@ -36,16 +36,13 @@ exports.addDeviceInstance = functions.https.onCall((data, context) => {
     .doc(data["device_id"])
     .collection("instances")
     .doc(data["device"]["serial"]);
-  return new Promise(async (resolve, reject) => {
-    try {
-      await devices.set(data["device"]);
-      return resolve({
-        success: true,
-      });
-    } catch (reason) {
-      return reject(reason);
-    }
-  });
+  
+  const snapshot = await devices.get();
+  if (snapshot.exists)
+    //throw error message if found
+    throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
+    
+  await devices.set(data["device"]);
 });
 
 exports.addDeviceReport = functions.https.onCall((data, context) => {

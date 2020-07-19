@@ -11,12 +11,19 @@ class AddPartForm extends StatefulWidget {
 class _AddPartFormState extends State<AddPartForm> {
   bool _uploading = false;
   Part _newPart = Part(
-    deviceId: "",
-    manifacturer: "",
-    serial: "",
-    description: "",
-  );
-  final _PartForm = GlobalKey<FormState>();
+      manifacturer: "",
+      reference: "",
+      altreference: "",
+      deviceId: "",
+      model: "",
+      description: "",
+      price: 0.0,
+      mainStockMin: 0,
+      personalStockMin: 0,
+      serialTracking: false,
+      active: true);
+
+  final _partForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
       String label, TextInputType type, Function onSave) {
@@ -45,14 +52,14 @@ class _AddPartFormState extends State<AddPartForm> {
                 right: 15,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 10),
             child: Form(
-              //TODO: recycler the addDevice form
-              key: _PartForm,
+              //TODO: recycle the addDevice form
+              key: _partForm,
               child: Column(
                 // mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   _buildTextFormField(
-                    "Manifacturer",
+                    "Description",
                     TextInputType.text,
                     (val) {},
                   ),
@@ -61,7 +68,7 @@ class _AddPartFormState extends State<AddPartForm> {
                       Flexible(
                         flex: 3,
                         child: _buildTextFormField(
-                          "Code Number",
+                          "Reference",
                           TextInputType.text,
                           (val) {},
                         ),
@@ -72,7 +79,7 @@ class _AddPartFormState extends State<AddPartForm> {
                       Flexible(
                         flex: 3,
                         child: _buildTextFormField(
-                          'Code Name',
+                          'Alternative Reference',
                           TextInputType.text,
                           (val) {},
                         ),
@@ -84,7 +91,30 @@ class _AddPartFormState extends State<AddPartForm> {
                       Flexible(
                         flex: 3,
                         child: _buildTextFormField(
-                          "Model",
+                          "Manifacturer",
+                          TextInputType.text,
+                          (val) {},
+                        ),
+                      ),
+                      Spacer(
+                        flex: 1,
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: _buildTextFormField(
+                          'Model',
+                          TextInputType.text,
+                          (val) {},
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 3,
+                        child: _buildTextFormField(
+                          "Target Device",
                           TextInputType.text,
                           (val) {},
                         ),
@@ -102,11 +132,57 @@ class _AddPartFormState extends State<AddPartForm> {
                       ),
                     ],
                   ),
+                  Row(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 3,
+                        child: _buildTextFormField(
+                          "Main Storage Min",
+                          TextInputType.text,
+                          (val) {},
+                        ),
+                      ),
+                      Spacer(
+                        flex: 1,
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: _buildTextFormField(
+                          'Personal Strorage Min',
+                          TextInputType.text,
+                          (val) {},
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 3,
+                        child: _buildTextFormField(
+                          "Track Serials",
+                          TextInputType.text,
+                          (val) {},
+                        ),
+                      ),
+                      Spacer(
+                        flex: 1,
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: _buildTextFormField(
+                          'Active',
+                          TextInputType.text,
+                          (val) {},
+                        ),
+                      ),
+                    ],
+                  ),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          _PartForm.currentState.save();
+                          _partForm.currentState.save();
                           setState(() {
                             _uploading = true;
                           });

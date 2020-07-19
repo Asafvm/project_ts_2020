@@ -81,7 +81,6 @@ class _DeviceListItemState extends State<DeviceInstanceListItem> {
                         tooltip: 'Show All',
                         icon: Icon(Icons.arrow_forward_ios),
                         onPressed: () {
-                          //TODO: build devices list screen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
