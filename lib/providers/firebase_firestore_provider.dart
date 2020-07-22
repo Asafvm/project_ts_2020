@@ -36,8 +36,8 @@ class FirebaseFirestoreProvider {
   }
 
   Future<void> uploadPart(Part _newPart) async {
-    // await CloudFunctions.instance
-    //     .getHttpsCallable(functionName: "addPart")
-    //     .call(<String, dynamic>{"part": _newPart.toJson()});
+    await CloudFunctions.instance
+        .getHttpsCallable(functionName: "addPart")
+        .call(<String, dynamic>{"part": _newPart.toJson()});
   }
 }

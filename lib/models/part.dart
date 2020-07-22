@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class Part {
-  final String manifacturer;
-  final String reference;
+  String manifacturer;
+  String reference;
   String altreference;
   String description;
   String model;
   double price;
   int mainStockMin;
   int personalStockMin;
-  final String deviceId;
+  String deviceId;
   bool serialTracking;
   bool active;
 
@@ -18,8 +18,16 @@ class Part {
     return this.manifacturer;
   }
 
+  void setManifacturer(String manifacturer) {
+    this.manifacturer = manifacturer;
+  }
+
   String getreference() {
     return this.reference;
+  }
+
+  void setReference(String reference) {
+    this.reference = reference;
   }
 
   String getAltreference() {
@@ -72,6 +80,10 @@ class Part {
 
   String getDeviceId() {
     return this.deviceId;
+  }
+
+  void setDeviceId(String deviceId) {
+    this.deviceId = deviceId;
   }
 
   bool getSerialTracking() {

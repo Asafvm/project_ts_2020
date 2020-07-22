@@ -24,13 +24,21 @@ class _AddPartFormState extends State<AddPartForm> {
       active: true);
 
   final _partForm = GlobalKey<FormState>();
+  var _isTracking = false;
+  var _isActive = true;
 
   Widget _buildTextFormField(
       String label, TextInputType type, Function onSave) {
-    return TextFormField(
-      decoration: InputDecoration(labelText: label),
-      keyboardType: type,
-      onSaved: onSave,
+    return Flexible(
+      flex: 3,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 10),
+        child: TextFormField(
+          decoration: InputDecoration(labelText: label),
+          keyboardType: type,
+          onSaved: onSave,
+        ),
+      ),
     );
   }
 
@@ -58,123 +66,111 @@ class _AddPartFormState extends State<AddPartForm> {
                 // mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  _buildTextFormField(
-                    "Description",
-                    TextInputType.text,
-                    (val) {},
-                  ),
+                  TextFormField(
+                      decoration: InputDecoration(labelText: "Description"),
+                      keyboardType: TextInputType.text,
+                      onSaved: (val) {
+                        _newPart.setDescription(val);
+                      }),
                   Row(
                     children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Reference",
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        "Reference",
+                        TextInputType.text,
+                        (val) {
+                          _newPart.setReference(val);
+                        },
                       ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          'Alternative Reference',
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        'Alternative Reference',
+                        TextInputType.text,
+                        (val) {
+                          _newPart.setAltreference(val);
+                        },
                       ),
                     ],
                   ),
                   Row(
                     children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Manifacturer",
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        "Manifacturer",
+                        TextInputType.text,
+                        (val) {
+                          _newPart.setManifacturer(val);
+                        },
                       ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          'Model',
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        'Model',
+                        TextInputType.text,
+                        (val) {
+                          _newPart.setModel(val);
+                        },
                       ),
                     ],
                   ),
                   Row(
                     children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Target Device",
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        "Target Device",
+                        TextInputType.text,
+                        (val) {
+                          _newPart.setDeviceId(val);
+                        },
                       ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "price",
-                          TextInputType.numberWithOptions(decimal: true),
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        "price",
+                        TextInputType.numberWithOptions(decimal: true),
+                        (val) {
+                          var price = double.tryParse(val);
+                          _newPart.setPrice(price == null ? 0.0 : price);
+                        },
                       ),
                     ],
                   ),
                   Row(
                     children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Main Storage Min",
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        "Main Storage Min",
+                        TextInputType.number,
+                        (val) {
+                          int min = int.tryParse(val);
+                          _newPart.setmainStockMin(min == null ? 0 : min);
+                        },
                       ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          'Personal Strorage Min',
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      _buildTextFormField(
+                        'Personal Storage Min',
+                        TextInputType.number,
+                        (val) {
+                          int min = int.tryParse(val);
+                          _newPart.setpersonalStockMin(min == null ? 0 : min);
+                        },
                       ),
                     ],
                   ),
                   Row(
                     children: <Widget>[
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          "Track Serials",
-                          TextInputType.text,
-                          (val) {},
+                      Expanded(
+                        child: SwitchListTile(
+                          title: Text("Track Serials"),
+                          value: _isTracking,
+                          onChanged: (val) {
+                            setState(() {
+                              _isTracking = val;
+                              _newPart.serialTracking = val;
+                            });
+                          },
                         ),
                       ),
-                      Spacer(
-                        flex: 1,
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: _buildTextFormField(
-                          'Active',
-                          TextInputType.text,
-                          (val) {},
-                        ),
+                      Expanded(
+                        child: SwitchListTile(
+                            title: Text("Active"),
+                            value: _isActive,
+                            onChanged: (val) {
+                              setState(() {
+                                _isActive = val;
+                                _newPart.setActive(val);
+                              });
+                            }),
                       ),
                     ],
                   ),

@@ -25,6 +25,24 @@ exports.addDevice = functions.https.onCall(async (data, context) => {
     });
     //upload new device
     await devices.add(data["device"]);
+});
+  
+exports.addPart = functions.https.onCall(async (data, context) => {
+  const parts = admin
+    .firestore()
+    .collection("username")
+    .doc("company")
+    .collection("parts");
+
+    var snapshot = await parts.get();
+    // snapshot.forEach(doc => {
+    //   //check for duplicates
+    //   if (doc.data()["reference"] === data["part"]["reference"])
+    //     //throw error message if found
+    //     throw new functions.https.HttpsError('already-exists' ,'Part already exists', 'Duplicate reference code');
+    // });
+    //upload new device
+    await parts.add(data["part"]);
   });
 
 exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
