@@ -17,8 +17,7 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceList =
-        Provider.of<List<DocumentSnapshot>>(context, listen: true);
+    final deviceList = Provider.of<List<Device>>(context, listen: true);
 
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +32,7 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
         child: ListView.builder(
           key: new Key(randomString(20)),
           itemBuilder: (ctx, index) =>
-              DeviceListItem(Icons.computer, ctx, deviceList[index]),
+              DeviceListItem(Icons.computer, ctx, deviceList.elementAt(index)),
           itemCount: deviceList == null ? 0 : deviceList.length,
         ),
       ),

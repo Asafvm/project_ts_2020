@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/device.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
@@ -20,14 +21,26 @@ class TeamShare extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Authentication(),
         ),
-        StreamProvider<List<DocumentSnapshot>>.value(
-          value: Firestore.instance
+        StreamProvider<List<Device>>(
+          create: (ctx) => Firestore.instance
               .collection('username')
               .document("company")
               .collection("devices")
               .snapshots()
-              .map((list) => list.documents),
-        ),
+              .map(
+                (query) => query.documents
+                    .map(
+                      (doc) => Device.fromFirestore(doc),
+                    )
+                    .toList(),
+              ),
+          catchError: (context, error) {
+            print("${error.toString()}");
+            return null;
+          },
+        )
+        //.map((list) => list.documents),
+        ,
         StreamProvider<List<DocumentSnapshot>>.value(
           value: Firestore.instance
               .collection('username')

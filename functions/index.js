@@ -19,12 +19,12 @@ exports.addDevice = functions.https.onCall(async (data, context) => {
     var snapshot = await devices.get();
     snapshot.forEach(doc => {
       //check for duplicates
-      if (doc.data()["codeName"] === data["device"]["codeName"])
+      if (doc.id === data["device"]["codeName"])
         //throw error message if found
         throw new functions.https.HttpsError('already-exists' ,'Device already exists', 'Duplicate code name');
     });
     //upload new device
-    await devices.add(data["device"]);
+    await devices.doc(data["device"]["codeName"]).set(data["device"]);
 });
   
 exports.addPart = functions.https.onCall(async (data, context) => {

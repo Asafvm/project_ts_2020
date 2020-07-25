@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/device.dart';
 import 'package:teamshare/widgets/add_device_instance_form.dart';
 
 class DeviceListScreen extends StatefulWidget {
-  final DocumentSnapshot deviceDoc;
+  final Device deviceDoc;
   DeviceListScreen(this.deviceDoc);
 
   @override
@@ -14,12 +15,11 @@ class DeviceListScreen extends StatefulWidget {
 class _DeviceListScreenState extends State<DeviceListScreen> {
   @override
   Widget build(BuildContext context) {
-    final deviceList =
-        Provider.of<List<DocumentSnapshot>>(context, listen: true);
+    final deviceList = Provider.of<List<Device>>(context, listen: true);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.deviceDoc.data['codeName']),
+        title: Text(widget.deviceDoc.getCodeName()),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.add),
@@ -41,7 +41,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
     showModalBottomSheet(
         context: ctx,
         builder: (_) {
-          return AddDeviceInstanceForm(widget.deviceDoc.documentID);
+          return AddDeviceInstanceForm(widget.deviceDoc.getCodeName());
         });
     setState(() {});
   }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/screens/device_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
@@ -8,23 +9,16 @@ import 'package:teamshare/screens/pdf_viewer_page.dart';
 class DeviceListItem extends StatefulWidget {
   final IconData icon;
   final BuildContext ctx;
-  final DocumentSnapshot document;
-  DeviceListItem(this.icon, this.ctx, this.document);
+  final Device device;
+  DeviceListItem(this.icon, this.ctx, this.device);
 
   @override
   _DeviceListItemState createState() => _DeviceListItemState();
 }
 
 class _DeviceListItemState extends State<DeviceListItem> {
-  var deviceDoc;
   Color _bgcolor = Colors.white;
   bool _selected = false;
-
-  @override
-  void initState() {
-    deviceDoc = widget.document;
-    super.initState();
-  }
 
   void _setSelected() {
     setState(() {
@@ -46,8 +40,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
               leading: CircleAvatar(
                 child: Icon(widget.icon),
               ),
-              title: Text(deviceDoc.data['codeName']),
-              subtitle: Text(deviceDoc.data['codeNumber']),
+              title: Text(widget.device.getCodeName()),
+              subtitle: Text(widget.device.getReference()),
               trailing: FittedBox(
                 child: Row(
                   //buttons
@@ -70,8 +64,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
                           MaterialPageRoute(
                             builder: (context) => PDFScreen(
                                 filePath,
-                                deviceDoc.documentID,
-                                deviceDoc.data["codeName"],
+                                widget.device.getCodeName(),
+                                widget.device.getCodeName(),
                                 null), //documentID = device document id
                           ),
                         );
@@ -86,7 +80,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => DeviceListScreen(
-                                widget.document,
+                                widget.device,
                               ), //documentID = device document id
                             ),
                           );
@@ -99,7 +93,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
         ),
         StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
-              .document(widget.document.reference.path)
+              .document(widget.device.getCodeName())
               .collection('reports')
               .snapshots()
               .map((list) => list.documents),
@@ -129,8 +123,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
                                 builder: (context) => PDFScreen(
                                     snapshot.data[index].documentID +
                                         ".pdf", //TODO: get file path from device automaticly,
-                                    deviceDoc.documentID,
-                                    deviceDoc.data["codeName"],
+                                    widget.device.getCodeName(),
+                                    widget.device.getCodeName(),
                                     snapshot.data[index].data.entries
                                         .map((e) => Field.fromJson(
                                             e.value.cast<String, dynamic>()))

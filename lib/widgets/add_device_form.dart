@@ -10,8 +10,7 @@ class AddDeviceForm extends StatefulWidget {
 
 class _AddDeviceFormState extends State<AddDeviceForm> {
   bool _uploading = false;
-  Device _newDevice = Device(
-      manifacturer: "", codeName: "", reference: "", model: "", price: 0.0);
+  Device _newDevice;
   final _deviceForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
@@ -21,6 +20,12 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
       keyboardType: type,
       onSaved: onSave,
     );
+  }
+
+  @override
+  void initState() {
+    _newDevice = Device();
+    super.initState();
   }
 
   @override
@@ -50,13 +55,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                     "Manifacturer",
                     TextInputType.text,
                     (val) {
-                      _newDevice = Device(
-                        manifacturer: val,
-                        codeName: _newDevice.codeName,
-                        reference: _newDevice.reference,
-                        model: _newDevice.model,
-                        price: _newDevice.price,
-                      );
+                      _newDevice.setManifacturer(val);
                     },
                   ),
                   Row(
@@ -67,13 +66,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           "Code Number",
                           TextInputType.text,
                           (val) {
-                            _newDevice = Device(
-                              manifacturer: _newDevice.manifacturer,
-                              codeName: _newDevice.codeName,
-                              reference: val,
-                              model: _newDevice.model,
-                              price: _newDevice.price,
-                            );
+                            _newDevice.setReference(val);
                           },
                         ),
                       ),
@@ -86,13 +79,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           'Code Name',
                           TextInputType.text,
                           (val) {
-                            _newDevice = Device(
-                              manifacturer: _newDevice.manifacturer,
-                              codeName: val,
-                              reference: _newDevice.reference,
-                              model: _newDevice.model,
-                              price: _newDevice.price,
-                            );
+                            _newDevice.setCodeName(val);
                           },
                         ),
                       ),
@@ -106,13 +93,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           "Model",
                           TextInputType.text,
                           (val) {
-                            _newDevice = Device(
-                              manifacturer: _newDevice.manifacturer,
-                              codeName: _newDevice.codeName,
-                              reference: _newDevice.reference,
-                              model: val,
-                              price: _newDevice.price,
-                            );
+                            _newDevice.setModel(val);
                           },
                         ),
                       ),
@@ -125,13 +106,8 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           "price",
                           TextInputType.numberWithOptions(decimal: true),
                           (val) {
-                            _newDevice = Device(
-                              manifacturer: _newDevice.manifacturer,
-                              codeName: _newDevice.codeName,
-                              reference: _newDevice.reference,
-                              model: _newDevice.model,
-                              price: double.parse(val),
-                            );
+                            double price = double.tryParse(val);
+                            _newDevice.setPrice(price == null ? 0.0 : price);
                           },
                         ),
                       ),
@@ -141,48 +117,50 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          _deviceForm.currentState.save();
-                          setState(() {
-                            _uploading = true;
-                          });
-                          //send to server
-                          try {
-                            await FirebaseFirestoreProvider()
-                                .uploadDevice(_newDevice)
-                                .then((_) async => await showDialog(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                              title: Text('Success!'),
-                                              content:
-                                                  Text('New device created!\n'),
-                                              actions: <Widget>[
-                                                FlatButton(
-                                                  onPressed:
-                                                      Navigator.of(context).pop,
-                                                  child: Text('Ok'),
-                                                ),
-                                              ],
-                                            ))
-                                    .then((_) => Navigator.of(context).pop()));
-                          } catch (error) {
-                            showDialog(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                      title: Text('Error!'),
-                                      content: Text('Operation failed\n' +
-                                          error.toString()),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          onPressed: Navigator.of(context).pop,
-                                          child: Text('Ok'),
-                                        ),
-                                      ],
-                                    ));
-                          } finally {
+                          if (_deviceForm.currentState.validate()) {
+                            _deviceForm.currentState.save();
                             setState(() {
-                              _newDevice = null;
-                              _uploading = false;
+                              _uploading = true;
                             });
+                            //send to server
+                            try {
+                              await FirebaseFirestoreProvider()
+                                  .uploadDevice(_newDevice)
+                                  .then((_) async => await showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                            title: Text('Success!'),
+                                            content:
+                                                Text('New device created!\n'),
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                onPressed:
+                                                    Navigator.of(context).pop,
+                                                child: Text('Ok'),
+                                              ),
+                                            ],
+                                          )).then(
+                                      (_) => Navigator.of(context).pop()));
+                            } catch (error) {
+                              showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                        title: Text('Error!'),
+                                        content: Text('Operation failed\n' +
+                                            error.toString()),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            onPressed:
+                                                Navigator.of(context).pop,
+                                            child: Text('Ok'),
+                                          ),
+                                        ],
+                                      ));
+                            } finally {
+                              setState(() {
+                                _uploading = false;
+                              });
+                            }
                           }
                         },
                         child: Text(

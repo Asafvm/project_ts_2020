@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/screens/device_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
@@ -8,7 +9,7 @@ import 'package:teamshare/screens/pdf_viewer_page.dart';
 class DeviceInstanceListItem extends StatefulWidget {
   final IconData icon;
   final BuildContext ctx;
-  final DocumentSnapshot document;
+  final Device document;
   DeviceInstanceListItem(this.icon, this.ctx, this.document);
 
   @override
@@ -99,7 +100,7 @@ class _DeviceListItemState extends State<DeviceInstanceListItem> {
         StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
               .collection('test')
-              .document(widget.document.documentID)
+              .document(widget.document.getCodeName())
               .collection('reports')
               .snapshots()
               .map((list) => list.documents),
