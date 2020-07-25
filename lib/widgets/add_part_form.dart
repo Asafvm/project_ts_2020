@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
@@ -46,8 +47,7 @@ class _AddPartFormState extends State<AddPartForm> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceList =
-        Provider.of<List<DocumentSnapshot>>(context, listen: true);
+    final deviceList = Provider.of<List<Device>>(context, listen: true);
     return _uploading
         ? Center(
             child: Padding(
@@ -114,13 +114,14 @@ class _AddPartFormState extends State<AddPartForm> {
                   ),
                   Row(
                     children: <Widget>[
-                      Flexible(
+                      Expanded(
                         flex: 3,
                         child: DropdownButton(
                             items: deviceList
-                                .map((e) =>
-                                    DropdownMenuItem(child: e['codeName']))
+                                .map((e) => DropdownMenuItem(
+                                    child: Text(e.getCodeName())))
                                 .toList(),
+                            //TODO: update value
                             onChanged: (val) {}),
                       ),
                       // _buildTextFormField(
