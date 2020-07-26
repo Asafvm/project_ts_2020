@@ -18,4 +18,8 @@ class DeviceInstance {
   factory DeviceInstance.fromFirestore(DocumentSnapshot documentSnapshot) {
     return DeviceInstance.fromJson(documentSnapshot.data);
   }
+
+  String get getSerial {
+    return this.serial;
+  }
 }

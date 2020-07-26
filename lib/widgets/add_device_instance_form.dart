@@ -3,8 +3,8 @@ import 'package:teamshare/models/device_instance.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddDeviceInstanceForm extends StatefulWidget {
-  final String deviceDocID;
-  AddDeviceInstanceForm(this.deviceDocID);
+  final String deviceCodeName;
+  AddDeviceInstanceForm(this.deviceCodeName);
 
   @override
   _AddDeviceInstanceFormState createState() => _AddDeviceInstanceFormState();
@@ -12,7 +12,7 @@ class AddDeviceInstanceForm extends StatefulWidget {
 
 class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
   bool _uploading = false;
-  DeviceInstance _newDevice = DeviceInstance("0");
+  DeviceInstance _newInstDevice = DeviceInstance("0");
 
   final _deviceForm = GlobalKey<FormState>();
 
@@ -51,7 +51,7 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
                     "Serial",
                     TextInputType.text,
                     (val) {
-                      _newDevice = DeviceInstance(val);
+                      _newInstDevice = DeviceInstance(val);
                     },
                   ),
                   Container(
@@ -66,7 +66,7 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
                           try {
                             await FirebaseFirestoreProvider()
                                 .uploadDeviceInstance(
-                                    _newDevice, widget.deviceDocID)
+                                    _newInstDevice, widget.deviceCodeName)
                                 .then((_) => Navigator.of(context).pop());
                           } catch (error) {
                             showDialog(

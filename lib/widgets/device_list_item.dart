@@ -91,9 +91,12 @@ class _DeviceListItemState extends State<DeviceListItem> {
             ),
           ),
         ),
+
+        //list of related reports for selected device
         StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
-              .document(widget.device.getCodeName())
+              .document(
+                  "username/company/devices/${widget.device.getCodeName()}")
               .collection('reports')
               .snapshots()
               .map((list) => list.documents),

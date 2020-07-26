@@ -55,12 +55,12 @@ exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
     .collection("instances")
     .doc(data["device"]["serial"]);
   
-  const snapshot = await devices.get();
-  if (snapshot.exists)
-    //throw error message if found
-    throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
+  // const snapshot = await devices.get();
+  // if (snapshot.exists)
+  //   //throw error message if found
+  //   throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
     
-  await devices.set(data["device"]);
+  await devices.create(data["device"]);
 });
 
 exports.addDeviceReport = functions.https.onCall((data, context) => {

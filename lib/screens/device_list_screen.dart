@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/device.dart';
+import 'package:teamshare/models/device_instance.dart';
 import 'package:teamshare/widgets/add_device_instance_form.dart';
+import 'package:teamshare/widgets/device_instance_list_item.dart';
 
 class DeviceListScreen extends StatefulWidget {
-  final Device deviceDoc;
-  DeviceListScreen(this.deviceDoc);
+  final Device device;
+  DeviceListScreen(this.device);
 
   @override
   _DeviceListScreenState createState() => _DeviceListScreenState();
@@ -15,11 +17,9 @@ class DeviceListScreen extends StatefulWidget {
 class _DeviceListScreenState extends State<DeviceListScreen> {
   @override
   Widget build(BuildContext context) {
-    final deviceList = Provider.of<List<Device>>(context, listen: true);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.deviceDoc.getCodeName()),
+        title: Text(widget.device.getCodeName()),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.add),
@@ -28,10 +28,27 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: ListView.builder(
-          itemBuilder: (ctx, index) =>
-              Container(), //DeviceInstanceListItem(Icons.computer, ctx, deviceList[index]),
-          itemCount: deviceList == null ? 0 : deviceList.length,
+        child: StreamBuilder<List<DocumentSnapshot>>(
+          stream: Firestore.instance
+              .document(
+                  "username/company/devices/${widget.device.getCodeName()}")
+              .collection('instances')
+              .snapshots()
+              .map((list) => list.documents),
+          builder: (context, snapshot) {
+            if (snapshot == null || snapshot.data == null) {
+              return Container();
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (ctx, index) => DeviceInstanceListItem(
+                  Icons.computer,
+                  ctx,
+                  DeviceInstance.fromFirestore(snapshot.data[index]),
+                ),
+              );
+            }
+          },
         ),
       ),
     );
@@ -41,7 +58,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
     showModalBottomSheet(
         context: ctx,
         builder: (_) {
-          return AddDeviceInstanceForm(widget.deviceDoc.getCodeName());
+          return AddDeviceInstanceForm(widget.device.getCodeName());
         });
     setState(() {});
   }
