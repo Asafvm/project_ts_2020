@@ -59,37 +59,79 @@ class _AddPartFormState extends State<AddPartForm> {
           )
         : SingleChildScrollView(
             padding: EdgeInsets.only(
-                left: 15,
-                top: 5,
-                right: 15,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+                left: 5,
+                right: 5,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20),
             child: Form(
-              //TODO: recycle the addDevice form
               key: _partForm,
               child: Column(
-                // mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  TextFormField(
-                      decoration: InputDecoration(labelText: "Description"),
-                      keyboardType: TextInputType.text,
-                      onSaved: (val) {
-                        _newPart.setDescription(val);
-                      }),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: IconButton(
+                            icon: Icon(Icons.add_a_photo),
+                            iconSize: 50,
+                            onPressed: () {}),
+                      ),
+                      Flexible(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextFormField(
+                                scrollPadding:
+                                    EdgeInsets.symmetric(horizontal: 5),
+                                decoration:
+                                    InputDecoration(labelText: "Description"),
+                                keyboardType: TextInputType.text,
+                                onSaved: (val) {
+                                  _newPart.setDescription(val);
+                                }),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                _buildTextFormField(
+                                  "Reference",
+                                  TextInputType.text,
+                                  (val) {
+                                    _newPart.setReference(val);
+                                  },
+                                ),
+                                _buildTextFormField(
+                                  'Alt. Reference',
+                                  TextInputType.text,
+                                  (val) {
+                                    _newPart.setAltreference(val);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                   Row(
                     children: <Widget>[
                       _buildTextFormField(
-                        "Reference",
-                        TextInputType.text,
+                        "Main Storage Min",
+                        TextInputType.number,
                         (val) {
-                          _newPart.setReference(val);
+                          int min = int.tryParse(val);
+                          _newPart.setmainStockMin(min == null ? 0 : min);
                         },
                       ),
                       _buildTextFormField(
-                        'Alternative Reference',
-                        TextInputType.text,
+                        'Personal Storage Min',
+                        TextInputType.number,
                         (val) {
-                          _newPart.setAltreference(val);
+                          int min = int.tryParse(val);
+                          _newPart.setpersonalStockMin(min == null ? 0 : min);
                         },
                       ),
                     ],
@@ -116,13 +158,18 @@ class _AddPartFormState extends State<AddPartForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 3,
-                        child: DropdownButton(
-                            items: deviceList
-                                .map((e) => DropdownMenuItem(
-                                    child: Text(e.getCodeName())))
-                                .toList(),
-                            //TODO: update value
-                            onChanged: (val) {}),
+                        child: deviceList == null
+                            ? Text(
+                                "No devices listed",
+                                style: TextStyle(color: Colors.red),
+                              )
+                            : DropdownButton(
+                                items: deviceList
+                                    .map((e) => DropdownMenuItem(
+                                          child: Text(e.getCodeName()),
+                                        ))
+                                    .toList(),
+                                onChanged: (val) {}),
                       ),
                       // _buildTextFormField(
                       //   "Target Device",
@@ -137,26 +184,6 @@ class _AddPartFormState extends State<AddPartForm> {
                         (val) {
                           var price = double.tryParse(val);
                           _newPart.setPrice(price == null ? 0.0 : price);
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _buildTextFormField(
-                        "Main Storage Min",
-                        TextInputType.number,
-                        (val) {
-                          int min = int.tryParse(val);
-                          _newPart.setmainStockMin(min == null ? 0 : min);
-                        },
-                      ),
-                      _buildTextFormField(
-                        'Personal Storage Min',
-                        TextInputType.number,
-                        (val) {
-                          int min = int.tryParse(val);
-                          _newPart.setpersonalStockMin(min == null ? 0 : min);
                         },
                       ),
                     ],

@@ -13,8 +13,10 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text("Team Share"),), 
-        drawer: CustomDrawer(),
+        appBar: AppBar(
+          title: Text("Team Share"),
+        ),
+        //drawer: CustomDrawer(),
         body: Center(child: Text('Main View')),
       ),
     );

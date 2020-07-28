@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/device_instance.dart';
 import 'package:teamshare/widgets/add_device_instance_form.dart';
