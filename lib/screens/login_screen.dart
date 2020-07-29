@@ -7,8 +7,8 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var headerText = Container(
-      margin: EdgeInsets.only(top: 40),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      //margin: EdgeInsets.only(top: 40),
+      //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
@@ -17,7 +17,7 @@ class LoginScreen extends StatelessWidget {
               fontSize: 52, fontWeight: FontWeight.bold, color: Colors.white),
           children: [
             TextSpan(
-              text: 'Big Solution for Small Buisness',
+              text: 'Insert a slogan here',
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.normal,
@@ -28,19 +28,24 @@ class LoginScreen extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
-      body:
-          //TEXT HEADER
-          Container(
-        decoration: BoxDecoration(color: Colors.blueGrey[800]),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              headerText,
-              AuthForm(),
-            ]),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.blueGrey[800],
+        body: ConstrainedBox(
+          constraints:
+              BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+          child: Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  headerText,
+                  AuthForm(),
+                ]),
+          ),
+        ),
       ),
     );
   }

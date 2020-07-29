@@ -17,7 +17,22 @@ class _MainScreenState extends State<MainScreen> {
           title: Text("Team Share"),
         ),
         //drawer: CustomDrawer(),
-        body: Center(child: Text('Main View')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RaisedButton.icon(,
+                  onPressed: () {},
+                  icon: Icon(Icons.group),
+                  label: Text("Join a team")),
+              Text("Or"),
+              RaisedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.create),
+                  label: Text("Create a team")),
+            ],
+          ),
+        ),
       ),
     );
   }
