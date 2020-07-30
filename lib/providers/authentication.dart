@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
-import 'package:teamshare/providers/http_exception.dart';
 
 class Authentication with ChangeNotifier {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;

@@ -12,10 +12,19 @@ class LoginScreen extends StatelessWidget {
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          text: 'Team Share\n',
+          text: 'Team',
           style: TextStyle(
-              fontSize: 52, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 52,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[700]),
           children: [
+            TextSpan(
+              text: 'Share\n',
+              style: TextStyle(
+                  fontSize: 52,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[400]),
+            ),
             TextSpan(
               text: 'Insert a slogan here',
               style: TextStyle(
@@ -30,20 +39,21 @@ class LoginScreen extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.blueGrey[800],
+        backgroundColor: Colors.blueGrey[900],
         body: ConstrainedBox(
           constraints:
               BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(25),
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  headerText,
-                  AuthForm(),
-                ]),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                headerText,
+                AuthForm(),
+              ],
+            ),
           ),
         ),
       ),

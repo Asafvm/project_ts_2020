@@ -115,7 +115,6 @@ class Part {
       this.serialTracking = false,
       this.active = true});
 
-//TODO: complete this def
   Map<String, dynamic> toJson() => {
         'manifacturer': manifacturer,
         'reference': reference,

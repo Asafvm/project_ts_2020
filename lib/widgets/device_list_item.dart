@@ -47,13 +47,6 @@ class _DeviceListItemState extends State<DeviceListItem> {
                   //buttons
                   children: <Widget>[
                     IconButton(
-                      icon: Icon(Icons.add_to_queue),
-                      tooltip: 'Add new device',
-                      onPressed: () {
-                        //TODO: build add device form
-                      },
-                    ),
-                    IconButton(
                       icon: Icon(Icons.picture_as_pdf),
                       tooltip: 'Add new form',
                       onPressed: () async {
@@ -72,19 +65,19 @@ class _DeviceListItemState extends State<DeviceListItem> {
                       },
                     ),
                     IconButton(
-                        tooltip: 'Show All',
-                        icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: () {
-                          //TODO: build devices list screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DeviceListScreen(
-                                widget.device,
-                              ), //documentID = device document id
-                            ),
-                          );
-                        })
+                      tooltip: 'Show All',
+                      icon: Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeviceListScreen(
+                              widget.device,
+                            ), //documentID = device document id
+                          ),
+                        );
+                      },
+                    )
                   ],
                 ),
               ),

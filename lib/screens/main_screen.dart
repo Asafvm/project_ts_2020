@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/widgets/custom_drawer.dart';
+import 'package:teamshare/screens/team_create_screen.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/main_screen';
@@ -21,13 +21,17 @@ class _MainScreenState extends State<MainScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              RaisedButton.icon(,
+              RaisedButton.icon(
                   onPressed: () {},
                   icon: Icon(Icons.group),
                   label: Text("Join a team")),
               Text("Or"),
               RaisedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => TeamCreateScreen()),
+                    );
+                  },
                   icon: Icon(Icons.create),
                   label: Text("Create a team")),
             ],

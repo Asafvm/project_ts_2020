@@ -11,6 +11,8 @@
     <!-- Required to read and write documents from device storage -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> 
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />  
 
     <application android:requestLegacyExternalStorage="true"
         android:name="io.flutter.app.FlutterApplication"

@@ -1,10 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/device_instance.dart';
-import 'package:teamshare/models/field.dart';
-import 'package:teamshare/screens/device_list_screen.dart';
-import 'package:teamshare/screens/pdf_viewer_page.dart';
 
 class DeviceInstanceListItem extends StatefulWidget {
   final IconData icon;

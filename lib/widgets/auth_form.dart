@@ -57,7 +57,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
 
     return _logging
         ? FittedBox(
-            fit: BoxFit.scaleDown,
+            fit: BoxFit.none,
             child: CircularProgressIndicator(
               strokeWidth: 3,
             ),
@@ -149,10 +149,13 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                Text(
-                  "Forgot password?",
-                  style: TextStyle(color: Theme.of(context).accentColor),
-                  textAlign: TextAlign.start,
+                FlatButton(
+                  child: Text(
+                    "Forgot password?",
+                    style: TextStyle(color: Theme.of(context).accentColor),
+                    textAlign: TextAlign.start,
+                  ),
+                  onPressed: () {},
                 ),
               ],
             ),
