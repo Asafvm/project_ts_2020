@@ -1,10 +1,13 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/providers/authentication.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
 Iterable<Contact> contacts;
-String _teamName = "";
+String _name = "";
+String _description = "";
 
 class TeamCreateScreen extends StatefulWidget {
   @override
@@ -85,16 +88,19 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                       child: Column(
                         children: [
                           TextFormField(
-                            initialValue: _teamName,
+                            initialValue: _name,
                             decoration: InputDecoration(
                               labelText: "Team name",
                             ),
                             maxLines: 1,
-                            onChanged: (value) => {_teamName = value},
+                            onChanged: (value) => {_name = value},
                           ),
                           TextFormField(
+                            initialValue: _description,
                             decoration:
                                 InputDecoration(labelText: "Description"),
+                            maxLines: 1,
+                            onChanged: (value) => {_description = value},
                           ),
                         ],
                       ),
@@ -127,7 +133,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
     setState(() {
       _currentStep = step;
     });
-    print(_currentStep);
   }
 
   void _createTeam() {
@@ -135,12 +140,27 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Confirm"),
-        content: Text("Create $_teamName?"),
+        content: Text("Create $_name?"),
         actions: [
           FlatButton(
-            onPressed: () => {
-              Navigator.of(context).pop(),
-              //TODO: add to firebase
+            onPressed: () async => {
+              await CloudFunctions.instance
+                  .getHttpsCallable(functionName: "addTeam")
+                  .call(<String, dynamic>{
+                    "name": _name,
+                    "description": _description,
+                    "creatorEmail": await Authentication().userEmail,
+                    "creatorName": await Authentication().userName,
+                  })
+                  .then((value) => print("Team Created"))
+                  .catchError(
+                      (e) => print("Failed to create team. ${e.toString()}"))
+                  .whenComplete(
+                    () => Navigator.of(context).pop(),
+                  )
+                  .then(
+                    (value) => Navigator.of(context).pop(),
+                  )
             },
             child: Text("Ok"),
           ),

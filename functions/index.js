@@ -9,6 +9,72 @@ const os = require("os");
 const fs = require("fs");
 const { exception } = require("console");
 
+
+exports.addTeam = functions.https.onCall(async (data, context) => {
+  const teams = admin
+    .firestore()
+    .collection("teams");
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      await teams.add(data) //add will give each entry a random id
+        .then(async value => {
+          await teams.doc(value.id)
+            .collection("users")
+            .doc(data["creatorEmail"])
+            .create({
+              "name": data["creatorName"],
+            });
+          
+          await admin.firestore().collection("userEmail").doc(data["creatorEmail"]).create({"teamId" : value.id});
+        return resolve(value.id)
+      });
+      return reject(reason);
+
+    } catch (reason) {
+      return reject(reason);
+    }
+  });
+  
+});
+
+exports.findTeam = functions.https.onCall(async (data, context) => {
+  const teams = await admin
+    .firestore()
+    .collectionGroup("users").where('name','==',data['user']).get();
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      var teamList = [];
+      console.log(teams);
+      
+      // await teams.where(documentId(),'==',data["user"]).get() //get documents
+      //   .then(value => {
+      //     value.forEach((val) => console.log(val.data()))
+          //["name"] === data["user"] ? teamList.push(value) : "")
+          
+          //.forEach((user) => if(user===data["userEmail"] teamList.push(team))))
+      return resolve(teamList);
+
+      //  }
+       // );
+        
+        
+      
+      //return reject(reason);
+
+    }
+    catch (reason) {
+      return reject(reason);
+    
+    }
+  }
+  );
+});
+  
+
+
+
 exports.addDevice = functions.https.onCall(async (data, context) => {
   const devices = admin
     .firestore()
@@ -34,7 +100,7 @@ exports.addPart = functions.https.onCall(async (data, context) => {
     .doc("company")
     .collection("parts");
 
-    var snapshot = await parts.get();
+    //var snapshot = await parts.get();
     // snapshot.forEach(doc => {
     //   //check for duplicates
     //   if (doc.data()["reference"] === data["part"]["reference"])
@@ -42,7 +108,7 @@ exports.addPart = functions.https.onCall(async (data, context) => {
     //     throw new functions.https.HttpsError('already-exists' ,'Part already exists', 'Duplicate reference code');
     // });
     //upload new device
-    await parts.add(data["part"]);
+    await parts.create(data["part"]);
   });
 
 exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
