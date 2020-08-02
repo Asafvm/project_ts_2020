@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/screens/team_create_screen.dart';
+import 'package:teamshare/widgets/team_thumbnail.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/main_screen';
@@ -18,12 +21,13 @@ class _MainScreenState extends State<MainScreen> {
           title: Text("Team Share"),
         ),
         //drawer: CustomDrawer(),
-        body: StreamBuilder<Map<String, dynamic>>(
+        body: StreamBuilder<List<DocumentSnapshot>>(
             stream: Firestore.instance
-                .collection("userEmail")
-                .document("ts@ts.com")
-                .get()
-                .then((value) => value.data)
+                .collection("users")
+                .document("ts@ts.com") //TODO: generalize this
+                .collection("teams")
+                .getDocuments()
+                .then((value) => value.documents)
                 .asStream(),
             builder: (context, snapshot) {
               if (snapshot == null || snapshot.data == null) {
@@ -51,7 +55,47 @@ class _MainScreenState extends State<MainScreen> {
                 );
               } else {
                 return Center(
-                  child: Text(snapshot.data.toString()),
+                  child: Column(
+                    children: [
+                      // ignore: missing_return
+                      ListView.builder(
+                        padding: const EdgeInsets.all(10),
+                        itemBuilder: (ctx, index) {
+                          return TeamThumbnail(
+                            key: UniqueKey(),
+                            teamDocId: snapshot.data[index].documentID,
+                          );
+                        },
+                        itemCount: snapshot.data.length,
+                        shrinkWrap: true,
+                      ),
+
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => TeamCreateScreen()),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          margin: EdgeInsets.all(15),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black, width: 2),
+                              borderRadius: BorderRadius.circular(15),
+                              color: Theme.of(context).accentColor,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 10))
+                              ]),
+                          child: Icon(Icons.add_circle_outline),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }
             }),

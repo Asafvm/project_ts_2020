@@ -20,13 +20,16 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
       await teams.add(data) //add will give each entry a random id
         .then(async value => {
           await teams.doc(value.id)
-            .collection("users")
+            .collection("members")
             .doc(data["creatorEmail"])
             .create({
               "name": data["creatorName"],
             });
           
-          await admin.firestore().collection("userEmail").doc(data["creatorEmail"]).create({"teamId" : value.id});
+          await admin.firestore().collection("users")
+            .doc(data["creatorEmail"])
+            .collection("teams")
+            .doc(value.id).set({});
         return resolve(value.id)
       });
       return reject(reason);
@@ -35,7 +38,6 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
       return reject(reason);
     }
   });
-  
 });
 
 exports.findTeam = functions.https.onCall(async (data, context) => {
