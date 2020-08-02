@@ -25,27 +25,23 @@ class TeamThumbnail extends StatelessWidget {
               .asStream(),
           builder: (context, snapshot) {
             if (snapshot == null || snapshot.hasData == false) {
-              return LinearProgressIndicator();
-            } else {
-              return ListView.builder(
-                itemBuilder: (ctx, index) => ListTile(
-                  leading: Image(
-                    image: AssetImage('assets/pics/unknown.jpg'),
-                  ),
-                  title: Text(snapshot.data['name']),
-                  subtitle: Text(
-                    snapshot.data['description'],
-                    overflow: TextOverflow.fade,
-                  ),
-                  onTap: () {},
-                ),
-                itemCount: 1,
-                shrinkWrap: true,
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: LinearProgressIndicator(),
               );
-
-              // Container(
-              //   child: Text(snapshot.data.toString()),
-              // );
+            } else {
+              return ListTile(
+                leading: Image(
+                  image: AssetImage('assets/pics/unknown.jpg'),
+                ),
+                title: Text(snapshot.data['name']),
+                subtitle: Text(
+                  snapshot.data['description'],
+                  maxLines: 2,
+                  overflow: TextOverflow.clip,
+                ),
+                onTap: () {},
+              );
             }
           },
         ),

@@ -54,11 +54,12 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 );
               } else {
-                return Center(
+                return SingleChildScrollView(
                   child: Column(
                     children: [
                       // ignore: missing_return
                       ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(10),
                         itemBuilder: (ctx, index) {
                           return TeamThumbnail(
@@ -72,10 +73,12 @@ class _MainScreenState extends State<MainScreen> {
 
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (_) => TeamCreateScreen()),
-                          );
+                          Navigator.of(context)
+                              .push(
+                                MaterialPageRoute(
+                                    builder: (_) => TeamCreateScreen()),
+                              )
+                              .then((_) => _refresh());
                         },
                         child: Container(
                           width: double.infinity,
@@ -101,5 +104,9 @@ class _MainScreenState extends State<MainScreen> {
             }),
       ),
     );
+  }
+
+  void _refresh() {
+    setState(() {});
   }
 }
