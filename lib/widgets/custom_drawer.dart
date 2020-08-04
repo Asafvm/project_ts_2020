@@ -8,7 +8,21 @@ class CustomDrawer extends StatelessWidget {
       child: Column(
         children: <Widget>[
           AppBar(
-            title: Text('Hello!'),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Hello!'),
+                FlatButton.icon(
+                    onPressed: () {
+                      //TODO: log out of current team
+                    },
+                    icon: Icon(
+                      Icons.exit_to_app,
+                      color: Colors.white,
+                    ),
+                    label: Text(""))
+              ],
+            ),
             automaticallyImplyLeading: false,
           ),
           ListTile(

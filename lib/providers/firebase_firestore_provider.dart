@@ -2,6 +2,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/device_instance.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/providers/team_provider.dart';
+
+//TODO: fix firebase links
 
 class FirebaseFirestoreProvider {
   Future<void> uploadFields(List<Map<String, dynamic>> fields, String fileName,
@@ -20,7 +23,10 @@ class FirebaseFirestoreProvider {
   Future<void> uploadDevice(Device _newDevice) async {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addDevice")
-        .call(<String, dynamic>{"device": _newDevice.toJson()})
+        .call(<String, dynamic>{
+          "device": _newDevice.toJson(),
+          "teamId": TeamProvider().getCurrentTeam.getTeamId
+        })
         .then((value) => print("Upload Finished: ${value.data}"))
         .catchError((e) => throw new Exception("${e.details["message"]}"));
   }

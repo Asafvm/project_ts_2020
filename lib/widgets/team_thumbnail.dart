@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/team.dart';
+import 'package:teamshare/screens/team_home_screen.dart';
 
 class TeamThumbnail extends StatelessWidget {
   final String teamDocId;
@@ -30,17 +32,24 @@ class TeamThumbnail extends StatelessWidget {
                 child: LinearProgressIndicator(),
               );
             } else {
+              String teamName = snapshot.data['name'];
               return ListTile(
                 leading: Image(
                   image: AssetImage('assets/pics/unknown.jpg'),
                 ),
-                title: Text(snapshot.data['name']),
+                title: Text(teamName),
                 subtitle: Text(
                   snapshot.data['description'],
                   maxLines: 2,
                   overflow: TextOverflow.clip,
                 ),
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => TeamHomeScreen(
+                      team: Team(id: teamDocId, name: teamName),
+                    ),
+                  ),
+                ),
               );
             }
           },

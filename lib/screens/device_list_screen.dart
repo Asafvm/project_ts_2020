@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/device_instance.dart';
+import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/add_device_instance_form.dart';
 import 'package:teamshare/widgets/device_instance_list_item.dart';
 
@@ -14,6 +16,13 @@ class DeviceListScreen extends StatefulWidget {
 }
 
 class _DeviceListScreenState extends State<DeviceListScreen> {
+  Team curTeam;
+  @override
+  void initState() {
+    curTeam = TeamProvider().getCurrentTeam;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +39,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         child: StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
               .document(
-                  "username/company/devices/${widget.device.getCodeName()}")
+                  "teams/${curTeam.getTeamId}/devices/${widget.device.getCodeName()}")
               .collection('instances')
               .snapshots()
               .map((list) => list.documents),

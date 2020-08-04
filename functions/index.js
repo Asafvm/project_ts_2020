@@ -40,39 +40,7 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
   });
 });
 
-exports.findTeam = functions.https.onCall(async (data, context) => {
-  const teams = await admin
-    .firestore()
-    .collectionGroup("users").where('name','==',data['user']).get();
 
-  return new Promise(async (resolve, reject) => {
-    try {
-      var teamList = [];
-      console.log(teams);
-      
-      // await teams.where(documentId(),'==',data["user"]).get() //get documents
-      //   .then(value => {
-      //     value.forEach((val) => console.log(val.data()))
-          //["name"] === data["user"] ? teamList.push(value) : "")
-          
-          //.forEach((user) => if(user===data["userEmail"] teamList.push(team))))
-      return resolve(teamList);
-
-      //  }
-       // );
-        
-        
-      
-      //return reject(reason);
-
-    }
-    catch (reason) {
-      return reject(reason);
-    
-    }
-  }
-  );
-});
   
 
 
@@ -80,8 +48,8 @@ exports.findTeam = functions.https.onCall(async (data, context) => {
 exports.addDevice = functions.https.onCall(async (data, context) => {
   const devices = admin
     .firestore()
-    .collection("username")
-    .doc("company")
+    .collection("teams")
+    .doc(data["teamId"])
     .collection("devices");
 
     var snapshot = await devices.get();
