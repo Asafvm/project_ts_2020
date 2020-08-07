@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/custom_drawer.dart';
@@ -24,43 +21,13 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        StreamProvider<List<Device>>(
-          create: (ctx) => Firestore.instance
-              .collection("teams")
-              .document(TeamProvider().getCurrentTeam.getTeamId)
-              .collection("devices")
-              .snapshots()
-              .map(
-                (query) => query.documents
-                    .map(
-                      (doc) => Device.fromFirestore(doc),
-                    )
-                    .toList(),
-              ),
-          catchError: (context, error) {
-            print("${error.toString()}");
-            return null;
-          },
-        )
-        //.map((list) => list.documents),
-        ,
-        StreamProvider<List<DocumentSnapshot>>.value(
-          value: Firestore.instance
-              .collection('teams')
-              .document(TeamProvider().getCurrentTeam.getTeamId)
-              .collection("parts")
-              .snapshots()
-              .map((list) => list.documents),
-        ),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(TeamProvider().getCurrentTeam.getTeamName),
-        ),
-        drawer: CustomDrawer(),
-        body: Center(child: Text('Placeholder text')),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(TeamProvider().getCurrentTeam.getTeamName),
+      ),
+      drawer: CustomDrawer(),
+      body: Center(
+        child: Text('Placeholder text'),
       ),
     );
   }

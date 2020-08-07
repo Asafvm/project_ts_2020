@@ -63,6 +63,25 @@ exports.addDevice = functions.https.onCall(async (data, context) => {
     await devices.doc(data["device"]["codeName"]).set(data["device"]);
 });
   
+
+exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
+  const devices = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamID"])
+    .collection("devices")
+    .doc(data[data["deviceID"]])
+    .collection("instances")
+    .doc(data["device"]["serial"]);
+  
+  // const snapshot = await devices.get();
+  // if (snapshot.exists)
+  //   //throw error message if found
+  //   throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
+    
+  await devices.create(data["device"]);
+});
+
 exports.addPart = functions.https.onCall(async (data, context) => {
   const parts = admin
     .firestore()
@@ -81,23 +100,6 @@ exports.addPart = functions.https.onCall(async (data, context) => {
     await parts.create(data["part"]);
   });
 
-exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
-  const devices = admin
-    .firestore()
-    .collection("username")
-    .doc("company")
-    .collection("devices")
-    .doc(data["device_id"])
-    .collection("instances")
-    .doc(data["device"]["serial"]);
-  
-  // const snapshot = await devices.get();
-  // if (snapshot.exists)
-  //   //throw error message if found
-  //   throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
-    
-  await devices.create(data["device"]);
-});
 
 exports.addDeviceReport = functions.https.onCall((data, context) => {
   const devicereports = admin

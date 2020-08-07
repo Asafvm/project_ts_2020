@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/screens/team_create_screen.dart';
 import 'package:teamshare/widgets/team_thumbnail.dart';
 
@@ -22,7 +23,7 @@ class _MainScreenState extends State<MainScreen> {
         body: StreamBuilder<List<DocumentSnapshot>>(
             stream: Firestore.instance
                 .collection("users")
-                .document("ts@ts.com") //TODO: generalize this
+                .document(Authentication().userEmail) //TODO: generalize this
                 .collection("teams")
                 .getDocuments()
                 .then((value) => value.documents)

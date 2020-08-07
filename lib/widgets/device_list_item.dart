@@ -3,6 +3,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/device_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
 
@@ -86,59 +88,61 @@ class _DeviceListItemState extends State<DeviceListItem> {
         ),
 
         //list of related reports for selected device
-        StreamBuilder<List<DocumentSnapshot>>(
-          stream: Firestore.instance
-              .document(
-                  "username/company/devices/${widget.device.getCodeName()}")
-              .collection('reports')
-              .snapshots()
-              .map((list) => list.documents),
-          builder: (context, snapshot) {
-            if (snapshot == null || snapshot.data == null) {
-              return Container();
-            } else {
-              int items = snapshot.data.length; //for height calculation
-              return AnimatedContainer(
-                height: _selected ? items * 50.0 : 0, //50 = height of listtile
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemBuilder: (ctx, index) => ListTile(
-                    leading: Icon(Icons.picture_as_pdf),
-                    title: Text(snapshot.data[index].documentID),
-                    trailing: FittedBox(
-                      child: Row(
-                        children: <Widget>[
-                          IconButton(
-                              icon: Icon(Icons.file_upload),
-                              onPressed: () {}), //TODO: replace file at storage
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PDFScreen(
-                                    snapshot.data[index].documentID +
-                                        ".pdf", //TODO: get file path from device automaticly,
-                                    widget.device.getCodeName(),
-                                    widget.device.getCodeName(),
-                                    snapshot.data[index].data.entries
-                                        .map((e) => Field.fromJson(
-                                            e.value.cast<String, dynamic>()))
-                                        .toList()),
+        if (Authentication().isAuth)
+          StreamBuilder<List<DocumentSnapshot>>(
+            stream: Firestore.instance
+                .collection(
+                    "teams/${TeamProvider().getCurrentTeam.getTeamId}/devices/${widget.device.getCodeName()}/reports")
+                .snapshots()
+                .map((list) => list.documents),
+            builder: (context, snapshot) {
+              if (snapshot == null || snapshot.data == null) {
+                return Container();
+              } else {
+                int items = snapshot.data.length; //for height calculation
+                return AnimatedContainer(
+                  height:
+                      _selected ? items * 50.0 : 0, //50 = height of listtile
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemBuilder: (ctx, index) => ListTile(
+                      leading: Icon(Icons.picture_as_pdf),
+                      title: Text(snapshot.data[index].documentID),
+                      trailing: FittedBox(
+                        child: Row(
+                          children: <Widget>[
+                            IconButton(
+                                icon: Icon(Icons.file_upload),
+                                onPressed:
+                                    () {}), //TODO: replace file at storage
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PDFScreen(
+                                      snapshot.data[index].documentID +
+                                          ".pdf", //TODO: get file path from device automaticly,
+                                      widget.device.getCodeName(),
+                                      widget.device.getCodeName(),
+                                      snapshot.data[index].data.entries
+                                          .map((e) => Field.fromJson(
+                                              e.value.cast<String, dynamic>()))
+                                          .toList()),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
+                    itemCount: items,
                   ),
-                  itemCount: items,
-                ),
-                duration: Duration(milliseconds: 300),
-              );
-            }
-          },
-        ),
+                  duration: Duration(milliseconds: 300),
+                );
+              }
+            },
+          ),
       ],
     );
   }

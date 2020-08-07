@@ -36,7 +36,8 @@ class FirebaseFirestoreProvider {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addDeviceInstance")
         .call(<String, dynamic>{
-      "device_id": deviceId,
+      "teamID": TeamProvider().getCurrentTeam.getTeamId,
+      "deviceID": deviceId,
       "device": _newDevice.toJson()
     });
   }

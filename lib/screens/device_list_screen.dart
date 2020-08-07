@@ -38,9 +38,8 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         padding: const EdgeInsets.all(10.0),
         child: StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
-              .document(
-                  "teams/${curTeam.getTeamId}/devices/${widget.device.getCodeName()}")
-              .collection('instances')
+              .collection(
+                  "teams/${curTeam.getTeamId}/devices/${widget.device.getCodeName()}/instances")
               .snapshots()
               .map((list) => list.documents),
           builder: (context, snapshot) {

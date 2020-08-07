@@ -144,23 +144,26 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
         actions: [
           FlatButton(
             onPressed: () async => {
-              await CloudFunctions.instance
-                  .getHttpsCallable(functionName: "addTeam")
-                  .call(<String, dynamic>{
-                    "name": _name,
-                    "description": _description,
-                    "creatorEmail": await Authentication().userEmail,
-                    "creatorName": await Authentication().userName,
-                  })
-                  .then((value) => print("Team Created"))
-                  .catchError(
-                      (e) => print("Failed to create team. ${e.toString()}"))
-                  .whenComplete(
-                    () => Navigator.of(context).pop(),
-                  )
-                  .then(
-                    (value) => Navigator.of(context).pop(),
-                  )
+              if (Authentication().isAuth)
+                await CloudFunctions.instance
+                    .getHttpsCallable(functionName: "addTeam")
+                    .call(<String, dynamic>{
+                      "name": _name,
+                      "description": _description,
+                      "creatorEmail": Authentication().userEmail,
+                      "creatorName": Authentication().userName,
+                    })
+                    .then((value) => print("Team Created"))
+                    .catchError(
+                        (e) => print("Failed to create team. ${e.toString()}"))
+                    .whenComplete(
+                      () => Navigator.of(context).pop(),
+                    )
+                    .then(
+                      (value) => Navigator.of(context).pop(),
+                    )
+              else
+                print("User is not connected")
             },
             child: Text("Ok"),
           ),

@@ -22,18 +22,14 @@ class Authentication with ChangeNotifier {
   }
 
   String get userId {
-    return isAuth ? _userId : null;
+    return isAuth && _user != null ? _userId : null;
   }
 
-  Future<String> get userEmail async {
-    _user = await firebaseAuth.currentUser();
-
+  String get userEmail {
     return isAuth && _user != null ? _user.email : null;
   }
 
-  Future<String> get userName async {
-    _user = await firebaseAuth.currentUser();
-
+  String get userName {
     return isAuth && _user != null ? _user.displayName : null;
   }
 

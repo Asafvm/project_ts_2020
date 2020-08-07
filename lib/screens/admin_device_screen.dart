@@ -48,10 +48,11 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
 
   void _openAddDevice(BuildContext ctx) {
     showModalBottomSheet(
+        enableDrag: false,
+        isDismissible: true,
         context: ctx,
         builder: (_) {
           return AddDeviceForm();
-        });
-    setState(() {});
+        }); //.whenComplete(() => setState(() {}));
   }
 }
