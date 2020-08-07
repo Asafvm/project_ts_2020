@@ -43,14 +43,15 @@ class TeamShare extends StatelessWidget {
         )
         //.map((list) => list.documents),
         ,
-        StreamProvider<List<DocumentSnapshot>>.value(
-          value: Firestore.instance
-              .collection('teams')
-              .document(TeamProvider().getCurrentTeam.getTeamId)
-              .collection("parts")
-              .snapshots()
-              .map((list) => list.documents),
-        ),
+        if (Authentication().isAuth && TeamProvider().getCurrentTeam != null)
+          StreamProvider<List<DocumentSnapshot>>.value(
+            value: Firestore.instance
+                .collection('teams')
+                .document(TeamProvider().getCurrentTeam.getTeamId)
+                .collection("parts")
+                .snapshots()
+                .map((list) => list.documents),
+          ),
       ],
       child: Consumer<Authentication>(
         builder: (ctx, auth, _) => MaterialApp(

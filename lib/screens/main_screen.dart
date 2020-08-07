@@ -23,7 +23,7 @@ class _MainScreenState extends State<MainScreen> {
         body: StreamBuilder<List<DocumentSnapshot>>(
             stream: Firestore.instance
                 .collection("users")
-                .document(Authentication().userEmail) //TODO: generalize this
+                .document(Authentication().userEmail)
                 .collection("teams")
                 .getDocuments()
                 .then((value) => value.documents)

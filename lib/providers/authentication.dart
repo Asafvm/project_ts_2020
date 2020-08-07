@@ -54,7 +54,9 @@ class Authentication with ChangeNotifier {
       IdTokenResult usertoken = await result.user.getIdToken();
       _token = usertoken.token;
       _expiryDate = usertoken.expirationTime;
-      _userId = result.user.uid;
+      //_userId = result.user.uid;
+      _user = result.user;
+
       notifyListeners();
     } on PlatformException catch (e) {
       throw e.code;

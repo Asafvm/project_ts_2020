@@ -9,41 +9,37 @@ const os = require("os");
 const fs = require("fs");
 const { exception } = require("console");
 
-
 exports.addTeam = functions.https.onCall(async (data, context) => {
-  const teams = admin
-    .firestore()
-    .collection("teams");
+  const teams = admin.firestore().collection("teams");
 
   return new Promise(async (resolve, reject) => {
     try {
-      await teams.add(data) //add will give each entry a random id
-        .then(async value => {
-          await teams.doc(value.id)
+      await teams
+        .add(data) //add will give each entry a random id
+        .then(async (value) => {
+          await teams
+            .doc(value.id)
             .collection("members")
             .doc(data["creatorEmail"])
             .create({
-              "name": data["creatorName"],
+              name: data["creatorName"],
             });
-          
-          await admin.firestore().collection("users")
+
+          await admin
+            .firestore()
+            .collection("users")
             .doc(data["creatorEmail"])
             .collection("teams")
-            .doc(value.id).set({});
-        return resolve(value.id)
-      });
+            .doc(value.id)
+            .set({});
+          return resolve(value.id);
+        });
       return reject(reason);
-
     } catch (reason) {
       return reject(reason);
     }
   });
 });
-
-
-  
-
-
 
 exports.addDevice = functions.https.onCall(async (data, context) => {
   const devices = admin
@@ -52,17 +48,20 @@ exports.addDevice = functions.https.onCall(async (data, context) => {
     .doc(data["teamId"])
     .collection("devices");
 
-    var snapshot = await devices.get();
-    snapshot.forEach(doc => {
-      //check for duplicates
-      if (doc.id === data["device"]["codeName"])
-        //throw error message if found
-        throw new functions.https.HttpsError('already-exists' ,'Device already exists', 'Duplicate code name');
-    });
-    //upload new device
-    await devices.doc(data["device"]["codeName"]).set(data["device"]);
+  var snapshot = await devices.get();
+  snapshot.forEach((doc) => {
+    //check for duplicates
+    if (doc.id === data["device"]["codeName"])
+      //throw error message if found
+      throw new functions.https.HttpsError(
+        "already-exists",
+        "Device already exists",
+        "Duplicate code name"
+      );
+  });
+  //upload new device
+  await devices.doc(data["device"]["codeName"]).set(data["device"]);
 });
-  
 
 exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
   const devices = admin
@@ -70,15 +69,15 @@ exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
     .collection("teams")
     .doc(data["teamID"])
     .collection("devices")
-    .doc(data[data["deviceID"]])
+    .doc(data["deviceID"])
     .collection("instances")
     .doc(data["device"]["serial"]);
-  
+
   // const snapshot = await devices.get();
   // if (snapshot.exists)
   //   //throw error message if found
   //   throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
-    
+
   await devices.create(data["device"]);
 });
 
@@ -89,17 +88,16 @@ exports.addPart = functions.https.onCall(async (data, context) => {
     .doc("company")
     .collection("parts");
 
-    //var snapshot = await parts.get();
-    // snapshot.forEach(doc => {
-    //   //check for duplicates
-    //   if (doc.data()["reference"] === data["part"]["reference"])
-    //     //throw error message if found
-    //     throw new functions.https.HttpsError('already-exists' ,'Part already exists', 'Duplicate reference code');
-    // });
-    //upload new device
-    await parts.create(data["part"]);
-  });
-
+  //var snapshot = await parts.get();
+  // snapshot.forEach(doc => {
+  //   //check for duplicates
+  //   if (doc.data()["reference"] === data["part"]["reference"])
+  //     //throw error message if found
+  //     throw new functions.https.HttpsError('already-exists' ,'Part already exists', 'Duplicate reference code');
+  // });
+  //upload new device
+  await parts.create(data["part"]);
+});
 
 exports.addDeviceReport = functions.https.onCall((data, context) => {
   const devicereports = admin
