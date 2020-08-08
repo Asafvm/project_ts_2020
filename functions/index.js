@@ -17,22 +17,25 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
       await teams
         .add(data) //add will give each entry a random id
         .then(async (value) => {
-          await teams
-            .doc(value.id)
-            .collection("members")
-            .doc(data["creatorEmail"])
-            .create({
-              name: data["creatorName"],
-            });
+          Promise.all([
+            await teams
+              .doc(value.id)
+              .collection("members")
+              .doc(data["creatorEmail"])
+              .create({
+                name: data["creatorName"],
+              }),
 
-          await admin
-            .firestore()
-            .collection("users")
-            .doc(data["creatorEmail"])
-            .collection("teams")
-            .doc(value.id)
-            .set({});
-          return resolve(value.id);
+            await admin
+              .firestore()
+              .collection("users")
+              .doc(data["creatorEmail"])
+              .collection("teams")
+              .doc(value.id)
+              .set({}),
+          ]).then(() => {
+            return resolve(value.id);
+          });
         });
       return reject(reason);
     } catch (reason) {

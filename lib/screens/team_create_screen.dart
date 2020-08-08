@@ -15,6 +15,8 @@ class TeamCreateScreen extends StatefulWidget {
 }
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
+  bool _loading = false;
+
   @override
   void initState() {
     setState(() {
@@ -142,31 +144,35 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
         title: Text("Confirm"),
         content: Text("Create $_name?"),
         actions: [
-          FlatButton(
-            onPressed: () async => {
-              if (Authentication().isAuth)
-                await CloudFunctions.instance
-                    .getHttpsCallable(functionName: "addTeam")
-                    .call(<String, dynamic>{
-                      "name": _name,
-                      "description": _description,
-                      "creatorEmail": Authentication().userEmail,
-                      "creatorName": Authentication().userName,
-                    })
-                    .then((value) => print("Team Created"))
-                    .catchError(
-                        (e) => print("Failed to create team. ${e.toString()}"))
-                    .whenComplete(
-                      () => Navigator.of(context).pop(),
-                    )
-                    .then(
-                      (value) => Navigator.of(context).pop(),
-                    )
-              else
-                print("User is not connected")
-            },
-            child: Text("Ok"),
-          ),
+          _loading
+              ? CircularProgressIndicator()
+              : FlatButton(
+                  onPressed: () async => {
+                    if (Authentication().isAuth)
+                      {
+                        _setLoading(),
+                        await CloudFunctions.instance
+                            .getHttpsCallable(functionName: "addTeam")
+                            .call(<String, dynamic>{
+                              "name": _name,
+                              "description": _description,
+                              "creatorEmail": Authentication().userEmail,
+                              "creatorName": Authentication().userName,
+                            })
+                            .then((value) => {print("Team Created")})
+                            .catchError((e) =>
+                                print("Failed to create team. ${e.toString()}"))
+                            .whenComplete(() =>
+                                {_setLoading(), Navigator.of(context).pop()})
+                            .then(
+                              (value) => Navigator.of(context).pop(),
+                            )
+                      }
+                    else
+                      print("User is not connected")
+                  },
+                  child: Text("Ok"),
+                ),
           FlatButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text("Cancel"),
@@ -174,5 +180,11 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
         ],
       ),
     );
+  }
+
+  _setLoading() {
+    setState(() {
+      _loading = !_loading;
+    });
   }
 }

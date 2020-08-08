@@ -16,7 +16,8 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceList = Provider.of<List<Device>>(context, listen: true);
+    var deviceList = Provider.of<List<Device>>(context, listen: true) ?? [];
+    //var partList = Provider.of<List<Part>>(context, listen: true);
 
     return Scaffold(
       appBar: AppBar(
@@ -27,14 +28,32 @@ class _AdminDeviceScreenState extends State<AdminDeviceScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ListView.builder(
-          key: new Key(randomString(20)),
-          itemBuilder: (ctx, index) =>
-              DeviceListItem(Icons.computer, ctx, deviceList.elementAt(index)),
-          itemCount: deviceList == null ? 0 : deviceList.length,
-        ),
-      ),
+          padding: const EdgeInsets.all(10.0),
+          child: deviceList.length == 0
+              ?
+
+              //  StreamBuilder<List<Device>>(
+              //     stream: Firestore.instance
+              //         .collection("teams")
+              //         .document(TeamProvider().getCurrentTeam.getTeamId)
+              //         .collection("devices")
+              //         .snapshots()
+              //         .map(
+              //           (query) => query.documents
+              //               .map(
+              //                 (doc) => Device.fromFirestore(doc),
+              //               )
+              //               .toList(),
+              //         ),
+              //     builder: (context, snapshot) {
+              //       if (snapshot != null && snapshot.data != null)
+              ListView.builder(
+                  key: new Key(randomString(20)),
+                  itemBuilder: (ctx, index) => DeviceListItem(
+                      Icons.computer, ctx, deviceList.elementAt(index)),
+                  itemCount: deviceList.length,
+                )
+              : Container()),
     );
   }
 
