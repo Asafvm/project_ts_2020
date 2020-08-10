@@ -13,35 +13,33 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
 
   return new Promise(async (resolve, reject) => {
-    try {
-      await teams
-        .add(data) //add will give each entry a random id
-        .then(async (value) => {
-          Promise.all([
-            await teams
-              .doc(value.id)
-              .collection("members")
-              .doc(data["creatorEmail"])
-              .create({
-                name: data["creatorName"],
-              }),
+    await teams
+      .add(data) //add will give each entry a random id
+      .then(async (value) => {
 
-            await admin
-              .firestore()
-              .collection("users")
-              .doc(data["creatorEmail"])
-              .collection("teams")
-              .doc(value.id)
-              .set({}),
-          ]).then(() => {
-            return resolve(value.id);
+        await teams
+          .doc(value.id)
+          .collection("members")
+          .doc(data["creatorEmail"])
+          .create({
+            name: data["creatorName"],
           });
-        });
+                
+        await admin
+          .firestore()
+          .collection("users")
+          .doc(data["creatorEmail"])
+          .collection("teams")
+          .doc(value.id)
+          .set({});
+          
+        return resolve(value.id);
+
+      }).catch(reason)
       return reject(reason);
-    } catch (reason) {
-      return reject(reason);
-    }
-  });
+    
+  }
+  );
 });
 
 exports.addDevice = functions.https.onCall(async (data, context) => {
@@ -87,8 +85,8 @@ exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
 exports.addPart = functions.https.onCall(async (data, context) => {
   const parts = admin
     .firestore()
-    .collection("username")
-    .doc("company")
+    .collection("teams")
+    .doc(data["teamID"])
     .collection("parts");
 
   //var snapshot = await parts.get();

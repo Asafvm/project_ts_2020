@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:teamshare/models/part.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/widgets/add_part_form.dart';
+import 'package:teamshare/widgets/part_list_item.dart';
 
 class AdminPartScreen extends StatefulWidget {
   @override
@@ -9,6 +13,8 @@ class AdminPartScreen extends StatefulWidget {
 class _AdminPartScreenState extends State<AdminPartScreen> {
   @override
   Widget build(BuildContext context) {
+    var partList = Provider.of<List<Part>>(context, listen: true) ?? [];
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Manage Parts"),
@@ -19,7 +25,14 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Text('Parts'),
+          child: partList.length == 0
+              ? Text("You haven't registered and parts")
+              : ListView.builder(
+                  key: new Key(randomString(20)),
+                  itemBuilder: (ctx, index) =>
+                      PartListItem(part: partList.elementAt(index)),
+                  itemCount: partList.length,
+                ),
         ));
   }
 

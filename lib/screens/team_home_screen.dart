@@ -27,23 +27,9 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
       appBar: AppBar(
         title: Text(TeamProvider().getCurrentTeam.getTeamName),
       ),
-      drawer: StreamProvider.value(
-        value: Firestore.instance
-            .collection("teams")
-            .document(TeamProvider().getCurrentTeam.getTeamId)
-            .collection("devices")
-            .snapshots()
-            .map(
-              (query) => query.documents
-                  .map(
-                    (doc) => Device.fromFirestore(doc),
-                  )
-                  .toList(),
-            ),
-        child: CustomDrawer(),
-      ),
+      drawer: CustomDrawer(),
       body: Center(
-        child: Text('Placeholder text'),
+        child: Text('This view will update in the future'),
       ),
     );
   }

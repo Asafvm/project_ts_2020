@@ -7,6 +7,9 @@ import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'models/device.dart';
+import 'models/part.dart';
+
 void main() {
   runApp(TeamShare());
 }
@@ -21,15 +24,34 @@ class TeamShare extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Authentication(),
         ),
-        if (Authentication().isAuth && TeamProvider().getCurrentTeam != null)
-          StreamProvider<List<DocumentSnapshot>>.value(
-            value: Firestore.instance
-                .collection('teams')
-                .document(TeamProvider().getCurrentTeam.getTeamId)
-                .collection("parts")
-                .snapshots()
-                .map((list) => list.documents),
-          ),
+        StreamProvider<List<Part>>.value(
+          value: Firestore.instance
+              .collection('teams')
+              .document(TeamProvider().getCurrentTeam.getTeamId)
+              .collection("parts")
+              .snapshots()
+              .map(
+                (query) => query.documents
+                    .map(
+                      (doc) => Part.fromFirestore(doc),
+                    )
+                    .toList(),
+              ),
+        ),
+        StreamProvider<List<Device>>.value(
+          value: Firestore.instance
+              .collection("teams")
+              .document(TeamProvider().getCurrentTeam.getTeamId)
+              .collection("devices")
+              .snapshots()
+              .map(
+                (query) => query.documents
+                    .map(
+                      (doc) => Device.fromFirestore(doc),
+                    )
+                    .toList(),
+              ),
+        ),
       ],
       child: Consumer<Authentication>(
         builder: (ctx, auth, _) => MaterialApp(
