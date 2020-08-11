@@ -34,8 +34,11 @@ class TeamThumbnail extends StatelessWidget {
             } else {
               String teamName = snapshot.data['name'];
               return ListTile(
-                leading: Image(
-                  image: AssetImage('assets/pics/unknown.jpg'),
+                leading: Hero(
+                  tag: "team_logo",
+                  child: Image(
+                    image: AssetImage('assets/pics/unknown.jpg'),
+                  ),
                 ),
                 title: Text(teamName),
                 subtitle: Text(

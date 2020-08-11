@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/models/Instrument_instance.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddInstrumentInstanceForm extends StatefulWidget {
-  final String InstrumentCodeName;
-  AddInstrumentInstanceForm(this.InstrumentCodeName);
+  final String instrumentCodeName;
+  AddInstrumentInstanceForm(this.instrumentCodeName);
 
   @override
   _AddInstrumentInstanceFormState createState() =>
@@ -15,7 +15,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
   bool _uploading = false;
   InstrumentInstance _newInstInstrument = InstrumentInstance("0");
 
-  final _InstrumentForm = GlobalKey<FormState>();
+  final _instrumentForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
       String label, TextInputType type, Function onSave) {
@@ -44,7 +44,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                 right: 15,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 10),
             child: Form(
-              key: _InstrumentForm,
+              key: _instrumentForm,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -59,7 +59,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          _InstrumentForm.currentState.save();
+                          _instrumentForm.currentState.save();
                           setState(() {
                             _uploading = true;
                           });
@@ -67,7 +67,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                           try {
                             await FirebaseFirestoreProvider()
                                 .uploadInstrumentInstance(_newInstInstrument,
-                                    widget.InstrumentCodeName)
+                                    widget.instrumentCodeName)
                                 .then((_) => Navigator.of(context).pop());
                           } catch (error) {
                             showDialog(

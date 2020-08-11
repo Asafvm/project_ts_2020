@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/consts.dart';
@@ -13,11 +11,11 @@ class AdminInstrumentScreen extends StatefulWidget {
 }
 
 class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
-  List<Instrument> Instruments = [];
+  List<Instrument> instruments = [];
 
   @override
   Widget build(BuildContext context) {
-    var InstrumentList =
+    var instrumentList =
         Provider.of<List<Instrument>>(context, listen: true) ?? [];
 
     return Scaffold(
@@ -31,13 +29,13 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: InstrumentList.length == 0
+        child: instrumentList.length == 0
             ? Center(child: Text("You haven't registered any instruments yet"))
             : ListView.builder(
                 key: new Key(randomString(20)),
                 itemBuilder: (ctx, index) => InstrumentListItem(
-                    Icons.computer, ctx, InstrumentList.elementAt(index)),
-                itemCount: InstrumentList.length,
+                    Icons.computer, ctx, instrumentList.elementAt(index)),
+                itemCount: instrumentList.length,
               ),
       ),
     );

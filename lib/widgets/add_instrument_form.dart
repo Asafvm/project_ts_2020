@@ -11,7 +11,7 @@ class AddInstrumentForm extends StatefulWidget {
 class _AddInstrumentFormState extends State<AddInstrumentForm> {
   bool _uploading = false;
   Instrument _newInstrument;
-  final _InstrumentForm = GlobalKey<FormState>();
+  final _instrumentForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
       String label, TextInputType type, Function onSave) {
@@ -46,7 +46,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                 right: 15,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 10),
             child: Form(
-              key: _InstrumentForm,
+              key: _instrumentForm,
               child: Column(
                 // mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -118,8 +118,8 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          if (_InstrumentForm.currentState.validate()) {
-                            _InstrumentForm.currentState.save();
+                          if (_instrumentForm.currentState.validate()) {
+                            _instrumentForm.currentState.save();
                             setState(() {
                               _uploading = true;
                             });

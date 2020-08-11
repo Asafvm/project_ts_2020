@@ -25,9 +25,23 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
         title: Text(TeamProvider().getCurrentTeam.getTeamName),
       ),
       drawer: CustomDrawer(),
-      body: Center(
-        child: Text('This view will update in the future'),
+      body: Hero(
+        tag: "team_logo",
+        child: Image(
+          image: AssetImage('assets/pics/unknown.jpg'),
+        ),
       ),
+      //     Column(
+      // mainAxisSize: MainAxisSize.max,
+      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // children: [
+      //   Expanded(
+      //     child:
+      //   ),
+      //   Center(
+      //     child: Text('This view will update in the future'),
+      //   ),
+      // ]),
     );
   }
 

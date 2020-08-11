@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/models/Instrument_instance.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 
 class InstrumentInstanceListItem extends StatefulWidget {
   final IconData icon;
   final BuildContext ctx;
-  final InstrumentInstance Instrument;
-  InstrumentInstanceListItem(this.icon, this.ctx, this.Instrument);
+  final InstrumentInstance instrument;
+  InstrumentInstanceListItem(this.icon, this.ctx, this.instrument);
 
   @override
   _InstrumentListItemState createState() => _InstrumentListItemState();
@@ -18,7 +18,7 @@ class _InstrumentListItemState extends State<InstrumentInstanceListItem> {
 
   @override
   void initState() {
-    InstrumentDoc = widget.Instrument;
+    InstrumentDoc = widget.instrument;
     super.initState();
   }
 
@@ -42,7 +42,7 @@ class _InstrumentListItemState extends State<InstrumentInstanceListItem> {
               leading: CircleAvatar(
                 child: Icon(widget.icon),
               ),
-              title: Text(widget.Instrument.getSerial),
+              title: Text(widget.instrument.getSerial),
               subtitle: Text("TODO: Insert next maintenance here"),
             ),
           ),

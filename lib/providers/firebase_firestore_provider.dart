@@ -8,11 +8,11 @@ import 'package:teamshare/providers/team_provider.dart';
 
 class FirebaseFirestoreProvider {
   Future<void> uploadFields(List<Map<String, dynamic>> fields, String fileName,
-      String InstrumentId) async {
+      String instrumentId) async {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addInstrumentReport")
         .call(<String, dynamic>{
-      "Instrument_id": InstrumentId,
+      "Instrument_id": instrumentId,
       "file_name": fileName,
       "fields": fields,
     }).then((_) async => {
@@ -24,7 +24,7 @@ class FirebaseFirestoreProvider {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addInstrument")
         .call(<String, dynamic>{
-          "Instrument": _newInstrument.toJson(),
+          "instrument": _newInstrument.toJson(),
           "teamId": TeamProvider().getCurrentTeam.getTeamId
         })
         .then((value) => print("Upload Finished: ${value.data}"))
@@ -32,13 +32,13 @@ class FirebaseFirestoreProvider {
   }
 
   Future<void> uploadInstrumentInstance(
-      InstrumentInstance _newInstrument, String InstrumentId) async {
+      InstrumentInstance _newInstrument, String instrumentId) async {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addInstrumentInstance")
         .call(<String, dynamic>{
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
-      "InstrumentID": InstrumentId,
-      "Instrument": _newInstrument.toJson()
+      "instrumentID": instrumentId,
+      "instrument": _newInstrument.toJson()
     });
   }
 

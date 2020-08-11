@@ -10,7 +10,7 @@ class Part {
   double price;
   int mainStockMin;
   int personalStockMin;
-  String InstrumentId;
+  String instrumentId;
   bool serialTracking;
   bool active;
 
@@ -79,11 +79,11 @@ class Part {
   }
 
   String getInstrumentId() {
-    return this.InstrumentId;
+    return this.instrumentId;
   }
 
-  void setInstrumentId(String InstrumentId) {
-    this.InstrumentId = InstrumentId;
+  void setInstrumentId(String instrumentId) {
+    this.instrumentId = instrumentId;
   }
 
   bool getSerialTracking() {
@@ -106,7 +106,7 @@ class Part {
       {@required this.manifacturer,
       @required this.reference,
       this.altreference = "",
-      @required this.InstrumentId,
+      @required this.instrumentId,
       this.model = "",
       @required this.description,
       this.price = 0.0,
@@ -119,7 +119,7 @@ class Part {
         'manifacturer': manifacturer,
         'reference': reference,
         'altreference': altreference,
-        'InstrumentId': InstrumentId,
+        'InstrumentId': instrumentId,
         'model': model,
         'description': description,
         'price': price,
@@ -133,7 +133,7 @@ class Part {
       : manifacturer = data['manifacturer'],
         reference = data['reference'],
         altreference = data['altreference'] ?? "",
-        InstrumentId = data['InstrumentId'],
+        instrumentId = data['instrumentId'],
         model = data['model'] ?? "",
         description = data['description'],
         price = data['price'] as double ?? 0.0,

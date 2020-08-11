@@ -16,7 +16,7 @@ class _AddPartFormState extends State<AddPartForm> {
       manifacturer: "",
       reference: "",
       altreference: "",
-      InstrumentId: "",
+      instrumentId: "",
       model: "",
       description: "",
       price: 0.0,
@@ -46,7 +46,7 @@ class _AddPartFormState extends State<AddPartForm> {
 
   @override
   Widget build(BuildContext context) {
-    final InstrumentList = Provider.of<List<Instrument>>(context, listen: true);
+    final instrumentList = Provider.of<List<Instrument>>(context, listen: true);
     return _uploading
         ? Center(
             child: Padding(
@@ -157,16 +157,17 @@ class _AddPartFormState extends State<AddPartForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 3,
-                        child: InstrumentList == null
+                        child: instrumentList == null
                             ? Text(
                                 "No Instruments listed",
                                 style: TextStyle(color: Colors.red),
                               )
                             : DropdownButton(
-                                items:
-                                    InstrumentList.map((e) => DropdownMenuItem(
+                                items: instrumentList
+                                    .map((e) => DropdownMenuItem(
                                           child: Text(e.getCodeName()),
-                                        )).toList(),
+                                        ))
+                                    .toList(),
                                 onChanged: (val) {}),
                       ),
                       // _buildTextFormField(
