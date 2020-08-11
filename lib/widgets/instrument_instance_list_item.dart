@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/models/device_instance.dart';
+import 'package:teamshare/models/Instrument_instance.dart';
 
-class DeviceInstanceListItem extends StatefulWidget {
+class InstrumentInstanceListItem extends StatefulWidget {
   final IconData icon;
   final BuildContext ctx;
-  final DeviceInstance device;
-  DeviceInstanceListItem(this.icon, this.ctx, this.device);
+  final InstrumentInstance Instrument;
+  InstrumentInstanceListItem(this.icon, this.ctx, this.Instrument);
 
   @override
-  _DeviceListItemState createState() => _DeviceListItemState();
+  _InstrumentListItemState createState() => _InstrumentListItemState();
 }
 
-class _DeviceListItemState extends State<DeviceInstanceListItem> {
-  var deviceDoc;
+class _InstrumentListItemState extends State<InstrumentInstanceListItem> {
+  var InstrumentDoc;
   Color _bgcolor = Colors.white;
   bool _selected = false;
 
   @override
   void initState() {
-    deviceDoc = widget.device;
+    InstrumentDoc = widget.Instrument;
     super.initState();
   }
 
@@ -42,7 +42,7 @@ class _DeviceListItemState extends State<DeviceInstanceListItem> {
               leading: CircleAvatar(
                 child: Icon(widget.icon),
               ),
-              title: Text(widget.device.getSerial),
+              title: Text(widget.Instrument.getSerial),
               subtitle: Text("TODO: Insert next maintenance here"),
             ),
           ),

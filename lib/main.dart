@@ -7,7 +7,7 @@ import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'models/device.dart';
+import 'models/instrument.dart';
 import 'models/part.dart';
 
 void main() {
@@ -38,16 +38,16 @@ class TeamShare extends StatelessWidget {
                     .toList(),
               ),
         ),
-        StreamProvider<List<Device>>.value(
+        StreamProvider<List<Instrument>>.value(
           value: Firestore.instance
               .collection("teams")
               .document(TeamProvider().getCurrentTeam.getTeamId)
-              .collection("devices")
+              .collection("Instruments")
               .snapshots()
               .map(
                 (query) => query.documents
                     .map(
-                      (doc) => Device.fromFirestore(doc),
+                      (doc) => Instrument.fromFirestore(doc),
                     )
                     .toList(),
               ),

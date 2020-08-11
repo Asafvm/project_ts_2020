@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/screens/admin_device_screen.dart';
+import 'package:teamshare/screens/admin_instrument_screen.dart';
 import 'package:teamshare/screens/admin_part_screen.dart';
 
 class AdminMenuScreen extends StatelessWidget {
@@ -52,13 +52,14 @@ class AdminMenuScreen extends StatelessWidget {
               children: [
                 Expanded(
                     child: createButton(
-                        Icons.location_city, null, 'Location', context)),
+                        Icons.location_city, null, 'Site', context)),
                 Expanded(
                   child: createButton(Icons.computer, () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => AdminDeviceScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => AdminInstrumentScreen()),
                     );
-                  }, 'Devices', context),
+                  }, 'Instruments', context),
                 ),
               ],
             ),

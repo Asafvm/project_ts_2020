@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/models/device_instance.dart';
+import 'package:teamshare/models/Instrument_instance.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
-class AddDeviceInstanceForm extends StatefulWidget {
-  final String deviceCodeName;
-  AddDeviceInstanceForm(this.deviceCodeName);
+class AddInstrumentInstanceForm extends StatefulWidget {
+  final String InstrumentCodeName;
+  AddInstrumentInstanceForm(this.InstrumentCodeName);
 
   @override
-  _AddDeviceInstanceFormState createState() => _AddDeviceInstanceFormState();
+  _AddInstrumentInstanceFormState createState() =>
+      _AddInstrumentInstanceFormState();
 }
 
-class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
+class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
   bool _uploading = false;
-  DeviceInstance _newInstDevice = DeviceInstance("0");
+  InstrumentInstance _newInstInstrument = InstrumentInstance("0");
 
-  final _deviceForm = GlobalKey<FormState>();
+  final _InstrumentForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
       String label, TextInputType type, Function onSave) {
@@ -43,7 +44,7 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
                 right: 15,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 10),
             child: Form(
-              key: _deviceForm,
+              key: _InstrumentForm,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -51,22 +52,22 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
                     "Serial",
                     TextInputType.text,
                     (val) {
-                      _newInstDevice = DeviceInstance(val);
+                      _newInstInstrument = InstrumentInstance(val);
                     },
                   ),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          _deviceForm.currentState.save();
+                          _InstrumentForm.currentState.save();
                           setState(() {
                             _uploading = true;
                           });
                           //send to server
                           try {
                             await FirebaseFirestoreProvider()
-                                .uploadDeviceInstance(
-                                    _newInstDevice, widget.deviceCodeName)
+                                .uploadInstrumentInstance(_newInstInstrument,
+                                    widget.InstrumentCodeName)
                                 .then((_) => Navigator.of(context).pop());
                           } catch (error) {
                             showDialog(
@@ -89,7 +90,7 @@ class _AddDeviceInstanceFormState extends State<AddDeviceInstanceForm> {
                           }
                         },
                         child: Text(
-                          'Add New Device',
+                          'Add New Instrument',
                           style: TextStyle(color: Colors.white),
                         ),
                         color: Theme.of(context).primaryColor,

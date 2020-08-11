@@ -42,44 +42,44 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
   );
 });
 
-exports.addDevice = functions.https.onCall(async (data, context) => {
-  const devices = admin
+exports.addInstrument = functions.https.onCall(async (data, context) => {
+  const instruments = admin
     .firestore()
     .collection("teams")
     .doc(data["teamId"])
-    .collection("devices");
+    .collection("instruments");
 
-  var snapshot = await devices.get();
+  var snapshot = await instruments.get();
   snapshot.forEach((doc) => {
     //check for duplicates
-    if (doc.id === data["device"]["codeName"])
+    if (doc.id === data["instrument"]["codeName"])
       //throw error message if found
       throw new functions.https.HttpsError(
         "already-exists",
-        "Device already exists",
+        "Instrument already exists",
         "Duplicate code name"
       );
   });
-  //upload new device
-  await devices.doc(data["device"]["codeName"]).set(data["device"]);
+  //upload new instrument
+  await instruments.doc(data["instrument"]["codeName"]).set(data["instrument"]);
 });
 
-exports.addDeviceInstance = functions.https.onCall(async (data, context) => {
-  const devices = admin
+exports.addInstrumentInstance = functions.https.onCall(async (data, context) => {
+  const instruments = admin
     .firestore()
     .collection("teams")
     .doc(data["teamID"])
-    .collection("devices")
-    .doc(data["deviceID"])
+    .collection("instruments")
+    .doc(data["instrumentID"])
     .collection("instances")
-    .doc(data["device"]["serial"]);
+    .doc(data["instrument"]["serial"]);
 
-  // const snapshot = await devices.get();
+  // const snapshot = await instruments.get();
   // if (snapshot.exists)
   //   //throw error message if found
-  //   throw new functions.https.HttpsError('already-exists', 'Device already exists', 'Duplicate serial');
+  //   throw new functions.https.HttpsError('already-exists', 'Instrument already exists', 'Duplicate serial');
 
-  await devices.create(data["device"]);
+  await instruments.create(data["instrument"]);
 });
 
 exports.addPart = functions.https.onCall(async (data, context) => {
@@ -96,23 +96,23 @@ exports.addPart = functions.https.onCall(async (data, context) => {
   //     //throw error message if found
   //     throw new functions.https.HttpsError('already-exists' ,'Part already exists', 'Duplicate reference code');
   // });
-  //upload new device
+  //upload new instrument
   await parts.create(data["part"]);
 });
 
-exports.addDeviceReport = functions.https.onCall((data, context) => {
-  const devicereports = admin
+exports.addInstrumentReport = functions.https.onCall((data, context) => {
+  const instrumentreports = admin
     .firestore()
     .collection("username")
     .doc("company")
-    .collection("devices")
-    .doc(data["device_id"])
+    .collection("instruments")
+    .doc(data["instrument_id"])
     .collection("reports")
     .doc(data["file_name"]);
 
   return new Promise(async (resolve, reject) => {
     try {
-      await devicereports.set(
+      await instrumentreports.set(
         Object.assign({}, data["fields"]) //map every list item to index number
       );
       return resolve({

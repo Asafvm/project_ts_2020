@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:teamshare/models/device.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
-class AddDeviceForm extends StatefulWidget {
+class AddInstrumentForm extends StatefulWidget {
   @override
-  _AddDeviceFormState createState() => _AddDeviceFormState();
+  _AddInstrumentFormState createState() => _AddInstrumentFormState();
 }
 
-class _AddDeviceFormState extends State<AddDeviceForm> {
+class _AddInstrumentFormState extends State<AddInstrumentForm> {
   bool _uploading = false;
-  Device _newDevice;
-  final _deviceForm = GlobalKey<FormState>();
+  Instrument _newInstrument;
+  final _InstrumentForm = GlobalKey<FormState>();
 
   Widget _buildTextFormField(
       String label, TextInputType type, Function onSave) {
@@ -24,7 +24,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
 
   @override
   void initState() {
-    _newDevice = Device();
+    _newInstrument = Instrument();
     super.initState();
   }
 
@@ -46,7 +46,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                 right: 15,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 10),
             child: Form(
-              key: _deviceForm,
+              key: _InstrumentForm,
               child: Column(
                 // mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -55,7 +55,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                     "Manifacturer",
                     TextInputType.text,
                     (val) {
-                      _newDevice.setManifacturer(val);
+                      _newInstrument.setManifacturer(val);
                     },
                   ),
                   Row(
@@ -66,7 +66,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           "Code Number",
                           TextInputType.text,
                           (val) {
-                            _newDevice.setReference(val);
+                            _newInstrument.setReference(val);
                           },
                         ),
                       ),
@@ -79,7 +79,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           'Code Name',
                           TextInputType.text,
                           (val) {
-                            _newDevice.setCodeName(val);
+                            _newInstrument.setCodeName(val);
                           },
                         ),
                       ),
@@ -93,7 +93,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           "Model",
                           TextInputType.text,
                           (val) {
-                            _newDevice.setModel(val);
+                            _newInstrument.setModel(val);
                           },
                         ),
                       ),
@@ -107,7 +107,8 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           TextInputType.numberWithOptions(decimal: true),
                           (val) {
                             double price = double.tryParse(val);
-                            _newDevice.setPrice(price == null ? 0.0 : price);
+                            _newInstrument
+                                .setPrice(price == null ? 0.0 : price);
                           },
                         ),
                       ),
@@ -117,21 +118,21 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          if (_deviceForm.currentState.validate()) {
-                            _deviceForm.currentState.save();
+                          if (_InstrumentForm.currentState.validate()) {
+                            _InstrumentForm.currentState.save();
                             setState(() {
                               _uploading = true;
                             });
                             //send to server
                             try {
                               await FirebaseFirestoreProvider()
-                                  .uploadDevice(_newDevice)
+                                  .uploadInstrument(_newInstrument)
                                   .then((_) async => await showDialog(
                                       context: context,
                                       builder: (ctx) => AlertDialog(
                                             title: Text('Success!'),
-                                            content:
-                                                Text('New device created!\n'),
+                                            content: Text(
+                                                'New Instrument created!\n'),
                                             actions: <Widget>[
                                               FlatButton(
                                                 onPressed:
@@ -164,7 +165,7 @@ class _AddDeviceFormState extends State<AddDeviceForm> {
                           }
                         },
                         child: Text(
-                          'Add New Device',
+                          'Add New Instrument',
                           style: TextStyle(color: Colors.white),
                         ),
                         color: Theme.of(context).primaryColor,

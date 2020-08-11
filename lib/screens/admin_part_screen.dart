@@ -26,7 +26,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
         body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: partList.length == 0
-              ? Text("You haven't registered and parts")
+              ? Center(child: Text("You haven't registered any parts"))
               : ListView.builder(
                   key: new Key(randomString(20)),
                   itemBuilder: (ctx, index) =>

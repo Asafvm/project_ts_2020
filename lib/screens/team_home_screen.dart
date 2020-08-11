@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:teamshare/models/device.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/custom_drawer.dart';

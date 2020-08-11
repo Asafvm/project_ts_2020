@@ -1,24 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:teamshare/models/device.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/screens/device_list_screen.dart';
+import 'package:teamshare/screens/instrument_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
 
-class DeviceListItem extends StatefulWidget {
+class InstrumentListItem extends StatefulWidget {
   final IconData icon;
   final BuildContext ctx;
-  final Device device;
-  DeviceListItem(this.icon, this.ctx, this.device);
+  final Instrument instrument;
+  InstrumentListItem(this.icon, this.ctx, this.instrument);
 
   @override
-  _DeviceListItemState createState() => _DeviceListItemState();
+  _InstrumentListItemState createState() => _InstrumentListItemState();
 }
 
-class _DeviceListItemState extends State<DeviceListItem> {
+class _InstrumentListItemState extends State<InstrumentListItem> {
   Color _bgcolor = Colors.white;
   bool _selected = false;
 
@@ -42,8 +42,8 @@ class _DeviceListItemState extends State<DeviceListItem> {
               leading: CircleAvatar(
                 child: Icon(widget.icon),
               ),
-              title: Text(widget.device.getCodeName()),
-              subtitle: Text(widget.device.getReference()),
+              title: Text(widget.instrument.getCodeName()),
+              subtitle: Text(widget.instrument.getReference()),
               trailing: FittedBox(
                 child: Row(
                   //buttons
@@ -59,9 +59,9 @@ class _DeviceListItemState extends State<DeviceListItem> {
                           MaterialPageRoute(
                             builder: (context) => PDFScreen(
                                 filePath,
-                                widget.device.getCodeName(),
-                                widget.device.getCodeName(),
-                                null), //documentID = device document id
+                                widget.instrument.getCodeName(),
+                                widget.instrument.getCodeName(),
+                                null), //documentID = Instrument document id
                           ),
                         );
                       },
@@ -73,9 +73,9 @@ class _DeviceListItemState extends State<DeviceListItem> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DeviceListScreen(
-                              widget.device,
-                            ), //documentID = device document id
+                            builder: (context) => InstrumentListScreen(
+                              widget.instrument,
+                            ), //documentID = Instrument document id
                           ),
                         );
                       },
@@ -87,12 +87,12 @@ class _DeviceListItemState extends State<DeviceListItem> {
           ),
         ),
 
-        //list of related reports for selected device
+        //list of related reports for selected Instrument
         if (Authentication().isAuth)
           StreamBuilder<List<DocumentSnapshot>>(
             stream: Firestore.instance
                 .collection(
-                    "teams/${TeamProvider().getCurrentTeam.getTeamId}/devices/${widget.device.getCodeName()}/reports")
+                    "teams/${TeamProvider().getCurrentTeam.getTeamId}/Instruments/${widget.instrument.getCodeName()}/reports")
                 .snapshots()
                 .map((list) => list.documents),
             builder: (context, snapshot) {
@@ -122,9 +122,9 @@ class _DeviceListItemState extends State<DeviceListItem> {
                                 MaterialPageRoute(
                                   builder: (context) => PDFScreen(
                                       snapshot.data[index].documentID +
-                                          ".pdf", //TODO: get file path from device automaticly,
-                                      widget.device.getCodeName(),
-                                      widget.device.getCodeName(),
+                                          ".pdf", //TODO: get file path from Instrument automaticly,
+                                      widget.instrument.getCodeName(),
+                                      widget.instrument.getCodeName(),
                                       snapshot.data[index].data.entries
                                           .map((e) => Field.fromJson(
                                               e.value.cast<String, dynamic>()))

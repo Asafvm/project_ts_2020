@@ -1,6 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:teamshare/models/device.dart';
-import 'package:teamshare/models/device_instance.dart';
+import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/team_provider.dart';
 
@@ -8,11 +8,11 @@ import 'package:teamshare/providers/team_provider.dart';
 
 class FirebaseFirestoreProvider {
   Future<void> uploadFields(List<Map<String, dynamic>> fields, String fileName,
-      String deviceId) async {
+      String InstrumentId) async {
     await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addDeviceReport")
+        .getHttpsCallable(functionName: "addInstrumentReport")
         .call(<String, dynamic>{
-      "device_id": deviceId,
+      "Instrument_id": InstrumentId,
       "file_name": fileName,
       "fields": fields,
     }).then((_) async => {
@@ -20,25 +20,25 @@ class FirebaseFirestoreProvider {
             });
   }
 
-  Future<void> uploadDevice(Device _newDevice) async {
+  Future<void> uploadInstrument(Instrument _newInstrument) async {
     await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addDevice")
+        .getHttpsCallable(functionName: "addInstrument")
         .call(<String, dynamic>{
-          "device": _newDevice.toJson(),
+          "Instrument": _newInstrument.toJson(),
           "teamId": TeamProvider().getCurrentTeam.getTeamId
         })
         .then((value) => print("Upload Finished: ${value.data}"))
         .catchError((e) => throw new Exception("${e.details["message"]}"));
   }
 
-  Future<void> uploadDeviceInstance(
-      DeviceInstance _newDevice, String deviceId) async {
+  Future<void> uploadInstrumentInstance(
+      InstrumentInstance _newInstrument, String InstrumentId) async {
     await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addDeviceInstance")
+        .getHttpsCallable(functionName: "addInstrumentInstance")
         .call(<String, dynamic>{
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
-      "deviceID": deviceId,
-      "device": _newDevice.toJson()
+      "InstrumentID": InstrumentId,
+      "Instrument": _newInstrument.toJson()
     });
   }
 

@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:teamshare/models/device.dart';
-import 'package:teamshare/models/device_instance.dart';
+import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/widgets/add_device_instance_form.dart';
-import 'package:teamshare/widgets/device_instance_list_item.dart';
+import 'package:teamshare/widgets/add_instrument_instance_form.dart';
+import 'package:teamshare/widgets/instrument_instance_list_item.dart';
 
-class DeviceListScreen extends StatefulWidget {
-  final Device device;
-  DeviceListScreen(this.device);
+class InstrumentListScreen extends StatefulWidget {
+  final Instrument instrument;
+  InstrumentListScreen(this.instrument);
 
   @override
-  _DeviceListScreenState createState() => _DeviceListScreenState();
+  _InstrumentListScreenState createState() => _InstrumentListScreenState();
 }
 
-class _DeviceListScreenState extends State<DeviceListScreen> {
+class _InstrumentListScreenState extends State<InstrumentListScreen> {
   Team curTeam;
   @override
   void initState() {
@@ -27,11 +27,11 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.device.getCodeName()),
+        title: Text(widget.instrument.getCodeName()),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.add),
-              onPressed: () => _openAddDeviceInstance(context))
+              onPressed: () => _openAddInstrumentInstance(context))
         ],
       ),
       body: Padding(
@@ -39,7 +39,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         child: StreamBuilder<List<DocumentSnapshot>>(
           stream: Firestore.instance
               .collection(
-                  "teams/${curTeam.getTeamId}/devices/${widget.device.getCodeName()}/instances")
+                  "teams/${curTeam.getTeamId}/Instruments/${widget.instrument.getCodeName()}/instances")
               .snapshots()
               .map((list) => list.documents),
           builder: (context, snapshot) {
@@ -48,10 +48,10 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
             } else {
               return ListView.builder(
                 itemCount: snapshot.data.length,
-                itemBuilder: (ctx, index) => DeviceInstanceListItem(
+                itemBuilder: (ctx, index) => InstrumentInstanceListItem(
                   Icons.computer,
                   ctx,
-                  DeviceInstance.fromFirestore(snapshot.data[index]),
+                  InstrumentInstance.fromFirestore(snapshot.data[index]),
                 ),
               );
             }
@@ -61,11 +61,11 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
     );
   }
 
-  void _openAddDeviceInstance(BuildContext ctx) {
+  void _openAddInstrumentInstance(BuildContext ctx) {
     showModalBottomSheet(
         context: ctx,
         builder: (_) {
-          return AddDeviceInstanceForm(widget.device.getCodeName());
+          return AddInstrumentInstanceForm(widget.instrument.getCodeName());
         });
     setState(() {});
   }

@@ -13,9 +13,9 @@ import 'package:path/path.dart' as path;
 class PDFScreen extends StatefulWidget {
   final List<Field> _fields;
   final String pathPDF;
-  final String deviceID;
+  final String InstrumentID;
   final String devCode;
-  PDFScreen(this.pathPDF, this.deviceID, this.devCode, this._fields);
+  PDFScreen(this.pathPDF, this.InstrumentID, this.devCode, this._fields);
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -215,14 +215,14 @@ class _PDFScreenState extends State<PDFScreen> {
       if (file != null) {
         //TODO: check that user is authenticated
         await FirebaseStorageProvider()
-            .uploadFile(file, "devices/" + widget.deviceID + "/")
+            .uploadFile(file, "Instruments/" + widget.InstrumentID + "/")
             .then((val) async => {
                   _updateProgress(50),
                   await FirebaseFirestoreProvider()
                       .uploadFields(
                           fields,
                           path.basenameWithoutExtension(file.path),
-                          widget.deviceID)
+                          widget.InstrumentID)
                       .then((val) async => {
                             _updateProgress(100),
                             await showDialog(

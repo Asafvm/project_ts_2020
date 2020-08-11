@@ -8,7 +8,7 @@ class FirebaseStorageProvider {
         .ref()
         .child('username')
         .child("company")
-        .child("devices")
+        .child("Instruments")
         .child(path)
         .child(basenameWithoutExtension(file.path))
         .putFile(

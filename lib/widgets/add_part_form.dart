@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/models/device.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
@@ -16,7 +16,7 @@ class _AddPartFormState extends State<AddPartForm> {
       manifacturer: "",
       reference: "",
       altreference: "",
-      deviceId: "",
+      InstrumentId: "",
       model: "",
       description: "",
       price: 0.0,
@@ -46,7 +46,7 @@ class _AddPartFormState extends State<AddPartForm> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceList = Provider.of<List<Device>>(context, listen: true);
+    final InstrumentList = Provider.of<List<Instrument>>(context, listen: true);
     return _uploading
         ? Center(
             child: Padding(
@@ -157,24 +157,23 @@ class _AddPartFormState extends State<AddPartForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 3,
-                        child: deviceList == null
+                        child: InstrumentList == null
                             ? Text(
-                                "No devices listed",
+                                "No Instruments listed",
                                 style: TextStyle(color: Colors.red),
                               )
                             : DropdownButton(
-                                items: deviceList
-                                    .map((e) => DropdownMenuItem(
+                                items:
+                                    InstrumentList.map((e) => DropdownMenuItem(
                                           child: Text(e.getCodeName()),
-                                        ))
-                                    .toList(),
+                                        )).toList(),
                                 onChanged: (val) {}),
                       ),
                       // _buildTextFormField(
-                      //   "Target Device",
+                      //   "Target Instrument",
                       //   TextInputType.text,
                       //   (val) {
-                      //     _newPart.setDeviceId(val);
+                      //     _newPart.setInstrumentId(val);
                       //   },
                       // ),
                       _buildTextFormField(

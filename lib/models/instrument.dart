@@ -1,6 +1,8 @@
+// TODO Implement this library.import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Device {
+class Instrument {
   String _manifacturer;
   String _reference;
   String _codeName;
@@ -47,7 +49,7 @@ class Device {
     this._price = price;
   }
 
-  Device() {
+  Instrument() {
     _manifacturer = "";
     _reference = "";
     _codeName = "";
@@ -63,14 +65,14 @@ class Device {
         'price': _price.toDouble(),
       };
 
-  Device.fromJson(Map<String, dynamic> data)
+  Instrument.fromJson(Map<String, dynamic> data)
       : _manifacturer = data['manifacturer'].toString().trim(),
         _reference = data['reference'].toString().trim(),
         _codeName = data['codeName'].toString().trim(),
         _model = data['model'].toString().trim(),
         _price = double.parse(data['price'].toString()); //stupid, but works
 
-  factory Device.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Device.fromJson(documentSnapshot.data);
+  factory Instrument.fromFirestore(DocumentSnapshot documentSnapshot) {
+    return Instrument.fromJson(documentSnapshot.data);
   }
 }
