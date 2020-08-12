@@ -42,7 +42,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
             Expanded(
               flex: 3,
               child: Center(
-                child: Text('This view will update in the future'),
+                child: Text('TODO: Insert cool time saving stuff here'),
               ),
             ),
           ]),

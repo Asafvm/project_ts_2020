@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/screens/team_create_screen.dart';
 import 'package:teamshare/widgets/team_thumbnail.dart';
@@ -29,7 +30,11 @@ class _MainScreenState extends State<MainScreen> {
                 .then((value) => value.documents)
                 .asStream(),
             builder: (context, snapshot) {
-              if (snapshot == null || snapshot.data == null) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.data.length == 0) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -39,10 +44,7 @@ class _MainScreenState extends State<MainScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: RaisedButton.icon(
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (_) => TeamCreateScreen()),
-                            );
+                            createTeam(context);
                           },
                           icon: Icon(Icons.create),
                           label: Text("Create"),
@@ -72,12 +74,7 @@ class _MainScreenState extends State<MainScreen> {
 
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context)
-                              .push(
-                                MaterialPageRoute(
-                                    builder: (_) => TeamCreateScreen()),
-                              )
-                              .then((_) => _refresh());
+                          createTeam(context);
                         },
                         child: Container(
                           width: double.infinity,
@@ -103,6 +100,16 @@ class _MainScreenState extends State<MainScreen> {
             }),
       ),
     );
+  }
+
+  void createTeam(BuildContext context) {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(builder: (_) => TeamCreateScreen()),
+        )
+        .then((value) => setState(() {
+              print("refreshing");
+            }));
   }
 
   void _refresh() {

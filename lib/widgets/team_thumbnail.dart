@@ -17,7 +17,7 @@ class TeamThumbnail extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(5.0),
         child: StreamBuilder<Map<String, dynamic>>(
           stream: Firestore.instance
               .collection("teams")
@@ -26,13 +26,16 @@ class TeamThumbnail extends StatelessWidget {
               .then((value) => value.data)
               .asStream(),
           builder: (context, snapshot) {
-            if (snapshot == null || snapshot.hasData == false) {
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: LinearProgressIndicator(),
-              );
+            if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.done)
+                return Container(); //error getting data
+              else
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: LinearProgressIndicator(),
+                );
             } else {
-              String teamName = snapshot.data['name'];
+              String teamName = snapshot.data['name'] ?? "";
               return ListTile(
                 leading: Hero(
                   tag: key,
@@ -42,7 +45,7 @@ class TeamThumbnail extends StatelessWidget {
                 ),
                 title: Text(teamName),
                 subtitle: Text(
-                  snapshot.data['description'],
+                  snapshot.data['description'] ?? "",
                   maxLines: 2,
                   overflow: TextOverflow.clip,
                 ),

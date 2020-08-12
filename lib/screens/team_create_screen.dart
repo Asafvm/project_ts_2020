@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
@@ -151,22 +153,12 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                     if (Authentication().isAuth)
                       {
                         _setLoading(),
-                        await CloudFunctions.instance
-                            .getHttpsCallable(functionName: "addTeam")
-                            .call(<String, dynamic>{
-                              "name": _name,
-                              "description": _description,
-                              "creatorEmail": Authentication().userEmail,
-                              "creatorName": Authentication().userName,
-                            })
-                            .then((value) => {print("Team Created")})
-                            .catchError((e) =>
-                                print("Failed to create team. ${e.toString()}"))
-                            .whenComplete(() =>
-                                {_setLoading(), Navigator.of(context).pop()})
+                        //firebase.uploadToFirebase(Authentication().userEmail),
+                        FirebaseFirestoreProvider()
+                            .addTeam(_name, _description)
                             .then(
                               (value) => Navigator.of(context).pop(),
-                            )
+                            ),
                       }
                     else
                       print("User is not connected")
@@ -179,7 +171,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
           ),
         ],
       ),
-    );
+    ).then((value) => {Navigator.of(context).pop(), _setLoading()});
   }
 
   _setLoading() {

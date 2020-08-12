@@ -12,35 +12,79 @@ const { exception } = require("console");
 exports.addTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
 
-  return new Promise(async (resolve, reject) => {
-    await teams
-      .add(data) //add will give each entry a random id
-      .then(async (value) => {
+  return await teams
+    .add(data) //add will give each entry a random id
+    .then(async (value) => {
+      // eslint-disable-next-line promise/no-nesting
+      await teams
+        .doc(value.id)
+        .collection("members")
+        .doc(data["creatorEmail"])
+        .set({})
+        .then((val) => console.log("success: added member "))
+        .catch((err) => console.log("could not add member. error: " + err));
+      return value.id;
+    })
+    .then((val) => {
+      console.log("success! new team created: " + val);
+      return val.id;
+    })
+    .catch((reason) => {
+      console.log("error creating team: " + reason); return reason
+    })
+  
+}
+);
 
-        await teams
-          .doc(value.id)
-          .collection("members")
-          .doc(data["creatorEmail"])
-          .create({
-            name: data["creatorName"],
-          });
-                
-        await admin
-          .firestore()
-          .collection("users")
-          .doc(data["creatorEmail"])
-          .collection("teams")
-          .doc(value.id)
-          .set({});
-          
-        return resolve(value.id);
+exports.autoAddUser = functions.firestore
+  .document('teams/{teamId}/members/{userId}')
+  .onWrite((change, context) => {
+    return admin.firestore()
+      .collection("users")
+      .doc(context.params.userId)
+      .collection("teams")
+      .doc(context.params.teamId)
+      .create({
+        "name": context.params.teamId,
+      });
+  });
 
-      }).catch(reason)
-      return reject(reason);
-    
-  }
-  );
-});
+  //case user was removed from team
+  exports.autoTeamManagement = functions.firestore
+  .document('teams/{teamId}/members/{userId}')
+  .onDelete((snap, context) => {
+    return admin.firestore()
+      .collection("users")
+      .doc(context.params.userId)
+      .collection("teams")
+      .doc(context.params.teamId).delete()
+      
+  });
+  //case user exited from team
+  exports.autoUserManagement = functions.firestore
+  .document('users/{userId}/teams/{teamId}')
+  .onDelete((snap, context) => {
+    return admin.firestore()
+      .collection("teams")
+      .doc(context.params.teamId)
+      .collection("members")
+      .doc(context.params.userId).delete()
+      
+  });
+  
+
+  // exports.autoUpdateTeam = functions.firestore
+  // .document('teams/{teamId}/member/{userId}')
+  // .onUpdate((change, context) => {
+  //   return admin.firestore()
+  //     .collection("users")
+  //     .doc(context.params.userId)
+  //     .collection("teams")
+  //     .doc(context.params.teamId)
+  //     .create({
+  //       "name": context.params.teamId,
+  //     });
+  // });
 
 exports.addInstrument = functions.https.onCall(async (data, context) => {
   const instruments = admin
