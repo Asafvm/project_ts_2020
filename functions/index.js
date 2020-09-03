@@ -60,7 +60,7 @@ exports.autoAddUser = functions.firestore
       .doc(context.params.teamId).delete()
       
   });
-  //case user exited from team
+  //case user exited from
   exports.autoUserManagement = functions.firestore
   .document('users/{userId}/teams/{teamId}')
   .onDelete((snap, context) => {

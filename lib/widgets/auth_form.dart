@@ -62,102 +62,106 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
               strokeWidth: 3,
             ),
           )
-        : Form(
-            key: _loginKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                TextFormField(
-                  style: textStyleWhite,
-                  decoration:
-                      _getInputDecoration(Icons.email, "Email", "Enter Email"),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    //RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
-                    RegExp regExp = RegExp(
-                        r'^[a-zA-Z0-9]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
-                        caseSensitive: false,
-                        multiLine: false);
-
-                    if (value.isEmpty || !regExp.hasMatch(value))
-                      return 'Insert a valid Email address';
-                    return null;
-                  },
-                  onSaved: (val) {
-                    _authData['email'] = val.trim();
-                  },
-                ),
-                TextFormField(
-                  style: textStyleWhite,
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: _getInputDecoration(
-                      Icons.lock, "Password", "Enter Password"),
-                  validator: (value) {
-                    if (value.isEmpty) return 'Password cannot be empty';
-                    return null;
-                  },
-                  onSaved: (val) {
-                    _authData['password'] = val;
-                  },
-                ),
-                if (_signup)
+        : SingleChildScrollView(
+            child: Form(
+              key: _loginKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
                   TextFormField(
                     style: textStyleWhite,
                     decoration: _getInputDecoration(
-                        Icons.lock, "Confirm Password", "Enter Password"),
-                    obscureText: true,
+                        Icons.email, "Email", "Enter Email"),
+                    keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value.isEmpty)
-                        return 'Password cannot be empty';
-                      else if (_passwordController.text.compareTo(value) != 0)
-                        return 'Passwords do not match';
+                      //RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
+                      RegExp regExp = RegExp(
+                          r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
+                          caseSensitive: false,
+                          multiLine: false);
+
+                      if (value.isEmpty || !regExp.hasMatch(value))
+                        return 'Insert a valid Email address';
+                      return null;
+                    },
+                    onSaved: (val) {
+                      _authData['email'] = val.trim();
+                    },
+                  ),
+                  TextFormField(
+                    style: textStyleWhite,
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: _getInputDecoration(
+                        Icons.lock, "Password", "Enter Password"),
+                    validator: (value) {
+                      if (value.isEmpty) return 'Password cannot be empty';
                       return null;
                     },
                     onSaved: (val) {
                       _authData['password'] = val;
                     },
                   ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    children: <Widget>[
-                      AnimatedContainer(
-                        duration: Duration(seconds: 1),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              child: getRaisedButton('Signin', !_signup),
-                            ),
-                            Expanded(
-                              child: getRaisedButton('Signup', _signup),
-                            )
-                          ],
+                  if (_signup)
+                    TextFormField(
+                      style: textStyleWhite,
+                      decoration: _getInputDecoration(
+                          Icons.lock, "Confirm Password", "Enter Password"),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value.isEmpty)
+                          return 'Password cannot be empty';
+                        else if (_passwordController.text.compareTo(value) != 0)
+                          return 'Passwords do not match';
+                        return null;
+                      },
+                      onSaved: (val) {
+                        _authData['password'] = val;
+                      },
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      children: <Widget>[
+                        AnimatedContainer(
+                          duration: Duration(seconds: 1),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                flex: !_signup ? 2 : 1,
+                                child: getRaisedButton('Signin', !_signup),
+                              ),
+                              Expanded(
+                                flex: !_signup ? 1 : 2,
+                                child: getRaisedButton('Signup', _signup),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      // GoogleSignInButton(
-                      //   onPressed: () async => {
-                      //     await _googleSignIn.signIn()
-                      //   }, //_authUserWithGoogle(context),
-                      //   darkMode: false,
-                      //   text: 'Sign in with Google',
-                      // ),
-                    ],
+                        // GoogleSignInButton(
+                        //   onPressed: () async => {
+                        //     await _googleSignIn.signIn()
+                        //   }, //_authUserWithGoogle(context),
+                        //   darkMode: false,
+                        //   text: 'Sign in with Google',
+                        // ),
+                      ],
+                    ),
                   ),
-                ),
-                FlatButton(
-                  child: Text(
-                    "Forgot password?",
-                    style: TextStyle(color: Theme.of(context).accentColor),
-                    textAlign: TextAlign.start,
+                  FlatButton(
+                    child: Text(
+                      "Forgot password?",
+                      style: TextStyle(color: Theme.of(context).accentColor),
+                      textAlign: TextAlign.start,
+                    ),
+                    onPressed: () {},
                   ),
-                  onPressed: () {},
-                ),
-              ],
+                ],
+              ),
             ),
           );
   }

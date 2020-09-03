@@ -24,21 +24,27 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(TeamProvider().getCurrentTeam.getTeamName),
+        actions: [
+          Hero(
+            tag: widget.teamLogo,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image(
+                image: AssetImage('assets/pics/unknown.jpg'),
+              ),
+            ),
+          ),
+        ],
       ),
       drawer: CustomDrawer(),
       body: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              flex: 1,
-              child: Hero(
-                tag: widget.teamLogo,
-                child: Image(
-                  image: AssetImage('assets/pics/unknown.jpg'),
-                ),
-              ),
-            ),
+            // Expanded(
+            //   flex: 1,
+            //   child:
+            // ),
             Expanded(
               flex: 3,
               child: Center(

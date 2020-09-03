@@ -4,8 +4,6 @@ import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as json;
 
 import 'authentication.dart';
 

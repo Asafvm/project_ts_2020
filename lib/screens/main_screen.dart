@@ -7,7 +7,6 @@ import 'package:teamshare/widgets/team_thumbnail.dart';
 
 class MainScreen extends StatefulWidget {
   static const String routeName = '/main_screen';
-
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -59,17 +58,23 @@ class _MainScreenState extends State<MainScreen> {
                   child: Column(
                     children: [
                       // ignore: missing_return
-                      ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(10),
-                        itemBuilder: (ctx, index) {
-                          return TeamThumbnail(
-                            key: UniqueKey(),
-                            teamDocId: snapshot.data[index].documentID,
-                          );
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          return await Future.delayed(
+                              Duration(seconds: 1), _refresh);
                         },
-                        itemCount: snapshot.data.length,
-                        shrinkWrap: true,
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(10),
+                          itemBuilder: (ctx, index) {
+                            return TeamThumbnail(
+                              key: UniqueKey(),
+                              teamDocId: snapshot.data[index].documentID,
+                            );
+                          },
+                          itemCount: snapshot.data.length,
+                          shrinkWrap: true,
+                        ),
                       ),
 
                       GestureDetector(

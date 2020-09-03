@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/widgets/instrument_list_item.dart';
-import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/widgets/add_instrument_form.dart';
 
 class AdminInstrumentScreen extends StatefulWidget {
@@ -11,13 +10,8 @@ class AdminInstrumentScreen extends StatefulWidget {
 }
 
 class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
-  List<Instrument> instruments = [];
-
   @override
   Widget build(BuildContext context) {
-    var instrumentList =
-        Provider.of<List<Instrument>>(context, listen: true) ?? [];
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Instruments"),
@@ -29,14 +23,24 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: instrumentList.length == 0
-            ? Center(child: Text("You haven't registered any instruments yet"))
-            : ListView.builder(
-                key: new Key(randomString(20)),
-                itemBuilder: (ctx, index) => InstrumentListItem(
-                    Icons.computer, ctx, instrumentList.elementAt(index)),
-                itemCount: instrumentList.length,
-              ),
+        child: StreamBuilder(
+          stream: FirebaseFirestoreProvider().getInstruments(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (!snapshot.hasData)
+                return Center(
+                    child: Text("You haven't registered any instruments yet"));
+              else
+                return ListView.builder(
+                  key: new Key(randomString(20)),
+                  itemBuilder: (ctx, index) => InstrumentListItem(
+                      Icons.computer, ctx, snapshot.data.elementAt(index)),
+                  itemCount: snapshot.data.length,
+                );
+            } else
+              return Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }

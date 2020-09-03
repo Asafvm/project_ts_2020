@@ -1,14 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/authentication.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
-
-import 'models/instrument.dart';
-import 'models/part.dart';
 
 void main() {
   runApp(TeamShare());

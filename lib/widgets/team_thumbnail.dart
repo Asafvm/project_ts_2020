@@ -27,7 +27,8 @@ class TeamThumbnail extends StatelessWidget {
               .asStream(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              if (snapshot.connectionState == ConnectionState.done)
+              if (snapshot.connectionState == ConnectionState.done ||
+                  snapshot.connectionState == ConnectionState.active)
                 return Container(); //error getting data
               else
                 return Padding(
