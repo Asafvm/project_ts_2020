@@ -41,16 +41,14 @@ class LoginScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.blueGrey[900],
         body: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               headerText,
-              Expanded(
-                child: AuthForm(),
-              ),
+              AuthForm(),
             ],
           ),
         ),
