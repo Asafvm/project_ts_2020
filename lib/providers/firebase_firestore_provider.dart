@@ -16,7 +16,7 @@ const baseUrl = "https://firestore.googleapis.com/v1/projects/teamshare-2020";
 
 class FirebaseFirestoreProvider {
   final instrumentRef =
-      "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/";
+      "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments";
 
   Stream<List<Part>> getParts() {
     return Firestore.instance
