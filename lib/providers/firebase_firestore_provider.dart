@@ -1,15 +1,23 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/team_provider.dart';
+import 'package:http/http.dart' as http;
 
 import 'authentication.dart';
+
+const baseUrl = "https://firestore.googleapis.com/v1/projects/teamshare-2020";
 
 //TODO: fix firebase links
 
 class FirebaseFirestoreProvider {
+  final instrumentRef =
+      "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/";
+
   Stream<List<Part>> getParts() {
     return Firestore.instance
         .collection('teams')
@@ -25,28 +33,14 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  Stream<List<Instrument>> getInstruments() {
+  getInstruments() {
     return Firestore.instance
-        .collection("teams")
-        .document(TeamProvider().getCurrentTeam.getTeamId)
-        .collection("Instruments")
-        .snapshots()
-        .map(
-          (query) => query.documents
-              .map(
-                (doc) => Instrument.fromFirestore(doc),
-              )
-              .toList(),
-        );
+        .collection(instrumentRef)
+        .getDocuments()
+        .then(
+            (value) => value.documents.map((e) => Instrument.fromFirestore(e)))
+        .asStream();
   }
-
-  // bool uploadToFirebase(String userEmail) {
-  //   const url = 'https://teamshare-2020.firebaseio.com/users/users.json';
-
-  //   http
-  //       .post(url, body: json.jsonEncode({'userEmail': userEmail}))
-  //       .then((value) => print(value.body));
-  // }
 
   Future<void> addTeam(String name, String description) async {
     return await CloudFunctions.instance
@@ -77,12 +71,19 @@ class FirebaseFirestoreProvider {
   Future<void> uploadInstrument(Instrument _newInstrument) async {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addInstrument")
-        .call(<String, dynamic>{
-          "instrument": _newInstrument.toJson(),
-          "teamId": TeamProvider().getCurrentTeam.getTeamId
-        })
-        .then((value) => print("Upload Finished: ${value.data}"))
-        .catchError((e) => throw new Exception("${e.details["message"]}"));
+        .call(
+          <String, dynamic>{
+            "instrument": _newInstrument.toJson(),
+            "teamId": TeamProvider().getCurrentTeam.getTeamId
+          },
+        )
+        .then(
+          (value) => print("Upload Finished: ${value.data}"),
+        )
+        .catchError(
+          (e) =>
+              throw new Exception("Error uploading: ${e.details["message"]}"),
+        );
   }
 
   Future<void> uploadInstrumentInstance(
@@ -100,5 +101,22 @@ class FirebaseFirestoreProvider {
     await CloudFunctions.instance
         .getHttpsCallable(functionName: "addPart")
         .call(<String, dynamic>{"part": _newPart.toJson()});
+  }
+
+  getTeamList() {
+    return Firestore.instance
+        .collection("users")
+        .document(Authentication().userEmail)
+        .collection("teams")
+        .getDocuments()
+        .then((value) => value.documents)
+        .asStream();
+  }
+
+  getInstrumentsInstances(String ref) {
+    return Firestore.instance
+        .collection("$instrumentRef/$ref/instances")
+        .snapshots()
+        .map((list) => list.documents);
   }
 }

@@ -27,7 +27,7 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
           stream: FirebaseFirestoreProvider().getInstruments(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              if (!snapshot.hasData)
+              if (!snapshot.hasData || snapshot.data.length == 0)
                 return Center(
                     child: Text("You haven't registered any instruments yet"));
               else

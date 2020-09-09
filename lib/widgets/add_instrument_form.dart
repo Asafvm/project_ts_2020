@@ -13,12 +13,105 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
   Instrument _newInstrument;
   final _instrumentForm = GlobalKey<FormState>();
 
-  Widget _buildTextFormField(
-      String label, TextInputType type, Function onSave) {
+  Color _reqColor;
+
+  Widget _buildNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: label),
-      keyboardType: type,
-      onSaved: onSave,
+      decoration: InputDecoration(labelText: 'Instrument Name'),
+      keyboardType: TextInputType.text,
+      onChanged: (value) => _newInstrument.setCodeName(value),
+      onSaved: (val) {
+        _newInstrument.setCodeName(val.trim());
+      },
+      validator: (value) {
+        if (value.trim() == "") {
+          _setReqErr(true);
+          return "An instrument must have a name";
+        } else {
+          return null;
+        }
+      },
+      initialValue:
+          (_newInstrument != null) ? _newInstrument.getCodeName() : "",
+    );
+  }
+
+  Widget _buildCodeField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: "Reference Number"),
+      keyboardType: TextInputType.text,
+      onChanged: (value) => _newInstrument.setReference(value),
+      onSaved: (val) {
+        _newInstrument.setReference(val.trim());
+      },
+      validator: (value) {
+        if (value.trim() == "") {
+          _setReqErr(true);
+          return "An instrument must have a unique reference";
+        } else {
+          return null;
+        }
+      },
+      initialValue: _newInstrument != null ? _newInstrument.getReference() : "",
+    );
+  }
+
+  Widget _buildManifacturerField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: "Manifacturer",
+          hintText: "Default: Unknown",
+          hintStyle: TextStyle(color: Colors.grey)),
+      keyboardType: TextInputType.text,
+      onChanged: (val) {
+        _newInstrument.setManifacturer(val);
+      },
+      onSaved: (val) {
+        if (val.trim() == "") val = "Unknown";
+        _newInstrument.setManifacturer(val);
+      },
+      initialValue:
+          _newInstrument != null ? _newInstrument.getManifacturer() : "",
+    );
+  }
+
+  Widget _buildModelField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: "Model",
+          hintText: "Default: 1",
+          hintStyle: TextStyle(color: Colors.grey)),
+      keyboardType: TextInputType.text,
+      onChanged: (val) {
+        _newInstrument.setModel(val);
+      },
+      onSaved: (val) {
+        if (val.trim() == "") val = "1";
+        _newInstrument.setModel(val);
+      },
+      initialValue: _newInstrument != null ? _newInstrument.getModel() : "",
+    );
+  }
+
+  Widget _buildPriceField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: "Price",
+          hintText: "Default: 0",
+          hintStyle: TextStyle(color: Colors.grey)),
+      keyboardType:
+          TextInputType.numberWithOptions(decimal: true, signed: false),
+      onChanged: (val) {
+        double price = double.tryParse(val);
+        _newInstrument.setPrice(price == null ? "" : price);
+      },
+      onSaved: (val) {
+        if (val.isEmpty) val = "0.0";
+        double price = double.tryParse(val);
+        _newInstrument.setPrice(price == null ? 0.0 : price);
+      },
+      initialValue:
+          _newInstrument != null ? _newInstrument.getPrice().toString() : "",
     );
   }
 
@@ -41,24 +134,27 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
           )
         : SingleChildScrollView(
             padding: EdgeInsets.only(
-                left: 15,
+                left: 25,
                 top: 5,
-                right: 15,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 10),
-            child: Form(
-              key: _instrumentForm,
-              child: DefaultTabController(
-                initialIndex: 0,
-                length: 2,
+                right: 25,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+            child: DefaultTabController(
+              initialIndex: 0,
+              length: 2,
+              child: Form(
+                key: _instrumentForm,
                 child: Column(
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: MainAxisSize.min,
                   //mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     TabBar(
                       labelColor: Colors.black,
                       tabs: [
                         Tab(
-                          text: "Required",
+                          child: Text(
+                            "Required",
+                            style: TextStyle(color: _reqColor),
+                          ),
                         ),
                         Tab(
                           text: "Optional",
@@ -71,125 +167,113 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                         children: [
                           Column(
                             children: <Widget>[
-                              Flexible(
-                                flex: 3,
-                                child: _buildTextFormField(
-                                  'Instrument Name',
-                                  TextInputType.text,
-                                  (val) {
-                                    _newInstrument.setCodeName(val);
-                                  },
-                                ),
-                              ),
-                              Flexible(
-                                flex: 3,
-                                child: _buildTextFormField(
-                                  "Code Number",
-                                  TextInputType.text,
-                                  (val) {
-                                    _newInstrument.setReference(val);
-                                  },
-                                ),
-                              ),
+                              _buildNameField(),
+                              _buildCodeField(),
                             ],
                           ),
                           Column(
                             children: <Widget>[
-                              _buildTextFormField(
-                                "Manifacturer",
-                                TextInputType.text,
-                                (val) {
-                                  _newInstrument.setManifacturer(val);
-                                },
-                              ),
-                              Flexible(
-                                flex: 3,
-                                child: _buildTextFormField(
-                                  "Model",
-                                  TextInputType.text,
-                                  (val) {
-                                    _newInstrument.setModel(val);
-                                  },
-                                ),
-                              ),
-                              Flexible(
-                                flex: 3,
-                                child: _buildTextFormField(
-                                  "price",
-                                  TextInputType.numberWithOptions(
-                                      decimal: true),
-                                  (val) {
-                                    double price = double.tryParse(val);
-                                    _newInstrument
-                                        .setPrice(price == null ? 0.0 : price);
-                                  },
-                                ),
-                              ),
+                              _buildManifacturerField(),
+                              _buildModelField(),
+                              _buildPriceField(),
                             ],
                           ),
                         ],
                       ),
                     ),
                     Container(
-                        margin: EdgeInsets.symmetric(vertical: 20),
-                        child: FlatButton(
-                          onPressed: () async {
-                            if (_instrumentForm.currentState.validate()) {
-                              _instrumentForm.currentState.save();
-                              setState(() {
-                                _uploading = true;
-                              });
-                              //send to server
-                              try {
-                                await FirebaseFirestoreProvider()
-                                    .uploadInstrument(_newInstrument)
-                                    .then((_) async => await showDialog(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                              title: Text('Success!'),
-                                              content: Text(
-                                                  'New Instrument created!\n'),
-                                              actions: <Widget>[
-                                                FlatButton(
-                                                  onPressed:
-                                                      Navigator.of(context).pop,
-                                                  child: Text('Ok'),
-                                                ),
-                                              ],
-                                            )).then(
-                                        (_) => Navigator.of(context).pop()));
-                              } catch (error) {
-                                showDialog(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                          title: Text('Error!'),
-                                          content: Text('Operation failed\n' +
-                                              error.toString()),
-                                          actions: <Widget>[
-                                            FlatButton(
-                                              onPressed:
-                                                  Navigator.of(context).pop,
-                                              child: Text('Ok'),
-                                            ),
-                                          ],
-                                        ));
-                              } finally {
-                                setState(() {
-                                  _uploading = false;
-                                });
-                              }
-                            }
-                          },
-                          child: Text(
-                            'Add New Instrument',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          color: Theme.of(context).primaryColor,
-                        ))
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: FlatButton(
+                        child: Text(
+                          'Add New Instrument',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () async {
+                          if (manualValidation()) {
+                            //_instrumentForm.currentState.validate()) {
+                            _setReqErr(false);
+                            _instrumentForm.currentState.save();
+                            setState(() {
+                              _uploading = true;
+                            });
+                            //send to server
+                            await _uploadInstrument();
+                          }
+                        },
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    )
                   ],
                 ),
               ),
             ),
           );
+  }
+
+  void _setReqErr(bool status) {
+    setState(() {
+      if (status)
+        _reqColor = Colors.red;
+      else
+        _reqColor = Colors.black;
+    });
+  }
+
+  _uploadInstrument() {
+    try {
+      FirebaseFirestoreProvider().uploadInstrument(_newInstrument).then(
+            (_) async => await showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text('Success!'),
+                content: Text('New Instrument created!\n'),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text('Ok'),
+                  ),
+                ],
+              ),
+            ).then(
+              (_) => Navigator.of(context).pop(),
+            ),
+          );
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Error!'),
+          content: Text('Operation failed\n' + error.toString()),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: Navigator.of(context).pop,
+              child: Text('Ok'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(
+        () {
+          _uploading = false;
+        },
+      );
+    }
+  }
+
+  bool manualValidation() {
+    if (_newInstrument.getReference().isEmpty ||
+        _newInstrument.getCodeName().isEmpty) {
+      _setReqErr(true);
+      return false;
+    } else {
+      _setReqErr(false);
+      if (_newInstrument.getManifacturer().isEmpty)
+        _newInstrument.setManifacturer("Unknown");
+      if (_newInstrument.getModel().isEmpty) _newInstrument.setModel("1");
+      if (_newInstrument.getPrice().isNaN ||
+          _newInstrument.getPrice().isNegative) _newInstrument.setPrice(0.0);
+      return true;
+    }
   }
 }

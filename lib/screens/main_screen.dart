@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/team_create_screen.dart';
 import 'package:teamshare/widgets/team_thumbnail.dart';
 
@@ -21,13 +22,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         //drawer: CustomDrawer(),
         body: StreamBuilder<List<DocumentSnapshot>>(
-            stream: Firestore.instance
-                .collection("users")
-                .document(Authentication().userEmail)
-                .collection("teams")
-                .getDocuments()
-                .then((value) => value.documents)
-                .asStream(),
+            stream: FirebaseFirestoreProvider().getTeamList(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return Center(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/add_instrument_instance_form.dart';
 import 'package:teamshare/widgets/instrument_instance_list_item.dart';
@@ -37,11 +38,8 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: StreamBuilder<List<DocumentSnapshot>>(
-          stream: Firestore.instance
-              .collection(
-                  "teams/${curTeam.getTeamId}/Instruments/${widget.instrument.getCodeName()}/instances")
-              .snapshots()
-              .map((list) => list.documents),
+          stream: FirebaseFirestoreProvider()
+              .getInstrumentsInstances(widget.instrument.getCodeName()),
           builder: (context, snapshot) {
             if (snapshot == null || snapshot.data == null) {
               return Container();
