@@ -52,6 +52,6 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
         context: ctx,
         builder: (_) {
           return AddInstrumentForm();
-        }); //.whenComplete(() => setState(() {}));
+        }).whenComplete(() => setState(() {}));
   }
 }

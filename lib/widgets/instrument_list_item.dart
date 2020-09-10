@@ -92,7 +92,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
           StreamBuilder<List<DocumentSnapshot>>(
             stream: Firestore.instance
                 .collection(
-                    "teams/${TeamProvider().getCurrentTeam.getTeamId}/Instruments/${widget.instrument.getCodeName()}/reports")
+                    "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrument.getCodeName()}/reports")
                 .snapshots()
                 .map((list) => list.documents),
             builder: (context, snapshot) {

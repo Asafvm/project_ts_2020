@@ -1,18 +1,11 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:http/http.dart' as http;
 
 import 'authentication.dart';
-
-const baseUrl = "https://firestore.googleapis.com/v1/projects/teamshare-2020";
-
-//TODO: fix firebase links
 
 class FirebaseFirestoreProvider {
   final instrumentRef =

@@ -37,23 +37,13 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: StreamBuilder<List<DocumentSnapshot>>(
-          stream: FirebaseFirestoreProvider()
-              .getInstrumentsInstances(widget.instrument.getCodeName()),
-          builder: (context, snapshot) {
-            if (snapshot == null || snapshot.data == null) {
-              return Container();
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (ctx, index) => InstrumentInstanceListItem(
-                  Icons.computer,
-                  ctx,
-                  InstrumentInstance.fromFirestore(snapshot.data[index]),
-                ),
-              );
-            }
-          },
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            _buildInstanceList(),
+          ],
         ),
       ),
     );
@@ -64,7 +54,52 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
         context: ctx,
         builder: (_) {
           return AddInstrumentInstanceForm(widget.instrument.getCodeName());
-        });
-    setState(() {});
+        }).whenComplete(() => setState(() {}));
+  }
+
+  _buildHeader() {
+    return Expanded(
+      flex: 1,
+      child: Card(
+        elevation: 10,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Icon(Icons.computer),
+            Positioned(
+                top: 10,
+                left: 10,
+                child: Text(
+                  "${widget.instrument.getManifacturer()}\n${widget.instrument.getCodeName()}",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  _buildInstanceList() {
+    return Expanded(
+      flex: 5,
+      child: StreamBuilder<List<DocumentSnapshot>>(
+        stream: FirebaseFirestoreProvider()
+            .getInstrumentsInstances(widget.instrument.getCodeName()),
+        builder: (context, snapshot) {
+          if (snapshot == null || snapshot.data == null) {
+            return Container();
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (ctx, index) => InstrumentInstanceListItem(
+                Icons.computer,
+                ctx,
+                InstrumentInstance.fromFirestore(snapshot.data[index]),
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 }
