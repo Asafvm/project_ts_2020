@@ -46,35 +46,6 @@ class TeamShare extends StatelessWidget {
               ChangeNotifierProvider.value(
                 value: Authentication(),
               ),
-              // if (TeamProvider().getCurrentTeam != null)
-              //   StreamProvider<List<Part>>.value(
-              //     value: Firestore.instance
-              //         .collection('teams')
-              //         .document(TeamProvider().getCurrentTeam.getTeamId)
-              //         .collection("parts")
-              //         .snapshots()
-              //         .map(
-              //           (query) => query.documents
-              //               .map(
-              //                 (doc) => Part.fromFirestore(doc),
-              //               )
-              //               .toList(),
-              //         ),
-              //   ),
-              //   StreamProvider<List<Instrument>>.value(
-              //     value: Firestore.instance
-              //         .collection("teams")
-              //         .document(TeamProvider().getCurrentTeam.getTeamId)
-              //         .collection("Instruments")
-              //         .snapshots()
-              //         .map(
-              //           (query) => query.documents
-              //               .map(
-              //                 (doc) => Instrument.fromFirestore(doc),
-              //               )
-              //               .toList(),
-              //         ),
-              //   ),
             ],
             child: Consumer<Authentication>(
               builder: (ctx, auth, _) => MaterialApp(
