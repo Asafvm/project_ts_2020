@@ -94,7 +94,11 @@ class TeamShare extends StatelessWidget {
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return CircularProgressIndicator();
+        // splash screen here?
+        return FittedBox(
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
+            child: CircularProgressIndicator());
       },
     );
   }
