@@ -11,14 +11,16 @@ class FirebaseFirestoreProvider {
   final instrumentRef =
       "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments";
 
-  Stream<List<Part>> getParts() {
-    return Firestore.instance
+//Get from Firebase
+
+  getParts() {
+    return FirebaseFirestore.instance
         .collection('teams')
-        .document(TeamProvider().getCurrentTeam.getTeamId)
+        .doc(TeamProvider().getCurrentTeam.getTeamId)
         .collection("parts")
         .snapshots()
         .map(
-          (query) => query.documents
+          (query) => query.docs
               .map(
                 (doc) => Part.fromFirestore(doc),
               )
@@ -27,38 +29,37 @@ class FirebaseFirestoreProvider {
   }
 
   getInstruments() {
-    return Firestore.instance
+    return FirebaseFirestore.instance
         .collection(instrumentRef)
-        .getDocuments()
-        .then(
-            (value) => value.documents.map((e) => Instrument.fromFirestore(e)))
+        .get()
+        .then((value) => value.docs.map((e) => Instrument.fromFirestore(e)))
         .asStream();
   }
 
-  Future<void> addTeam(String name, String description) async {
-    return await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addTeam")
-        .call(<String, dynamic>{
-          "name": name,
-          "description": description,
-          "creatorEmail": Authentication().userEmail,
-          //"creatorName": Authentication().userName,
-        })
-        .then((value) => {print("Team Created")})
-        .catchError((e) => print("Failed to create team. ${e.toString()}"));
+  getInstrumentsInstances(String ref) {
+    return FirebaseFirestore.instance
+        .collection("$instrumentRef/$ref/instances")
+        .snapshots()
+        .map((list) => list.docs);
   }
 
-  Future<void> uploadFields(List<Map<String, dynamic>> fields, String fileName,
-      String instrumentId) async {
+  //Cloud Functions
+
+  Future<void> uploadPart(Part _newPart) async {
     await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addInstrumentReport")
+        .getHttpsCallable(functionName: "addPart")
+        .call(<String, dynamic>{"part": _newPart.toJson()});
+  }
+
+  Future<void> uploadInstrumentInstance(
+      InstrumentInstance _newInstrument, String instrumentId) async {
+    await CloudFunctions.instance
+        .getHttpsCallable(functionName: "addInstrumentInstance")
         .call(<String, dynamic>{
-      "Instrument_id": instrumentId,
-      "file_name": fileName,
-      "fields": fields,
-    }).then((_) async => {
-              print('fields uploaded'),
-            });
+      "teamID": TeamProvider().getCurrentTeam.getTeamId,
+      "instrumentID": instrumentId,
+      "instrument": _newInstrument.toJson()
+    });
   }
 
   Future<void> uploadInstrument(Instrument _newInstrument) async {
@@ -79,37 +80,31 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  Future<void> uploadInstrumentInstance(
-      InstrumentInstance _newInstrument, String instrumentId) async {
-    await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addInstrumentInstance")
+  Future<void> addTeam(String name, String description) async {
+    return await CloudFunctions.instance
+        .getHttpsCallable(functionName: "addTeam")
         .call(<String, dynamic>{
-      "teamID": TeamProvider().getCurrentTeam.getTeamId,
-      "instrumentID": instrumentId,
-      "instrument": _newInstrument.toJson()
-    });
+          "name": name,
+          "description": description,
+          "creatorEmail": Authentication().userEmail,
+          //"creatorName": Authentication().userName,
+        })
+        .then((value) => {print("Team Created")})
+        .catchError((e) => print("Failed to create team. ${e.toString()}"));
   }
 
-  Future<void> uploadPart(Part _newPart) async {
+  //Cloud Storage
+
+  Future<void> uploadFields(List<Map<String, dynamic>> fields, String fileName,
+      String instrumentId) async {
     await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addPart")
-        .call(<String, dynamic>{"part": _newPart.toJson()});
-  }
-
-  getTeamList() {
-    return Firestore.instance
-        .collection("users")
-        .document(Authentication().userEmail)
-        .collection("teams")
-        .getDocuments()
-        .then((value) => value.documents)
-        .asStream();
-  }
-
-  getInstrumentsInstances(String ref) {
-    return Firestore.instance
-        .collection("$instrumentRef/$ref/instances")
-        .snapshots()
-        .map((list) => list.documents);
+        .getHttpsCallable(functionName: "addInstrumentReport")
+        .call(<String, dynamic>{
+      "Instrument_id": instrumentId,
+      "file_name": fileName,
+      "fields": fields,
+    }).then((_) async => {
+              print('fields uploaded'),
+            });
   }
 }

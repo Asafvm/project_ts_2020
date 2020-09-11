@@ -3,16 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class Authentication with ChangeNotifier {
-  //define as a singelton
   static final Authentication _instance = Authentication._internal();
-  factory Authentication() {
-    return _instance;
-  }
+
+  factory Authentication() => _instance;
+
   Authentication._internal();
-  //end - define as a singelton
 
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  FirebaseUser _user;
+  User _user;
   String _token;
   DateTime _expiryDate;
   String _userId;
@@ -41,7 +39,7 @@ class Authentication with ChangeNotifier {
   }
 
   Future<void> authenticate(String email, String password, bool signup) async {
-    AuthResult result;
+    UserCredential result;
 
     try {
       if (signup)
@@ -51,7 +49,7 @@ class Authentication with ChangeNotifier {
         result = await firebaseAuth.signInWithEmailAndPassword(
             email: email, password: password);
 
-      IdTokenResult usertoken = await result.user.getIdToken();
+      IdTokenResult usertoken = await result.user.getIdTokenResult();
       _token = usertoken.token;
       _expiryDate = usertoken.expirationTime;
       _user = result.user;

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/team_create_screen.dart';
@@ -22,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         //drawer: CustomDrawer(),
         body: StreamBuilder<List<DocumentSnapshot>>(
-            stream: FirebaseFirestoreProvider().getTeamList(),
+            stream: getTeamList(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return Center(
@@ -64,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
                           itemBuilder: (ctx, index) {
                             return TeamThumbnail(
                               key: UniqueKey(),
-                              teamDocId: snapshot.data[index].documentID,
+                              teamDocId: snapshot.data[index].id,
                             );
                           },
                           itemCount: snapshot.data.length,
@@ -114,5 +113,16 @@ class _MainScreenState extends State<MainScreen> {
 
   void _refresh() {
     setState(() {});
+  }
+
+//Extracted from FirebaseFirestoreProvider class
+  getTeamList() {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(Authentication().userEmail)
+        .collection("teams")
+        .get()
+        .then((value) => value.docs)
+        .asStream();
   }
 }

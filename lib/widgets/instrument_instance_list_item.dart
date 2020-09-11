@@ -12,13 +12,13 @@ class InstrumentInstanceListItem extends StatefulWidget {
 }
 
 class _InstrumentListItemState extends State<InstrumentInstanceListItem> {
-  var InstrumentDoc;
+  var instrumentDoc;
   Color _bgcolor = Colors.white;
   bool _selected = false;
 
   @override
   void initState() {
-    InstrumentDoc = widget.instrument;
+    instrumentDoc = widget.instrument;
     super.initState();
   }
 

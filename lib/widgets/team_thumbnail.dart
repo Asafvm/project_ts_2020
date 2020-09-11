@@ -19,11 +19,11 @@ class TeamThumbnail extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: StreamBuilder<Map<String, dynamic>>(
-          stream: Firestore.instance
+          stream: FirebaseFirestore.instance
               .collection("teams")
-              .document(teamDocId)
+              .doc(teamDocId)
               .get()
-              .then((value) => value.data)
+              .then((value) => value.data())
               .asStream(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {

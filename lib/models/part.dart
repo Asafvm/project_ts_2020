@@ -143,6 +143,6 @@ class Part {
         active = data['active'] ?? true;
 
   factory Part.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Part.fromJson(documentSnapshot.data);
+    return Part.fromJson(documentSnapshot.data());
   }
 }

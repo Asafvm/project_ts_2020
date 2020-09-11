@@ -71,6 +71,6 @@ class Instrument {
         _price = double.parse(data['price'].toString()); //stupid, but works
 
   factory Instrument.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Instrument.fromJson(documentSnapshot.data);
+    return Instrument.fromJson(documentSnapshot.data());
   }
 }

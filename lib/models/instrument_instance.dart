@@ -17,7 +17,7 @@ class InstrumentInstance {
       : _serial = data['serial'];
 
   factory InstrumentInstance.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return InstrumentInstance.fromJson(documentSnapshot.data);
+    return InstrumentInstance.fromJson(documentSnapshot.data());
   }
 
   String get getSerial {

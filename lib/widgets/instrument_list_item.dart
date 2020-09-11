@@ -90,11 +90,11 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
         //list of related reports for selected Instrument
         if (Authentication().isAuth)
           StreamBuilder<List<DocumentSnapshot>>(
-            stream: Firestore.instance
+            stream: FirebaseFirestore.instance
                 .collection(
                     "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrument.getCodeName()}/reports")
                 .snapshots()
-                .map((list) => list.documents),
+                .map((list) => list.docs),
             builder: (context, snapshot) {
               if (snapshot == null || snapshot.data == null) {
                 return Container();
@@ -107,7 +107,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                     shrinkWrap: true,
                     itemBuilder: (ctx, index) => ListTile(
                       leading: Icon(Icons.picture_as_pdf),
-                      title: Text(snapshot.data[index].documentID),
+                      title: Text(snapshot.data[index].id),
                       trailing: FittedBox(
                         child: Row(
                           children: <Widget>[
@@ -121,11 +121,13 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PDFScreen(
-                                      snapshot.data[index].documentID +
+                                      snapshot.data[index].id +
                                           ".pdf", //TODO: get file path from Instrument automaticly,
                                       widget.instrument.getCodeName(),
                                       widget.instrument.getCodeName(),
-                                      snapshot.data[index].data.entries
+                                      snapshot.data[index]
+                                          .data()
+                                          .entries
                                           .map((e) => Field.fromJson(
                                               e.value.cast<String, dynamic>()))
                                           .toList()),
