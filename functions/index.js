@@ -73,19 +73,6 @@ exports.autoAddUser = functions.firestore
   });
   
 
-  // exports.autoUpdateTeam = functions.firestore
-  // .document('teams/{teamId}/member/{userId}')
-  // .onUpdate((change, context) => {
-  //   return admin.firestore()
-  //     .collection("users")
-  //     .doc(context.params.userId)
-  //     .collection("teams")
-  //     .doc(context.params.teamId)
-  //     .create({
-  //       "name": context.params.teamId,
-  //     });
-  // });
-
 exports.addInstrument = functions.https.onCall(async (data, context) => {
   const instruments = admin
     .firestore()

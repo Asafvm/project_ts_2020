@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/widgets/add_field_form.dart';
@@ -156,7 +157,16 @@ class _PDFScreenState extends State<PDFScreen> {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
-          return AddFieldForm(_fieldIndex, _pageIndex, pos.relative);
+          Field f = Field(
+              index: _fieldIndex,
+              hint: null,
+              isText: null,
+              prefix: null,
+              page: _pageIndex,
+              offset: pos.relative,
+              size: null,
+              isMandatory: null);
+          return AddFieldForm(f);
         });
     if (f != null) {
       setState(() {
@@ -171,7 +181,7 @@ class _PDFScreenState extends State<PDFScreen> {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
-          return AddFieldForm.fromField(field);
+          return AddFieldForm(field);
         });
     if (f != null)
       setState(() {
@@ -212,14 +222,12 @@ class _PDFScreenState extends State<PDFScreen> {
       _fields.forEach((f) => fields.add(f.toJson()));
       File file = File(widget.pathPDF);
 
-      if (file != null) {
-        //TODO: check that user is authenticated
-        await FirebaseStorageProvider()
-            .uploadFile(file, "Instruments/" + widget.instrumentID + "/")
+      if (file != null && Authentication().isAuth) {
+        await FirebaseStorageProvider.uploadFile(
+                file, "instruments/" + widget.instrumentID + "/")
             .then((val) async => {
                   _updateProgress(50),
-                  await FirebaseFirestoreProvider()
-                      .uploadFields(
+                  await FirebaseFirestoreProvider.uploadFields(
                           fields,
                           path.basenameWithoutExtension(file.path),
                           widget.instrumentID)

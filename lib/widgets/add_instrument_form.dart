@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddInstrumentForm extends StatefulWidget {
@@ -138,29 +139,15 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                 top: 5,
                 right: 25,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-            child: DefaultTabController(
-              initialIndex: 0,
-              length: 2,
-              child: Form(
-                key: _instrumentForm,
+            child: Form(
+              key: _instrumentForm,
+              child: DefaultTabController(
+                initialIndex: 0,
+                length: 2,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  //mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    TabBar(
-                      labelColor: Colors.black,
-                      tabs: [
-                        Tab(
-                          child: Text(
-                            "Required",
-                            style: TextStyle(color: _reqColor),
-                          ),
-                        ),
-                        Tab(
-                          text: "Optional",
-                        ),
-                      ],
-                    ),
+                    tabbar, //defined in consts
                     Container(
                       height: 200,
                       child: TabBarView(
@@ -221,23 +208,23 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   _uploadInstrument() {
     try {
-      FirebaseFirestoreProvider().uploadInstrument(_newInstrument).then(
-            (_) async => await showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: Text('Success!'),
-                content: Text('New Instrument created!\n'),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: Text('Ok'),
-                  ),
-                ],
+      FirebaseFirestoreProvider.uploadInstrument(_newInstrument).then(
+        (_) async => await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Success!'),
+            content: Text('New Instrument created!\n'),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: Navigator.of(context).pop,
+                child: Text('Ok'),
               ),
-            ).then(
-              (_) => Navigator.of(context).pop(),
-            ),
-          );
+            ],
+          ),
+        ).then(
+          (_) => Navigator.of(context).pop(),
+        ),
+      );
     } catch (error) {
       showDialog(
         context: context,

@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddPartForm extends StatefulWidget {
@@ -28,25 +30,107 @@ class _AddPartFormState extends State<AddPartForm> {
   final _partForm = GlobalKey<FormState>();
   var _isTracking = false;
   var _isActive = true;
+  StreamSubscription<List<Instrument>> subscription;
+  List<Instrument> instrumentList;
 
-  Widget _buildTextFormField(
-      String label, TextInputType type, Function onSave) {
-    return Flexible(
-      flex: 3,
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10),
-        child: TextFormField(
-          decoration: InputDecoration(labelText: label),
-          keyboardType: type,
-          onSaved: onSave,
-        ),
-      ),
+  Widget _buildDescFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: "Description"),
+      keyboardType: TextInputType.text,
+      onSaved: (val) {
+        _newPart.setDescription(val);
+      },
+    );
+  }
+
+  Widget _buildMinStorageFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: "Main Storage Min"),
+      keyboardType: TextInputType.number,
+      onSaved: (val) {
+        int min = int.tryParse(val);
+        _newPart.setmainStockMin(min == null ? 0 : min);
+      },
+    );
+  }
+
+  Widget _buildPerStorageFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Personal Storage Min'),
+      keyboardType: TextInputType.number,
+      onSaved: (val) {
+        int min = int.tryParse(val);
+        _newPart.setpersonalStockMin(min == null ? 0 : min);
+      },
+    );
+  }
+
+  Widget _buildRefFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Reference'),
+      keyboardType: TextInputType.text,
+      onSaved: (val) {
+        _newPart.setReference(val);
+      },
+    );
+  }
+
+  Widget _buildAltRefFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Alt. Reference'),
+      keyboardType: TextInputType.text,
+      onSaved: (val) {
+        _newPart.setAltreference(val);
+      },
+    );
+  }
+
+  Widget _buildManFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Manifacturer'),
+      keyboardType: TextInputType.text,
+      onSaved: (val) {
+        _newPart.setManifacturer(val);
+      },
+    );
+  }
+
+  Widget _buildModelFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Model'),
+      keyboardType: TextInputType.text,
+      onSaved: (val) {
+        _newPart.setModel(val);
+      },
+    );
+  }
+
+  Widget _buildPriceFormField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Price'),
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      onSaved: (val) {
+        var price = double.tryParse(val);
+        _newPart.setPrice(price == null ? 0.0 : price);
+      },
     );
   }
 
   @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final instrumentList = Provider.of<List<Instrument>>(context, listen: true);
+    subscription = FirebaseFirestoreProvider.getInstruments().listen((event) {
+      setState(() {
+        instrumentList = event;
+        subscription.cancel();
+      });
+    });
+
     return _uploading
         ? Center(
             child: Padding(
@@ -63,211 +147,181 @@ class _AddPartFormState extends State<AddPartForm> {
                 bottom: MediaQuery.of(context).viewInsets.bottom + 20),
             child: Form(
               key: _partForm,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        fit: FlexFit.tight,
-                        child: IconButton(
-                            icon: Icon(Icons.add_a_photo),
-                            iconSize: 50,
-                            onPressed: () {}),
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextFormField(
-                                scrollPadding:
-                                    EdgeInsets.symmetric(horizontal: 5),
-                                decoration:
-                                    InputDecoration(labelText: "Description"),
-                                keyboardType: TextInputType.text,
-                                onSaved: (val) {
-                                  _newPart.setDescription(val);
-                                }),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                _buildTextFormField(
-                                  "Reference",
-                                  TextInputType.text,
-                                  (val) {
-                                    _newPart.setReference(val);
-                                  },
-                                ),
-                                _buildTextFormField(
-                                  'Alt. Reference',
-                                  TextInputType.text,
-                                  (val) {
-                                    _newPart.setAltreference(val);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _buildTextFormField(
-                        "Main Storage Min",
-                        TextInputType.number,
-                        (val) {
-                          int min = int.tryParse(val);
-                          _newPart.setmainStockMin(min == null ? 0 : min);
-                        },
-                      ),
-                      _buildTextFormField(
-                        'Personal Storage Min',
-                        TextInputType.number,
-                        (val) {
-                          int min = int.tryParse(val);
-                          _newPart.setpersonalStockMin(min == null ? 0 : min);
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _buildTextFormField(
-                        "Manifacturer",
-                        TextInputType.text,
-                        (val) {
-                          _newPart.setManifacturer(val);
-                        },
-                      ),
-                      _buildTextFormField(
-                        'Model',
-                        TextInputType.text,
-                        (val) {
-                          _newPart.setModel(val);
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 3,
-                        child: instrumentList == null
-                            ? Text(
-                                "No Instruments listed",
-                                style: TextStyle(color: Colors.red),
-                              )
-                            : DropdownButton(
-                                items: instrumentList
-                                    .map((e) => DropdownMenuItem(
-                                          child: Text(e.getCodeName()),
-                                        ))
-                                    .toList(),
-                                onChanged: (val) {}),
-                      ),
-                      // _buildTextFormField(
-                      //   "Target Instrument",
-                      //   TextInputType.text,
-                      //   (val) {
-                      //     _newPart.setInstrumentId(val);
-                      //   },
-                      // ),
-                      _buildTextFormField(
-                        "price",
-                        TextInputType.numberWithOptions(decimal: true),
-                        (val) {
-                          var price = double.tryParse(val);
-                          _newPart.setPrice(price == null ? 0.0 : price);
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: SwitchListTile(
-                          title: Text("Track Serials"),
-                          value: _isTracking,
-                          onChanged: (val) {
-                            setState(() {
-                              _isTracking = val;
-                              _newPart.serialTracking = val;
-                            });
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: SwitchListTile(
-                            title: Text("Active"),
-                            value: _isActive,
-                            onChanged: (val) {
-                              setState(() {
-                                _isActive = val;
-                                _newPart.setActive(val);
-                              });
-                            }),
-                      ),
-                    ],
-                  ),
-                  Container(
-                      margin: EdgeInsets.symmetric(vertical: 20),
-                      child: FlatButton(
-                        onPressed: () async {
-                          _partForm.currentState.save();
-                          setState(() {
-                            _uploading = true;
-                          });
-                          //send to server
-                          try {
-                            await FirebaseFirestoreProvider()
-                                .uploadPart(_newPart)
-                                .then((_) async => await showDialog(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                          title: Text('Success!'),
-                                          content: Text('New Part created!\n'),
-                                          actions: <Widget>[
-                                            FlatButton(
-                                              onPressed:
-                                                  Navigator.of(context).pop,
-                                              child: Text('Ok'),
-                                            ),
+              child: DefaultTabController(
+                initialIndex: 0,
+                length: 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    tabbar, //defined in consts
+                    SizedBox(
+                      height: 200,
+                      child: TabBarView(
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Flexible(
+                                    flex: 1,
+                                    fit: FlexFit.tight,
+                                    child: IconButton(
+                                      icon: Icon(Icons.add_a_photo),
+                                      iconSize: 50,
+                                      onPressed: () {},
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 3,
+                                    fit: FlexFit.tight,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _buildDescFormField(),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Expanded(
+                                                child: _buildRefFormField()),
+                                            Expanded(
+                                                child: _buildAltRefFormField()),
                                           ],
-                                        )).then(
-                                    (_) => Navigator.of(context).pop()));
-                          } catch (error) {
-                            showDialog(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                      title: Text('Error!'),
-                                      content: Text('Operation failed\n' +
-                                          error.toString()),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          onPressed: Navigator.of(context).pop,
-                                          child: Text('Ok'),
                                         ),
                                       ],
-                                    ));
-                          } finally {
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(child: _buildMinStorageFormField()),
+                                  Expanded(child: _buildPerStorageFormField()),
+                                ],
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: instrumentList == null
+                                    ? Text(
+                                        "No Instruments listed",
+                                        style: TextStyle(color: Colors.red),
+                                      )
+                                    : DropdownButton(
+                                        hint: Text("Device"),
+                                        items: instrumentList
+                                            .map((e) => DropdownMenuItem(
+                                                  child: Text(e.getCodeName()),
+                                                ))
+                                            .toList(),
+                                        onChanged: (val) {},
+                                      ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Row(
+                                children: <Widget>[
+                                  Expanded(child: _buildManFormField()),
+                                  Expanded(child: _buildModelFormField()),
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(child: _buildPriceFormField())
+                                ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: SwitchListTile(
+                                      title: Text("Track Serials"),
+                                      value: _isTracking,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _isTracking = val;
+                                          _newPart.serialTracking = val;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: SwitchListTile(
+                                        title: Text("Active"),
+                                        value: _isActive,
+                                        onChanged: (val) {
+                                          setState(() {
+                                            _isActive = val;
+                                            _newPart.setActive(val);
+                                          });
+                                        }),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 20),
+                        child: FlatButton(
+                          onPressed: () async {
+                            _partForm.currentState.save();
                             setState(() {
-                              _newPart = null;
-                              _uploading = false;
+                              _uploading = true;
                             });
-                          }
-                        },
-                        child: Text(
-                          'Add New Part',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        color: Theme.of(context).primaryColor,
-                      ))
-                ],
+                            //send to server
+                            try {
+                              await FirebaseFirestoreProvider.uploadPart(
+                                      _newPart)
+                                  .then((_) async => await showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                            title: Text('Success!'),
+                                            content:
+                                                Text('New Part created!\n'),
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                onPressed:
+                                                    Navigator.of(context).pop,
+                                                child: Text('Ok'),
+                                              ),
+                                            ],
+                                          )).then(
+                                      (_) => Navigator.of(context).pop()));
+                            } catch (error) {
+                              showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                        title: Text('Error!'),
+                                        content: Text('Operation failed\n' +
+                                            error.toString()),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            onPressed:
+                                                Navigator.of(context).pop,
+                                            child: Text('Ok'),
+                                          ),
+                                        ],
+                                      ));
+                            } finally {
+                              setState(() {
+                                _newPart = null;
+                                _uploading = false;
+                              });
+                            }
+                          },
+                          child: Text(
+                            'Add New Part',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          color: Theme.of(context).primaryColor,
+                        ))
+                  ],
+                ),
               ),
             ),
           );

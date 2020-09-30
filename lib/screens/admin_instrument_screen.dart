@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/widgets/instrument_list_item.dart';
 import 'package:teamshare/widgets/add_instrument_form.dart';
@@ -24,7 +23,7 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: StreamBuilder(
-          stream: FirebaseFirestoreProvider().getInstruments(),
+          stream: FirebaseFirestoreProvider.getInstruments(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (!snapshot.hasData || snapshot.data.length == 0)
@@ -32,7 +31,7 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
                     child: Text("You haven't registered any instruments yet"));
               else
                 return ListView.builder(
-                  key: new Key(randomString(20)),
+                  key: UniqueKey(), //new Key(Strings.randomString(20)),
                   itemBuilder: (ctx, index) => InstrumentListItem(
                       Icons.computer, ctx, snapshot.data.elementAt(index)),
                   itemCount: snapshot.data.length,

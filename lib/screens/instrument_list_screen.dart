@@ -83,8 +83,8 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
     return Expanded(
       flex: 5,
       child: StreamBuilder<List<DocumentSnapshot>>(
-        stream: FirebaseFirestoreProvider()
-            .getInstrumentsInstances(widget.instrument.getCodeName()),
+        stream: FirebaseFirestoreProvider.getInstrumentsInstances(
+            widget.instrument.getCodeName()),
         builder: (context, snapshot) {
           if (snapshot == null || snapshot.data == null) {
             return Container();

@@ -1,7 +1,7 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/authentication.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
@@ -152,11 +152,10 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                       {
                         _setLoading(),
                         //firebase.uploadToFirebase(Authentication().userEmail),
-                        FirebaseFirestoreProvider()
-                            .addTeam(_name, _description)
-                            .then(
-                              (value) => Navigator.of(context).pop(),
-                            ),
+
+                        addTeam(_name, _description).then(
+                          (value) => Navigator.of(context).pop(),
+                        ),
                       }
                     else
                       print("User is not connected")
@@ -170,6 +169,19 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
         ],
       ),
     ).then((value) => {Navigator.of(context).pop(), _setLoading()});
+  }
+
+  addTeam(String name, String description) async {
+    return await CloudFunctions.instance
+        .getHttpsCallable(functionName: "addTeam")
+        .call(<String, dynamic>{
+          "name": name,
+          "description": description,
+          "creatorEmail": Authentication().userEmail,
+          //"creatorName": Authentication().userName,
+        })
+        .then((value) => {print("Team Created")})
+        .catchError((e) => print("Failed to create team. ${e.toString()}"));
   }
 
   _setLoading() {

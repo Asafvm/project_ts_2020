@@ -52,18 +52,18 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                       icon: Icon(Icons.picture_as_pdf),
                       tooltip: 'Add new form',
                       onPressed: () async {
-                        String filePath = await FilePicker.getFilePath(
-                            type: FileType.custom, allowedExtensions: ['pdf']);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PDFScreen(
-                                filePath,
-                                widget.instrument.getCodeName(),
-                                widget.instrument.getCodeName(),
-                                null), //documentID = Instrument document id
-                          ),
-                        );
+                        //TODO: fix this code later. FilePicker.getFilePath is deprecated
+                        //String filePath = await FilePicker.getFilePath(type: FileType.custom, allowedExtensions: ['pdf']);
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => PDFScreen(
+                        //         filePath,
+                        //         widget.instrument.getCodeName(),
+                        //         widget.instrument.getCodeName(),
+                        //         null), //documentID = Instrument document id
+                        //   ),
+                        // );
                       },
                     ),
                     IconButton(

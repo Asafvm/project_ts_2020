@@ -65,9 +65,10 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                           });
                           //send to server
                           try {
-                            await FirebaseFirestoreProvider()
-                                .uploadInstrumentInstance(_newInstInstrument,
-                                    widget.instrumentCodeName)
+                            await FirebaseFirestoreProvider
+                                    .uploadInstrumentInstance(
+                                        _newInstInstrument,
+                                        widget.instrumentCodeName)
                                 .then((_) => Navigator.of(context).pop());
                           } catch (error) {
                             showDialog(

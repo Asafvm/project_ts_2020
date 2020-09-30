@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/team_create_screen.dart';
 import 'package:teamshare/widgets/team_thumbnail.dart';
@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         //drawer: CustomDrawer(),
         body: StreamBuilder<List<DocumentSnapshot>>(
-            stream: getTeamList(),
+            stream: FirebaseFirestoreProvider.getTeamList(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return Center(
@@ -107,22 +107,11 @@ class _MainScreenState extends State<MainScreen> {
           MaterialPageRoute(builder: (_) => TeamCreateScreen()),
         )
         .then((value) => setState(() {
-              print("refreshing");
+              Applogger.consoleLog(MessegeType.info, "Refreshing");
             }));
   }
 
   void _refresh() {
     setState(() {});
-  }
-
-//Extracted from FirebaseFirestoreProvider class
-  getTeamList() {
-    return FirebaseFirestore.instance
-        .collection("users")
-        .doc(Authentication().userEmail)
-        .collection("teams")
-        .get()
-        .then((value) => value.docs)
-        .asStream();
   }
 }

@@ -4,19 +4,19 @@ import 'package:teamshare/models/field.dart';
 //TODO: finish form
 
 class AddFieldForm extends StatefulWidget {
-  int index;
-  int page;
-  Offset offset;
-  Field field;
-  AddFieldForm(this.index, this.page, this.offset);
-  AddFieldForm.fromField(this.field);
+  // int index;
+  // int page;
+  // Offset offset;
+  final Field field;
+//  AddFieldForm(this.index, this.page, this.offset);
+  AddFieldForm(this.field);
   @override
   _AddFieldFormState createState() => _AddFieldFormState();
 }
 
 class _AddFieldFormState extends State<AddFieldForm> {
-  double _defaultHeight = 20;
-  double _defaultWidth = 50;
+  final double _defaultHeight = 20;
+  final double _defaultWidth = 50;
   String _typeValue = 'Text';
   String _mandatoryValue = 'No';
   Field _newField;
@@ -30,9 +30,9 @@ class _AddFieldFormState extends State<AddFieldForm> {
       _mandatoryValue = (_newField.isMandatory) ? "Yes" : "No";
     } else {
       _newField = Field(
-          index: widget.index,
-          page: widget.page,
-          offset: widget.offset,
+          index: widget.field.index,
+          page: widget.field.page,
+          offset: widget.field.offset,
           size: Size(_defaultWidth, _defaultHeight),
           isMandatory: false,
           hint: "",

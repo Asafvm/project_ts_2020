@@ -14,7 +14,8 @@ class CustomDrawer extends StatelessWidget {
                 Text('Hello!'),
                 FlatButton.icon(
                     onPressed: () {
-                      //TODO: log out of current team
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                     },
                     icon: Icon(
                       Icons.exit_to_app,

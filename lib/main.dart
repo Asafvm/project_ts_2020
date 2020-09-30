@@ -13,9 +13,6 @@ Future<void> main() async {
 
 class TeamShare extends StatelessWidget {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-
-  //get domain from user
-  //final domain =
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -24,19 +21,20 @@ class TeamShare extends StatelessWidget {
         // Check for errors
         if (snapshot.hasError) {
           return MaterialApp(
-              title: 'Team Share',
-              theme: ThemeData(
-                primarySwatch: Colors.green,
-                accentColor: Colors.lightGreen,
-              ),
-              home: Scaffold(
-                body: Center(
-                  child: Text(
-                    "There was an error conneting to TeamShare service.\n please try again later!",
-                    textAlign: TextAlign.center,
-                  ),
+            title: 'Team Share',
+            theme: ThemeData(
+              primarySwatch: Colors.green,
+              accentColor: Colors.lightGreen,
+            ),
+            home: Scaffold(
+              body: Center(
+                child: Text(
+                  "There was an error conneting to TeamShare service.\n please try again later!",
+                  textAlign: TextAlign.center,
                 ),
-              ));
+              ),
+            ),
+          );
         }
 
         // Once complete, show your application
@@ -66,10 +64,32 @@ class TeamShare extends StatelessWidget {
 
         // Otherwise, show something whilst waiting for initialization to complete
         // splash screen here?
-        return FittedBox(
-            fit: BoxFit.contain,
-            alignment: Alignment.center,
-            child: CircularProgressIndicator());
+        return MaterialApp(
+          title: 'Team Share',
+          theme: ThemeData(
+            primarySwatch: Colors.green,
+            accentColor: Colors.lightGreen,
+          ),
+          home: Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Connection in progress...",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    LinearProgressIndicator(
+                      minHeight: 30,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }

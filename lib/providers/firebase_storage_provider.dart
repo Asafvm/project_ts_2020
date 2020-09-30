@@ -1,14 +1,17 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
+import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/team_provider.dart';
 
 class FirebaseStorageProvider {
-  Future<void> uploadFile(File file, String path) async {
+  static Future<void> uploadFile(File file, String path) async {
     await FirebaseStorage.instance
         .ref()
-        .child('username')
-        .child("company")
-        .child("Instruments")
+        .child(Authentication().userId)
+        .child(TeamProvider().getCurrentTeam.getTeamId)
+        .child("instruments")
         .child(path)
         .child(basenameWithoutExtension(file.path))
         .putFile(
@@ -20,8 +23,9 @@ class FirebaseStorageProvider {
         )
         .onComplete
         .then((value) async => {
-              print('file uploaded'),
+              Applogger.consoleLog(MessegeType.info, 'file uploaded'),
             })
-        .catchError((e) => print("Error uploading: " + e.toString()));
+        .catchError((e) => Applogger.consoleLog(
+            MessegeType.error, "Error uploading: " + e.toString()));
   }
 }
