@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +16,7 @@ class Authentication with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
   String _userId;
+  Timer _authTimer;
 
   bool get isAuth {
     return token != null;
@@ -53,7 +56,7 @@ class Authentication with ChangeNotifier {
       _token = usertoken.token;
       _expiryDate = usertoken.expirationTime;
       _user = result.user;
-
+      autoLogout();
       notifyListeners();
     } on PlatformException catch (e) {
       throw e.code;
@@ -66,6 +69,16 @@ class Authentication with ChangeNotifier {
     _token = null;
     _userId = null;
     _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
     notifyListeners();
+  }
+
+  void autoLogout() {
+    if (_authTimer != null) _authTimer.cancel();
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
