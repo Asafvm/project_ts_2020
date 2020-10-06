@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/screens/admin_menu_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -8,22 +10,7 @@ class CustomDrawer extends StatelessWidget {
       child: Column(
         children: <Widget>[
           AppBar(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Hello!'),
-                FlatButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    },
-                    icon: Icon(
-                      Icons.exit_to_app,
-                      color: Colors.white,
-                    ),
-                    label: Text(""))
-              ],
-            ),
+            title: Text('Hello!'),
             automaticallyImplyLeading: false,
           ),
           ListTile(
@@ -58,6 +45,25 @@ class CustomDrawer extends StatelessWidget {
             leading: Icon(Icons.settings),
             title: Text('Settings'),
             onTap: () {},
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.loop),
+            title: Text('Switch Team'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Logout'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+
+              Provider.of<Authentication>(context, listen: false).logout();
+            },
           ),
           Divider(),
         ],
