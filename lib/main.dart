@@ -5,6 +5,7 @@ import 'package:teamshare/screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/screens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,49 +47,35 @@ class TeamShare extends StatelessWidget {
               ),
             ],
             child: Consumer<Authentication>(
-              builder: (ctx, auth, _) => MaterialApp(
-                title: 'Team Share',
-                theme: ThemeData(
-                  primarySwatch: Colors.green,
-                  accentColor: Colors.lightGreen,
-                ),
-                home: auth.isAuth ? MainScreen() : LoginScreen(),
-                routes: {
-                  MainScreen.routeName: (ctx) => MainScreen(),
-                  AdminMenuScreen.routeName: (ctx) => AdminMenuScreen(),
-                },
-              ),
+              builder: (ctx, auth, _) {
+                return MaterialApp(
+                  title: 'Team Share',
+                  theme: ThemeData(
+                    primarySwatch: Colors.green,
+                    accentColor: Colors.lightGreen,
+                  ),
+                  home: auth.isAuth
+                      ? MainScreen()
+                      : FutureBuilder(
+                          future: auth.tryAutoLogin(),
+                          builder: (ctx, authResultSnapshot) =>
+                              authResultSnapshot.connectionState ==
+                                      ConnectionState.waiting
+                                  ? SplashScreen()
+                                  : LoginScreen()),
+                  routes: {
+                    MainScreen.routeName: (ctx) => MainScreen(),
+                    AdminMenuScreen.routeName: (ctx) => AdminMenuScreen(),
+                  },
+                );
+              },
             ),
           );
         }
 
-        // Otherwise, show something whilst waiting for initialization to complete
-        // splash screen here?
+        // splash screen while loading
         return MaterialApp(
-          title: 'Team Share',
-          theme: ThemeData(
-            primarySwatch: Colors.green,
-            accentColor: Colors.lightGreen,
-          ),
-          home: Scaffold(
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Connection in progress...",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    LinearProgressIndicator(
-                      minHeight: 30,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          home: SplashScreen(),
         );
       },
     );

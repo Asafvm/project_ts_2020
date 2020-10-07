@@ -19,7 +19,6 @@ class _MainScreenState extends State<MainScreen> {
         appBar: AppBar(
           title: Text("Team Share"),
         ),
-        //drawer: CustomDrawer(),
         body: StreamBuilder<List<DocumentSnapshot>>(
             stream: FirebaseFirestoreProvider.getTeamList(),
             builder: (context, snapshot) {

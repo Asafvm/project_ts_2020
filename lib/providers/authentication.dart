@@ -1,11 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teamshare/providers/applogger.dart';
 
 class Authentication with ChangeNotifier {
   static final Authentication _instance = Authentication._internal();
+
+  String _authToken;
+  String _authUserId;
+  String _authUserEmail;
+  DateTime _authTokenExpiry;
 
   factory Authentication() => _instance;
 
@@ -13,21 +22,20 @@ class Authentication with ChangeNotifier {
 
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   User _user;
-  String _token;
-  DateTime _expiryDate;
-  String _userId;
+  IdTokenResult _usertoken;
+
   Timer _authTimer;
 
   bool get isAuth {
-    return token != null;
+    return _authToken != null;
   }
 
   String get userId {
-    return isAuth && _user != null ? _userId : null;
+    return isAuth ? _authUserId : null;
   }
 
   String get userEmail {
-    return isAuth && _user != null ? _user.email : null;
+    return isAuth ? _authUserEmail : null;
   }
 
   String get userName {
@@ -35,9 +43,9 @@ class Authentication with ChangeNotifier {
   }
 
   String get token {
-    if (_expiryDate != null &&
-        _expiryDate.isAfter(DateTime.now()) &&
-        _token != null) return _token;
+    if (_authTokenExpiry != null &&
+        _authToken != null &&
+        _authTokenExpiry.isAfter(DateTime.now())) return _authToken;
     return null;
   }
 
@@ -52,10 +60,26 @@ class Authentication with ChangeNotifier {
         result = await firebaseAuth.signInWithEmailAndPassword(
             email: email, password: password);
 
-      IdTokenResult usertoken = await result.user.getIdTokenResult();
-      _token = usertoken.token;
-      _expiryDate = usertoken.expirationTime;
       _user = result.user;
+      _usertoken = await _user.getIdTokenResult();
+      _authToken = _usertoken.token;
+
+      _authUserId = _user.uid;
+      _authUserEmail = _user.email;
+      _authTokenExpiry = _usertoken.expirationTime;
+
+      //store login data
+      final pref = await SharedPreferences.getInstance();
+      final userData = json.encode(
+        {
+          'userEmail': _authUserEmail,
+          'userId': _authUserId,
+          'token': _authToken,
+          'expiry': _authTokenExpiry.toIso8601String(),
+        },
+      );
+      pref.setString('userData', userData);
+
       autoLogout();
       notifyListeners();
     } on PlatformException catch (e) {
@@ -65,20 +89,43 @@ class Authentication with ChangeNotifier {
     }
   }
 
-  void logout() {
-    _token = null;
-    _userId = null;
-    _expiryDate = null;
+  Future<bool> tryAutoLogin() async {
+    final pref = await SharedPreferences.getInstance();
+    if (!pref.containsKey('userData')) return false;
+    final extractedUserData =
+        json.decode(pref.getString('userData')) as Map<String, Object>;
+
+    _authTokenExpiry = DateTime.parse(extractedUserData['expiry']);
+    if (_authTokenExpiry.isBefore(DateTime.now())) return false;
+
+    _authUserEmail = extractedUserData['userEmail'];
+    _authUserId = extractedUserData['userId'];
+    _authToken = extractedUserData['token'];
+
+    notifyListeners();
+    autoLogout();
+
+    return true;
+  }
+
+  Future<void> logout() async {
+    _user = null;
+    _usertoken = null;
+    _authToken = null;
+    _authUserId = null;
+    _authUserEmail = null;
     if (_authTimer != null) {
       _authTimer.cancel();
       _authTimer = null;
     }
+    final pref = await SharedPreferences.getInstance();
+    pref.remove('userData');
     notifyListeners();
   }
 
   void autoLogout() {
     if (_authTimer != null) _authTimer.cancel();
-    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    final timeToExpiry = _authTokenExpiry.difference(DateTime.now()).inSeconds;
     Timer(Duration(seconds: timeToExpiry), logout);
   }
 }

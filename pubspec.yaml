@@ -37,6 +37,8 @@ dependencies:
   firebase_remote_config: "^0.4.0"
   firebase_storage: "^4.0.0"
 
+
+  shared_preferences: ^0.5.12
   provider: ^4.3.2+2
   #data_handeling
   json_annotation:

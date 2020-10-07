@@ -26,3 +26,28 @@ const tabbar = TabBar(
     ),
   ],
 );
+
+final logoText = Container(
+  //margin: EdgeInsets.only(top: 40),
+  //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+  child: RichText(
+    textAlign: TextAlign.center,
+    text: TextSpan(
+      text: 'Team',
+      style: const TextStyle(
+          fontSize: 52, fontWeight: FontWeight.bold, color: Colors.blue),
+      children: [
+        TextSpan(
+          text: 'Share\n',
+          style: const TextStyle(
+              fontSize: 52, fontWeight: FontWeight.bold, color: Colors.cyan),
+        ),
+        TextSpan(
+          text: 'Insert a slogan here',
+          style: const TextStyle(
+              fontSize: 20, fontWeight: FontWeight.normal, color: Colors.white),
+        )
+      ],
+    ),
+  ),
+);

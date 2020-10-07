@@ -172,9 +172,6 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
         await Provider.of<Authentication>(context, listen: false)
             .authenticate(_authData['email'], _authData['password'], _signup)
             .then((value) => _setLogging());
-
-        //Navigator.of(context).pushReplacementNamed(MainScreen.routeName);
-
       } catch (error) {
         var errorMessage = 'Authentication failed';
         if (error.toString().contains('EMAIL_EXISTS'))
@@ -217,7 +214,11 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
 
   Widget getRaisedButton(String text, bool signup) {
     return Expanded(
-      flex: text == 'Signup' ? (signup ? 2 : 1) : signup ? 2 : 1,
+      flex: text == 'Signup'
+          ? (signup ? 2 : 1)
+          : signup
+              ? 2
+              : 1,
       child: RaisedButton(
           animationDuration: Duration(milliseconds: 400),
           textColor: signup ? Colors.black : Colors.white,
