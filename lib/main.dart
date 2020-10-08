@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/custom_route.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
@@ -53,6 +54,10 @@ class TeamShare extends StatelessWidget {
                   theme: ThemeData(
                     primarySwatch: Colors.green,
                     accentColor: Colors.lightGreen,
+                    pageTransitionsTheme: PageTransitionsTheme(builders: {
+                      TargetPlatform.android: CustomPageTransitionBuilder(),
+                      TargetPlatform.iOS: CustomPageTransitionBuilder(),
+                    }),
                   ),
                   home: auth.isAuth
                       ? MainScreen()
