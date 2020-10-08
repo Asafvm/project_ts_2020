@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 
 class AuthForm extends StatefulWidget {
@@ -7,17 +8,13 @@ class AuthForm extends StatefulWidget {
   _AuthFormState createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
+class _AuthFormState extends State<AuthForm>
+    with SingleTickerProviderStateMixin {
   final _loginKey = GlobalKey<FormState>();
 
   AnimationController _animationController;
-
-  // GoogleSignIn _googleSignIn = GoogleSignIn(
-  //   scopes: <String>[
-  //     'email',
-  //     'https://www.googleapis.com/auth/contacts.readonly',
-  //   ],
-  // );
+  Animation<double> _opacityAnimation;
+  // Animation<Size> _heightAnimation;
 
   Map<String, String> _authData = {
     'email': '',
@@ -32,7 +29,13 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    // _heightAnimation.addListener(() {
+    //   setState(() {});
+    // });
   }
 
   @override
@@ -44,11 +47,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
     InputDecoration _getInputDecoration(
         IconData icon, String label, String hint) {
       final inputDecoration = InputDecoration(
-          // border: OutlineInputBorder(
-          //     borderSide: BorderSide(color: Colors.white),
-          //     borderRadius: BorderRadius.circular(8)),
           icon: Icon(icon, color: Colors.white),
-          //hintText: hint,
           hintStyle: textStyleWhite.copyWith(color: Colors.grey[500]),
           labelText: label,
           labelStyle: textStyleWhite);
@@ -62,10 +61,13 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
               strokeWidth: 3,
             ),
           )
-        : Form(
-            key: _loginKey,
-            child: Flexible(
-              child: SingleChildScrollView(
+        : AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.fastOutSlowIn,
+            height: _signup ? 350 : 280,
+            child: SingleChildScrollView(
+              child: Form(
+                key: _loginKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   mainAxisSize: MainAxisSize.max,
@@ -76,7 +78,6 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                           Icons.email, "Email", "Enter Email"),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        //RegExp regExp = RegExp(r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$',caseSensitive: false,multiLine: false);
                         RegExp regExp = RegExp(
                             r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
                             caseSensitive: false,
@@ -104,23 +105,31 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                         _authData['password'] = val;
                       },
                     ),
-                    if (_signup)
-                      TextFormField(
-                        style: textStyleWhite,
-                        decoration: _getInputDecoration(
-                            Icons.lock, "Confirm Password", "Enter Password"),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Password cannot be empty';
-                          else if (_passwordController.text.compareTo(value) !=
-                              0) return 'Passwords do not match';
-                          return null;
-                        },
-                        onSaved: (val) {
-                          _authData['password'] = val;
-                        },
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      constraints: BoxConstraints(
+                          minHeight: _signup ? 60 : 0,
+                          maxHeight: _signup ? 120 : 0),
+                      child: FadeTransition(
+                        opacity: _opacityAnimation,
+                        child: TextFormField(
+                          style: textStyleWhite,
+                          decoration: _getInputDecoration(
+                              Icons.lock, "Confirm Password", "Enter Password"),
+                          obscureText: true,
+                          validator: _signup
+                              ? (value) {
+                                  if (value.isEmpty)
+                                    return 'Password cannot be empty';
+                                  else if (_passwordController.text
+                                          .compareTo(value) !=
+                                      0) return 'Passwords do not match';
+                                  return null;
+                                }
+                              : null,
+                        ),
                       ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
@@ -159,7 +168,8 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
     setState(() {
       _signup = !_signup;
     });
-    _animationController.forward();
+
+    _signup ? _animationController.forward() : _animationController.reverse();
   }
 
   Future<void> _authUser(BuildContext context) async {
@@ -169,6 +179,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
         setState(() {
           _logging = true;
         });
+        Applogger.consoleLog(MessegeType.info, 'logging');
         await Provider.of<Authentication>(context, listen: false)
             .authenticate(_authData['email'], _authData['password'], _signup)
             .then((value) => _setLogging());

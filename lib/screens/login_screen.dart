@@ -14,11 +14,11 @@ class LoginScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              logoText, //defined in consts
-              AuthForm(),
+              Flexible(child: logoText), //defined in consts
+              Flexible(child: AuthForm()),
             ],
           ),
         ),
