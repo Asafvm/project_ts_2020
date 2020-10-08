@@ -14,12 +14,13 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Parts"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _openAddParts(context),
-          ),
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        onPressed: () => _openAddParts(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),

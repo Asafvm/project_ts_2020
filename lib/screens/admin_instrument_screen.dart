@@ -14,11 +14,13 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Instruments"),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _openAddInstrument(context))
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        onPressed: () => _openAddInstrument(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
