@@ -52,8 +52,8 @@ class TeamShare extends StatelessWidget {
                 return MaterialApp(
                   title: 'Team Share',
                   theme: ThemeData(
-                    primarySwatch: Colors.green,
-                    accentColor: Colors.lightGreen,
+                    primarySwatch: Colors.blue,
+                    accentColor: Colors.blueAccent,
                     pageTransitionsTheme: PageTransitionsTheme(builders: {
                       TargetPlatform.android: CustomPageTransitionBuilder(),
                       TargetPlatform.iOS: CustomPageTransitionBuilder(),
