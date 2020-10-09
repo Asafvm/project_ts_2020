@@ -14,8 +14,6 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
   Instrument _newInstrument;
   final _instrumentForm = GlobalKey<FormState>();
 
-  Color _reqColor;
-
   Widget _buildNameField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Instrument Name'),
@@ -26,7 +24,6 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
       },
       validator: (value) {
         if (value.trim() == "") {
-          _setReqErr(true);
           return "An instrument must have a name";
         } else {
           return null;
@@ -47,7 +44,6 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
       },
       validator: (value) {
         if (value.trim() == "") {
-          _setReqErr(true);
           return "An instrument must have a unique reference";
         } else {
           return null;
@@ -178,7 +174,6 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                         onPressed: () async {
                           if (manualValidation()) {
                             //_instrumentForm.currentState.validate()) {
-                            _setReqErr(false);
                             _instrumentForm.currentState.save();
                             setState(() {
                               _uploading = true;
@@ -195,15 +190,6 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
               ),
             ),
           );
-  }
-
-  void _setReqErr(bool status) {
-    setState(() {
-      if (status)
-        _reqColor = Colors.red;
-      else
-        _reqColor = Colors.black;
-    });
   }
 
   _uploadInstrument() {
@@ -251,10 +237,8 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
   bool manualValidation() {
     if (_newInstrument.getReference().isEmpty ||
         _newInstrument.getCodeName().isEmpty) {
-      _setReqErr(true);
       return false;
     } else {
-      _setReqErr(false);
       if (_newInstrument.getManifacturer().isEmpty)
         _newInstrument.setManifacturer("Unknown");
       if (_newInstrument.getModel().isEmpty) _newInstrument.setModel("1");

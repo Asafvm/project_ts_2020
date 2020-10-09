@@ -54,10 +54,12 @@ class TeamShare extends StatelessWidget {
                   theme: ThemeData(
                     primarySwatch: Colors.blue,
                     accentColor: Colors.blueAccent,
-                    pageTransitionsTheme: PageTransitionsTheme(builders: {
-                      TargetPlatform.android: CustomPageTransitionBuilder(),
-                      TargetPlatform.iOS: CustomPageTransitionBuilder(),
-                    }),
+                    pageTransitionsTheme: PageTransitionsTheme(
+                      builders: {
+                        TargetPlatform.android: CustomPageTransitionBuilder(),
+                        TargetPlatform.iOS: CustomPageTransitionBuilder(),
+                      },
+                    ),
                   ),
                   home: auth.isAuth
                       ? MainScreen()
