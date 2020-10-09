@@ -3,39 +3,55 @@ import 'package:provider/provider.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 
+enum AuthState { signin, signup }
+
 class AuthForm extends StatefulWidget {
   @override
   _AuthFormState createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm>
-    with SingleTickerProviderStateMixin {
+class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   final _loginKey = GlobalKey<FormState>();
 
-  AnimationController _animationController;
+  AnimationController _animationContainerController;
+  AnimationController _animationButtonController;
   Animation<double> _opacityAnimation;
+  Animation<double> _buttonAnimation;
   // Animation<Size> _heightAnimation;
+
+  double screenWidth;
 
   Map<String, String> _authData = {
     'email': '',
     'password': '',
   };
 
-  bool _signup = false;
-
+  AuthState signMode = AuthState.signin;
   bool _logging = false;
 
   @override
-  void initState() {
-    super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    screenWidth = MediaQuery.of(context).size.width - 80;
+
+    _animationContainerController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
     );
-    // _heightAnimation.addListener(() {
-    //   setState(() {});
-    // });
+    _animationButtonController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+          parent: _animationContainerController, curve: Curves.easeInOut),
+    );
+    _buttonAnimation =
+        Tween(begin: screenWidth / 3, end: screenWidth / 3 * 2).animate(
+      CurvedAnimation(
+          parent: _animationButtonController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -64,12 +80,12 @@ class _AuthFormState extends State<AuthForm>
         : AnimatedContainer(
             duration: Duration(milliseconds: 300),
             curve: Curves.fastOutSlowIn,
-            height: _signup ? 350 : 280,
+            height: signMode == AuthState.signup ? 350 : 280,
             child: SingleChildScrollView(
               child: Form(
                 key: _loginKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     TextFormField(
@@ -108,8 +124,8 @@ class _AuthFormState extends State<AuthForm>
                     AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       constraints: BoxConstraints(
-                          minHeight: _signup ? 60 : 0,
-                          maxHeight: _signup ? 120 : 0),
+                          minHeight: signMode == AuthState.signup ? 60 : 0,
+                          maxHeight: signMode == AuthState.signup ? 120 : 0),
                       child: FadeTransition(
                         opacity: _opacityAnimation,
                         child: TextFormField(
@@ -117,7 +133,7 @@ class _AuthFormState extends State<AuthForm>
                           decoration: _getInputDecoration(
                               Icons.lock, "Confirm Password", "Enter Password"),
                           obscureText: true,
-                          validator: _signup
+                          validator: signMode == AuthState.signup
                               ? (value) {
                                   if (value.isEmpty)
                                     return 'Password cannot be empty';
@@ -131,20 +147,16 @@ class _AuthFormState extends State<AuthForm>
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Column(
                         children: <Widget>[
-                          AnimatedContainer(
-                            duration: Duration(seconds: 1),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                getRaisedButton('Signin', !_signup),
-                                getRaisedButton('Signup', _signup)
-                              ],
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              getSigninButton(),
+                              getSignupButton(),
+                            ],
                           ),
                         ],
                       ),
@@ -166,10 +178,20 @@ class _AuthFormState extends State<AuthForm>
 
   _setSigningMode() {
     setState(() {
-      _signup = !_signup;
+      _loginKey.currentState.reset();
+      if (signMode == AuthState.signup)
+        signMode = AuthState.signin;
+      else
+        signMode = AuthState.signup;
     });
 
-    _signup ? _animationController.forward() : _animationController.reverse();
+    if (signMode == AuthState.signup) {
+      _animationContainerController.forward();
+      _animationButtonController.forward();
+    } else {
+      _animationContainerController.reverse();
+      _animationButtonController.reverse();
+    }
   }
 
   Future<void> _authUser(BuildContext context) async {
@@ -181,7 +203,8 @@ class _AuthFormState extends State<AuthForm>
         });
         Applogger.consoleLog(MessegeType.info, 'logging');
         await Provider.of<Authentication>(context, listen: false)
-            .authenticate(_authData['email'], _authData['password'], _signup)
+            .authenticate(_authData['email'], _authData['password'],
+                signMode == AuthState.signup)
             .then((value) => _setLogging());
       } catch (error) {
         var errorMessage = 'Authentication failed';
@@ -223,23 +246,47 @@ class _AuthFormState extends State<AuthForm>
     );
   }
 
-  Widget getRaisedButton(String text, bool signup) {
-    return Expanded(
-      flex: text == 'Signup'
-          ? (signup ? 2 : 1)
-          : signup
-              ? 2
-              : 1,
+  Widget getSigninButton() {
+    return AnimatedBuilder(
+      animation: _buttonAnimation,
+      builder: (context, ch) => Container(
+        width: screenWidth - _buttonAnimation.value,
+        child: ch,
+      ),
       child: RaisedButton(
-          animationDuration: Duration(milliseconds: 400),
-          textColor: signup ? Colors.black : Colors.white,
-          shape: signup
-              ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
-              : RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-          color: signup ? Theme.of(context).accentColor : Colors.white24,
-          elevation: 12,
-          child: Text(text),
-          onPressed: signup ? () => _authUser(context) : _setSigningMode),
+        textColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+        color: signMode == AuthState.signin
+            ? Theme.of(context).accentColor
+            : Colors.blueGrey,
+        elevation: 12,
+        child: Text('Signin'),
+        onPressed: signMode == AuthState.signin
+            ? () => _authUser(context)
+            : _setSigningMode,
+      ),
+    );
+  }
+
+  Widget getSignupButton() {
+    return AnimatedBuilder(
+      animation: _buttonAnimation,
+      builder: (context, ch) => Container(
+        width: _buttonAnimation.value,
+        child: ch,
+      ),
+      child: RaisedButton(
+        textColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+        color: signMode == AuthState.signup
+            ? Theme.of(context).accentColor
+            : Colors.blueGrey,
+        elevation: 12,
+        child: Text('Signup'),
+        onPressed: signMode == AuthState.signup
+            ? () => _authUser(context)
+            : _setSigningMode,
+      ),
     );
   }
 
