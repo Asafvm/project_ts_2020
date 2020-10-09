@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as syspath;
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
@@ -16,6 +22,8 @@ class TeamCreateScreen extends StatefulWidget {
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
   bool _loading = false;
+
+  String _picUrl = 'assets/pics/add_image.png';
 
   @override
   void initState() {
@@ -78,12 +86,10 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.add_photo_alternate,
-                            size: 50,
-                          ),
-                          onPressed: () {}),
+                      child: FlatButton(
+                        child: Image.asset(_picUrl),
+                        onPressed: _takePicture,
+                      ),
                     ),
                     Expanded(
                       flex: 3,
@@ -153,7 +159,10 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                         _setLoading(),
                         //firebase.uploadToFirebase(Authentication().userEmail),
 
-                        addTeam(_name, _description).then(
+                        addTeam(
+                          _name,
+                          _description,
+                        ).then(
                           (value) => Navigator.of(context).pop(),
                         ),
                       }
@@ -187,6 +196,22 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
   _setLoading() {
     setState(() {
       _loading = !_loading;
+    });
+  }
+
+  Future<void> _takePicture() async {
+    final picker = ImagePicker();
+    final imageFile = await picker.getImage(
+      source: ImageSource.gallery,
+      maxHeight: 100,
+      maxWidth: 100,
+    );
+    final appDir = await syspath.getApplicationDocumentsDirectory();
+    final picName = path.basename(imageFile.path);
+    File image = File(imageFile.path);
+    File savedImage = await image.copy('${appDir.path}/$picName');
+    setState(() {
+      _picUrl = savedImage.path;
     });
   }
 }
