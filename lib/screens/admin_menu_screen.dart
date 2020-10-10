@@ -30,8 +30,7 @@ class AdminMenuScreen extends StatelessWidget {
             ),
             iconSize: 100,
             onPressed: click,
-            splashRadius: 30,
-            splashColor: Theme.of(context).primaryColor,
+            focusColor: Theme.of(context).primaryColor,
           ),
           Text(
             title,
@@ -53,41 +52,43 @@ class AdminMenuScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                    child: createButton(Icons.location_city, () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => AdminSiteScreen()),
-                  );
-                }, 'Site', context)),
-                Expanded(
-                  child: createButton(Icons.computer, () {
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: createButton(Icons.location_city, () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (_) => AdminInstrumentScreen()),
+                      MaterialPageRoute(builder: (_) => AdminSiteScreen()),
                     );
-                  }, 'Instruments', context),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: createButton(Icons.developer_board, () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => AdminPartScreen()),
-                    );
-                  }, 'Parts', context),
-                ),
-                Expanded(
-                    child: createButton(Icons.perm_contact_calendar, null,
-                        'Contacts', context)),
-              ],
-            ),
-          ],
+                  }, 'Site', context)),
+                  Expanded(
+                    child: createButton(Icons.computer, () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => AdminInstrumentScreen()),
+                      );
+                    }, 'Instruments', context),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: createButton(Icons.developer_board, () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => AdminPartScreen()),
+                      );
+                    }, 'Parts', context),
+                  ),
+                  Expanded(
+                      child: createButton(Icons.perm_contact_calendar, null,
+                          'Contacts', context)),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
