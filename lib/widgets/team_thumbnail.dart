@@ -10,11 +10,15 @@ class TeamThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 2),
-        borderRadius: BorderRadius.circular(15),
+    return Card(
+      elevation: 7,
+      margin: EdgeInsets.symmetric(vertical: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(15),
+        ),
+        side: BorderSide(
+            color: Colors.blueGrey, width: 2, style: BorderStyle.solid),
       ),
       child: Padding(
         padding: const EdgeInsets.all(5.0),
