@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 
 enum AuthState { signin, signup }
@@ -31,10 +30,8 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     screenWidth = MediaQuery.of(context).size.width - 80;
-
     _animationContainerController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
@@ -197,11 +194,12 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   Future<void> _authUser(BuildContext context) async {
     _loginKey.currentState.save();
     if (_loginKey.currentState.validate()) {
+      FocusScope.of(context).unfocus();
       try {
         setState(() {
           _logging = true;
         });
-        Applogger.consoleLog(MessegeType.info, 'logging');
+
         await Provider.of<Authentication>(context, listen: false)
             .authenticate(_authData['email'], _authData['password'],
                 signMode == AuthState.signup)

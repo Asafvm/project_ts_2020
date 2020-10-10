@@ -10,14 +10,14 @@ class AdminMenuScreen extends StatelessWidget {
       IconData icon, Function click, String title, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
+        border: Border.all(width: 3, color: Colors.black),
         borderRadius: BorderRadius.all(Radius.circular(25)),
         boxShadow: [
           BoxShadow(
-              color: Theme.of(context).accentColor.withOpacity(0.5),
+              color: Theme.of(context).accentColor.withOpacity(0.3),
               offset: Offset(0, 0),
               blurRadius: 3.0,
-              spreadRadius: 5.0)
+              spreadRadius: 1.0)
         ],
       ),
       margin: EdgeInsets.all(10),
@@ -33,7 +33,13 @@ class AdminMenuScreen extends StatelessWidget {
             splashRadius: 30,
             splashColor: Theme.of(context).primaryColor,
           ),
-          Text(title),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
