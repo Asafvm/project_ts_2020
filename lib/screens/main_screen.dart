@@ -19,14 +19,17 @@ class _MainScreenState extends State<MainScreen> {
         appBar: AppBar(
           title: Text("Team Share"),
         ),
-        body: StreamBuilder<List<DocumentSnapshot>>(
+        body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestoreProvider.getTeamList(),
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              } else if (snapshot.data.length == 0) {
+              }
+              final List<QueryDocumentSnapshot> documents = snapshot.data.docs;
+
+              if (documents.length == 0) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -62,10 +65,10 @@ class _MainScreenState extends State<MainScreen> {
                           itemBuilder: (ctx, index) {
                             return TeamThumbnail(
                               key: UniqueKey(),
-                              teamDocId: snapshot.data[index].id,
+                              teamDocId: documents[index].id,
                             );
                           },
-                          itemCount: snapshot.data.length,
+                          itemCount: documents.length,
                           shrinkWrap: true,
                         ),
                       ),

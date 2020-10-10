@@ -16,14 +16,22 @@ class FirebaseFirestoreProvider {
 //Get from Firebase
 
 //Extracted from FirebaseFirestoreProvider class
-  static Stream<List<DocumentSnapshot>> getTeamList() {
+  // static Stream<List<DocumentSnapshot>> getTeamList() {
+  //   return FirebaseFirestore.instance
+  //       .collection("users")
+  //       .doc(Authentication().userEmail)
+  //       .collection("teams")
+  //       .get()
+  //       .then((value) => value.docs)
+  //       .asStream();
+  // }
+
+  static Stream<QuerySnapshot> getTeamList() {
     return FirebaseFirestore.instance
         .collection("users")
         .doc(Authentication().userEmail)
         .collection("teams")
-        .get()
-        .then((value) => value.docs)
-        .asStream();
+        .snapshots();
   }
 
   static Stream<List<Part>> getParts() {
