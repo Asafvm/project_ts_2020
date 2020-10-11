@@ -67,6 +67,16 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: 0.8.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "dev_assets/logo_size.jpg"
+  adaptive_icon_background: "#191919"
+  adaptive_icon_foreground: "dev_assets/logo_size_invert.jpg"
+    
+
   build_runner:
   json_serializable:
 
