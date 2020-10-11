@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 
 import 'authentication.dart';
@@ -15,16 +20,47 @@ class FirebaseFirestoreProvider {
 
 //Get from Firebase
 
-//Extracted from FirebaseFirestoreProvider class
-  // static Stream<List<DocumentSnapshot>> getTeamList() {
-  //   return FirebaseFirestore.instance
-  //       .collection("users")
-  //       .doc(Authentication().userEmail)
-  //       .collection("teams")
-  //       .get()
-  //       .then((value) => value.docs)
-  //       .asStream();
-  // }
+  static addTeam(String name, String description, [String picUrl]) async {
+    //step 1: upload team and get id
+    HttpsCallableResult teaminfo = await CloudFunctions.instance
+        .getHttpsCallable(functionName: "addTeam")
+        .call(<String, dynamic>{
+      "name": name,
+      "description": description,
+      "creatorEmail": Authentication().userEmail,
+    }).catchError((err) => Applogger.consoleLog(
+            MessegeType.error, 'Failed to create team: ${err.toString()}'));
+
+    String teamid = teaminfo.data;
+    Applogger.consoleLog(MessegeType.info,
+        "Team created successfuly without logo. teamid: ${teamid}\n");
+    //step 2: user team id to upload pic to team folder
+    if (picUrl != null) {
+      String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
+          File(picUrl), '$teams/$teamid', 'logo');
+
+      await CloudFunctions.instance
+          .getHttpsCallable(functionName: "updateTeam")
+          .call(<String, dynamic>{
+            'teamid': teamid,
+            'data': {
+              'logo': firestoragePicUrl,
+            }
+          })
+          .catchError((err) => Applogger.consoleLog(MessegeType.error,
+              'Failed to update team logo path: ${err.toString()}'))
+          .then((value) => Applogger.consoleLog(
+              MessegeType.info, "Team created successfuly"));
+    }
+    // .catchError((err) => Applogger.consoleLog(MessegeType.error,
+    //     'Failed to upload team logo: ${err.toString()}'))
+    // .then(
+    //   (value) async => {
+    //     //step 3: update team info with path to team logo
+
+    //   },
+    // );
+  }
 
   static Stream<QuerySnapshot> getTeamList() {
     return FirebaseFirestore.instance

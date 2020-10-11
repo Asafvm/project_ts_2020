@@ -43,9 +43,11 @@ class TeamThumbnail extends StatelessWidget {
               String teamName = snapshot.data['name'] ?? "";
               return ListTile(
                 leading: Hero(
-                  tag: key,
+                  tag: teamDocId,
                   child: Image(
-                    image: AssetImage('assets/pics/unknown.jpg'),
+                    image: snapshot.data['logo'] == null
+                        ? AssetImage('assets/pics/unknown.jpg')
+                        : NetworkImage(snapshot.data['logo']),
                   ),
                 ),
                 title: Text(teamName),
@@ -58,7 +60,7 @@ class TeamThumbnail extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => TeamHomeScreen(
                       team: Team(id: teamDocId, name: teamName),
-                      teamLogo: key,
+                      teamLogoUrl: snapshot.data['logo'],
                     ),
                   ),
                 ),

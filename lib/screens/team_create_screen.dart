@@ -4,10 +4,10 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspath;
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
@@ -22,6 +22,7 @@ class TeamCreateScreen extends StatefulWidget {
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
   bool _loading = false;
+  bool __imgPicked = false;
 
   String _picUrl = 'assets/pics/add_image.png';
 
@@ -87,7 +88,9 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                     Expanded(
                       flex: 1,
                       child: FlatButton(
-                        child: Image.asset(_picUrl),
+                        child: __imgPicked
+                            ? Image.file(File(_picUrl))
+                            : Image.asset(_picUrl),
                         onPressed: _takePicture,
                       ),
                     ),
@@ -159,10 +162,9 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                         _setLoading(),
                         //firebase.uploadToFirebase(Authentication().userEmail),
 
-                        addTeam(
-                          _name,
-                          _description,
-                        ).then(
+                        FirebaseFirestoreProvider.addTeam(_name, _description,
+                                __imgPicked ? _picUrl : null)
+                            .then(
                           (value) => Navigator.of(context).pop(),
                         ),
                       }
@@ -178,19 +180,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
         ],
       ),
     ).then((value) => {Navigator.of(context).pop(), _setLoading()});
-  }
-
-  addTeam(String name, String description) async {
-    return await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addTeam")
-        .call(<String, dynamic>{
-          "name": name,
-          "description": description,
-          "creatorEmail": Authentication().userEmail,
-          //"creatorName": Authentication().userName,
-        })
-        .then((value) => {print("Team Created")})
-        .catchError((e) => print("Failed to create team. ${e.toString()}"));
   }
 
   _setLoading() {
@@ -212,6 +201,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
     File savedImage = await image.copy('${appDir.path}/$picName');
     setState(() {
       _picUrl = savedImage.path;
+      __imgPicked = true;
     });
   }
 }

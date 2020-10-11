@@ -50,55 +50,34 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 );
               } else {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // ignore: missing_return
-                      RefreshIndicator(
-                        onRefresh: () async {
-                          return await Future.delayed(
-                              Duration(seconds: 1), _refresh);
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(10),
+                        itemBuilder: (ctx, index) {
+                          return TeamThumbnail(
+                            key: UniqueKey(),
+                            teamDocId: documents[index].id,
+                          );
                         },
-                        child: ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(10),
-                          itemBuilder: (ctx, index) {
-                            return TeamThumbnail(
-                              key: UniqueKey(),
-                              teamDocId: documents[index].id,
-                            );
-                          },
-                          itemCount: documents.length,
-                          shrinkWrap: true,
-                        ),
+                        itemCount: documents.length,
+                        shrinkWrap: true,
                       ),
-
-                      GestureDetector(
-                        onTap: () {
-                          createTeam(context);
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          margin: EdgeInsets.all(15),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black, width: 2),
-                              borderRadius: BorderRadius.circular(15),
-                              color: Theme.of(context).accentColor,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 10))
-                              ]),
-                          child: Icon(Icons.add_circle_outline),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               }
             }),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => createTeam(context),
+          child: Icon(Icons.group_add),
+          focusElevation: 6,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
@@ -111,9 +90,5 @@ class _MainScreenState extends State<MainScreen> {
         .then((value) => setState(() {
               Applogger.consoleLog(MessegeType.info, "Refreshing");
             }));
-  }
-
-  void _refresh() {
-    setState(() {});
   }
 }

@@ -5,8 +5,9 @@ import 'package:teamshare/widgets/custom_drawer.dart';
 
 class TeamHomeScreen extends StatefulWidget {
   final Team team;
-  final Key teamLogo;
-  const TeamHomeScreen({Key key, this.team, this.teamLogo}) : super(key: key);
+  final String teamLogoUrl;
+  const TeamHomeScreen({Key key, this.team, this.teamLogoUrl})
+      : super(key: key);
 
   @override
   _TeamHomeScreenState createState() => _TeamHomeScreenState();
@@ -34,11 +35,13 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
             Expanded(
               flex: 1,
               child: Hero(
-                tag: widget.teamLogo,
+                tag: widget.team.getTeamId,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Image(
-                    image: AssetImage('assets/pics/unknown.jpg'),
+                    image: widget.teamLogoUrl == null
+                        ? AssetImage('assets/pics/unknown.jpg')
+                        : NetworkImage(widget.teamLogoUrl),
                   ),
                 ),
               ),
