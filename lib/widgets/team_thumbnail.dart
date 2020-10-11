@@ -45,6 +45,7 @@ class TeamThumbnail extends StatelessWidget {
                 leading: Hero(
                   tag: teamDocId,
                   child: Image(
+                    width: 60,
                     image: snapshot.data['logo'] == null
                         ? AssetImage('assets/pics/unknown.jpg')
                         : NetworkImage(snapshot.data['logo']),

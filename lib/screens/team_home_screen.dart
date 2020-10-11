@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/team_provider.dart';
@@ -31,19 +33,37 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
       body: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               flex: 1,
-              child: Hero(
-                tag: widget.team.getTeamId,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image(
+                    fit: BoxFit.fitWidth,
                     image: widget.teamLogoUrl == null
                         ? AssetImage('assets/pics/unknown.jpg')
                         : NetworkImage(widget.teamLogoUrl),
                   ),
-                ),
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+                      child: Container(
+                        color: Colors.black.withOpacity(0),
+                      ),
+                    ),
+                  ),
+                  Hero(
+                    tag: widget.team.getTeamId,
+                    child: Image(
+                      fit: BoxFit.fitHeight,
+                      image: widget.teamLogoUrl == null
+                          ? AssetImage('assets/pics/unknown.jpg')
+                          : NetworkImage(widget.teamLogoUrl),
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
