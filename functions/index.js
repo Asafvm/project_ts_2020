@@ -31,11 +31,9 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
 exports.updateTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
   // eslint-disable-next-line promise/no-nesting
-  var info= data['data'];
-
   await teams
     .doc(data['teamid'])
-    .update(info)
+    .update(data['data'])
     .then((val) => {
       console.log("success: updated team info ");
       return true;
@@ -44,7 +42,6 @@ exports.updateTeam = functions.https.onCall(async (data, context) => {
       console.log("could updated team info. error: " + err);
       return false;
     });
-  return teamid;
 });
 
 //register team at user profile automatically
