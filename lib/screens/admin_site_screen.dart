@@ -17,7 +17,7 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
     try {
       final locData = await Location().getLocation();
       _showPreview(locData.latitude, locData.longitude);
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       return;
     }
   }

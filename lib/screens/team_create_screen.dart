@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

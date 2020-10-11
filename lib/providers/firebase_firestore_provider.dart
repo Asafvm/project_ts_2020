@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,7 +32,7 @@ class FirebaseFirestoreProvider {
 
     String teamid = teaminfo.data;
     Applogger.consoleLog(MessegeType.info,
-        "Team created successfuly without logo. teamid: ${teamid}\n");
+        "Team created successfuly without logo. teamid: $teamid\n");
     //step 2: user team id to upload pic to team folder
     if (picUrl != null) {
       String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
