@@ -51,14 +51,6 @@ class FirebaseFirestoreProvider {
           .then((value) => Applogger.consoleLog(
               MessegeType.info, "Team created successfuly"));
     }
-    // .catchError((err) => Applogger.consoleLog(MessegeType.error,
-    //     'Failed to upload team logo: ${err.toString()}'))
-    // .then(
-    //   (value) async => {
-    //     //step 3: update team info with path to team logo
-
-    //   },
-    // );
   }
 
   static Stream<QuerySnapshot> getTeamList() {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspath;
@@ -20,9 +21,7 @@ class TeamCreateScreen extends StatefulWidget {
 }
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
-  bool _loading = false;
   bool __imgPicked = false;
-
   String _picUrl = 'assets/pics/add_image.png';
 
   @override
@@ -146,45 +145,45 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
   }
 
   void _createTeam() {
+    bool _loading = false;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Confirm"),
-        content: Text("Create $_name?"),
-        actions: [
-          _loading
-              ? CircularProgressIndicator()
-              : FlatButton(
-                  onPressed: () async => {
-                    if (Authentication().isAuth)
-                      {
-                        _setLoading(),
-                        //firebase.uploadToFirebase(Authentication().userEmail),
-
-                        FirebaseFirestoreProvider.addTeam(_name, _description,
-                                __imgPicked ? _picUrl : null)
-                            .then(
-                          (value) => Navigator.of(context).pop(),
-                        ),
-                      }
-                    else
-                      print("User is not connected")
-                  },
-                  child: Text("Ok"),
-                ),
-          FlatButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("Cancel"),
-          ),
-        ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text("Confirm"),
+            content: Text("Create $_name?"),
+            actions: [
+              FlatButton(
+                onPressed: () async => {
+                  if (Authentication().isAuth)
+                    {
+                      setState(() {
+                        _loading = true;
+                      }),
+                      await FirebaseFirestoreProvider.addTeam(
+                          _name, _description, __imgPicked ? _picUrl : null),
+                      setState(() {
+                        _loading = false;
+                      }),
+                      Navigator.of(context).pop(),
+                    }
+                  else
+                    Applogger.consoleLog(
+                        MessegeType.error, "User is not connected")
+                },
+                child: _loading ? CircularProgressIndicator() : Text("Ok"),
+              ),
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("Cancel"),
+              ),
+            ],
+          );
+        },
       ),
-    ).then((value) => {Navigator.of(context).pop(), _setLoading()});
-  }
-
-  _setLoading() {
-    setState(() {
-      _loading = !_loading;
-    });
+    ).then((value) => {Navigator.of(context).pop()});
   }
 
   Future<void> _takePicture() async {
