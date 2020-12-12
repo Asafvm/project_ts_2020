@@ -92,7 +92,8 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         RegExp regExp = RegExp(
-                            r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
+                            r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",
+                            //r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
                             caseSensitive: false,
                             multiLine: false);
 

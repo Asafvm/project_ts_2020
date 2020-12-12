@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:contact_picker/contact_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
@@ -11,7 +11,6 @@ import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
-Iterable<Contact> contacts;
 String _name = "";
 String _description = "";
 
@@ -80,60 +79,75 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
           type: StepperType.horizontal,
           steps: [
             Step(
-                title: Text("Info"),
-                content: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: FlatButton(
-                        child: __imgPicked
-                            ? Image.file(File(_picUrl))
-                            : Image.asset(_picUrl),
-                        onPressed: _takePicture,
-                      ),
+              //GENERAL INFORMATION
+              title: Text("Info"),
+              content: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: FlatButton(
+                      child: __imgPicked
+                          ? Image.file(File(_picUrl))
+                          : Image.asset(_picUrl),
+                      onPressed: _takePicture,
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            initialValue: _name,
-                            decoration: InputDecoration(
-                              labelText: "Team name",
-                            ),
-                            maxLines: 1,
-                            onChanged: (value) => {_name = value},
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          initialValue: _name,
+                          decoration: InputDecoration(
+                            labelText: "Team name",
                           ),
-                          TextFormField(
-                            initialValue: _description,
-                            decoration:
-                                InputDecoration(labelText: "Description"),
-                            maxLines: 1,
-                            onChanged: (value) => {_description = value},
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                          maxLines: 1,
+                          onChanged: (value) => {_name = value},
+                        ),
+                        TextFormField(
+                          initialValue: _description,
+                          decoration: InputDecoration(labelText: "Description"),
+                          maxLines: 1,
+                          onChanged: (value) => {_description = value},
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              isActive: _currentStep == STEPS.INFO.index ? true : false,
+              state: _currentStep == STEPS.INFO.index
+                  ? StepState.editing
+                  : StepState.indexed,
+            ),
+            Step(
+              //INVITE TEAM MEMBERS
+              title: Text("Invite"),
+              content: Container(
+                child: FlatButton(
+                  onPressed: () async {
+                    final Contact contact =
+                        await ContactPicker().selectContact();
+
+                    print(contact);
+                  },
+                  child: Text("Contacts"),
                 ),
-                isActive: _currentStep == STEPS.INFO.index ? true : false,
-                state: _currentStep == STEPS.INFO.index
-                    ? StepState.editing
-                    : StepState.indexed),
+              ),
+              isActive: _currentStep == STEPS.INVITE.index ? true : false,
+              state: _currentStep == STEPS.INVITE.index
+                  ? StepState.editing
+                  : StepState.indexed,
+            ),
             Step(
-                title: Text("Invite"),
-                content: Container(),
-                isActive: _currentStep == STEPS.INVITE.index ? true : false,
-                state: _currentStep == STEPS.INVITE.index
-                    ? StepState.editing
-                    : StepState.indexed),
-            Step(
-                title: Text("Confirm"),
-                content: Container(),
-                isActive: _currentStep == STEPS.CONFIRM.index ? true : false,
-                state: _currentStep == STEPS.CONFIRM.index
-                    ? StepState.editing
-                    : StepState.indexed),
+              //CONFIRMATION
+              title: Text("Confirm"),
+              content: Container(),
+              isActive: _currentStep == STEPS.CONFIRM.index ? true : false,
+              state: _currentStep == STEPS.CONFIRM.index
+                  ? StepState.editing
+                  : StepState.indexed,
+            ),
           ]),
     );
   }

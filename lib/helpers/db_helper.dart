@@ -1,10 +1,9 @@
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as path;
-import 'package:sqflite/sqflite.dart';
 import 'package:teamshare/providers/applogger.dart';
 
 class DBHelper {
-  static Future<Database> database() async {
+  static Future<sql.Database> database() async {
     final String dbPath = await sql.getDatabasesPath();
     return sql.openDatabase(path.join(dbPath, 'test.db'),
         onCreate: (db, version) {

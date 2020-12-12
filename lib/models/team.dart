@@ -1,9 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Team {
-  String id;
+  String _id;
   String name;
+  String description;
+  String logoUrl;
+  String creatorEmail;
 
-  Team({this.id, this.name});
+  Team({this.name});
 
-  String get getTeamId => this.id;
+  void setTeamId(String id) => _id = id;
+  String get getTeamId => this._id;
   String get getTeamName => this.name;
+
+  factory Team.fromFirebase(DocumentSnapshot teamDoc) {
+    return Team.fromJson(teamDoc.data());
+  }
+
+  Team.fromJson(Map<String, dynamic> data)
+      : name = data['name'].toString().trim(),
+        description = data['description'].toString().trim(),
+        logoUrl = data['logoUrl'].toString().trim(),
+        creatorEmail = data['creatorEmail'].toString().trim();
 }

@@ -5,29 +5,32 @@ import 'package:path/path.dart';
 class FirebaseStorageProvider {
   static Future<String> uploadFile(File file, String path,
       [String fileName]) async {
-    StorageTaskSnapshot snapshot = await FirebaseStorage.instance
+    UploadTask task = FirebaseStorage.instance
         .ref()
         .child(path)
         .child(
             fileName == null ? basenameWithoutExtension(file.path) : fileName)
         .putFile(
           file,
-          StorageMetadata(
+          SettableMetadata(
             contentLanguage: 'en',
             customMetadata: <String, String>{'version': '1'},
           ),
-        )
-        .onComplete;
+        );
 
-    String url = await snapshot.ref.getDownloadURL();
-    return url;
+    task.snapshotEvents.listen((TaskSnapshot snapshot) {
+      print('Snapshot state: ${snapshot.state}'); // paused, running, complete
+      print('Progress: ${snapshot.totalBytes / snapshot.bytesTransferred}');
+    }, onError: (Object e) {
+      print(e); // FirebaseException
+    });
 
-    // .then((StorageTaskSnapshot value) async => {
-    //       Applogger.consoleLog(MessegeType.info, 'file uploaded'),
-    //       Applogger.consoleLog(
-    //           MessegeType.info, value.storageMetadata.path),
-    //     })
-    // .catchError((e) => Applogger.consoleLog(
-    //     MessegeType.error, "Error uploading: " + e.toString()));
+    task.then((TaskSnapshot snapshot) async {
+      return await snapshot.ref.getDownloadURL();
+    }).catchError((Object e) {
+      print(e); // FirebaseException
+      return null;
+    });
+    return null;
   }
 }

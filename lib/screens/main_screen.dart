@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
           title: Text("Team Share"),
         ),
         body: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestoreProvider.getTeamList(),
+            stream: FirebaseFirestoreProvider.getUserTeamList(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(

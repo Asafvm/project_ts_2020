@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:teamshare/models/team.dart';
 
 class TeamProvider with ChangeNotifier {
-  Team _currentTeam;
-  List<Team> _teams;
+  static Team _currentTeam;
+  static Set<Team> _teams = new Set<Team>();
 
   static final TeamProvider _instance = TeamProvider._internal();
   factory TeamProvider() {
@@ -12,7 +12,7 @@ class TeamProvider with ChangeNotifier {
   TeamProvider._internal();
 
   void addTeam(Team team) {
-    if (!_teams.contains(team)) _teams.add(team);
+    _teams.add(team);
     notifyListeners();
   }
 
@@ -25,4 +25,12 @@ class TeamProvider with ChangeNotifier {
   }
 
   Team get getCurrentTeam => _currentTeam;
+
+  List<Team> getTeams() {
+    return _teams == null ? [] : _teams;
+  }
+
+  static Stream<Set<Team>> getTeamStream() {
+    return Stream.value(_teams);
+  }
 }

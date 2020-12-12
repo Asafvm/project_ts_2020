@@ -21,8 +21,8 @@ class FirebaseFirestoreProvider {
 
   static addTeam(String name, String description, [String picUrl]) async {
     //step 1: upload team and get id
-    HttpsCallableResult teaminfo = await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addTeam")
+    HttpsCallableResult teaminfo = await FirebaseFunctions.instance
+        .httpsCallable("addTeam")
         .call(<String, dynamic>{
       "name": name,
       "description": description,
@@ -36,14 +36,14 @@ class FirebaseFirestoreProvider {
     //step 2: user team id to upload pic to team folder
     if (picUrl != null) {
       String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
-          File(picUrl), '$teams/$teamid', 'logo');
+          File(picUrl), '$teams/$teamid', 'logoUrl');
 
-      await CloudFunctions.instance
-          .getHttpsCallable(functionName: "updateTeam")
+      await FirebaseFunctions.instance
+          .httpsCallable("updateTeam")
           .call(<String, dynamic>{
             'teamid': teamid,
             'data': {
-              'logo': firestoragePicUrl,
+              'logoUrl': firestoragePicUrl,
             }
           })
           .catchError((err) => Applogger.consoleLog(MessegeType.error,
@@ -53,7 +53,7 @@ class FirebaseFirestoreProvider {
     }
   }
 
-  static Stream<QuerySnapshot> getTeamList() {
+  static Stream<QuerySnapshot> getUserTeamList() {
     return FirebaseFirestore.instance
         .collection("users")
         .doc(Authentication().userEmail)
@@ -99,15 +99,15 @@ class FirebaseFirestoreProvider {
   //Cloud Functions
 
   static Future<void> uploadPart(Part _newPart) async {
-    await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addPart")
+    await FirebaseFunctions.instance
+        .httpsCallable("addPart")
         .call(<String, dynamic>{"part": _newPart.toJson()});
   }
 
   static Future<void> uploadInstrumentInstance(
       InstrumentInstance _newInstrument, String instrumentId) async {
-    await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addInstrumentInstance")
+    await FirebaseFunctions.instance
+        .httpsCallable("addInstrumentInstance")
         .call(<String, dynamic>{
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
       "instrumentID": instrumentId,
@@ -116,8 +116,8 @@ class FirebaseFirestoreProvider {
   }
 
   static Future<void> uploadInstrument(Instrument _newInstrument) async {
-    await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addInstrument")
+    await FirebaseFunctions.instance
+        .httpsCallable("addInstrument")
         .call(
           <String, dynamic>{
             "instrument": _newInstrument.toJson(),
@@ -137,8 +137,8 @@ class FirebaseFirestoreProvider {
 
   static Future<void> uploadFields(List<Map<String, dynamic>> fields,
       String fileName, String instrumentId) async {
-    await CloudFunctions.instance
-        .getHttpsCallable(functionName: "addInstrumentReport")
+    await FirebaseFunctions.instance
+        .httpsCallable("addInstrumentReport")
         .call(<String, dynamic>{
       "Instrument_id": instrumentId,
       "file_name": fileName,
@@ -146,5 +146,23 @@ class FirebaseFirestoreProvider {
     }).then((_) async => {
               print('fields uploaded'),
             });
+  }
+
+  static Stream<Map<String, dynamic>> getTeamInfo(String teamDocId) {
+    return FirebaseFirestore.instance
+        .collection("teams")
+        .doc(teamDocId)
+        .get()
+        .then((value) => value.data())
+        .asStream();
+  }
+
+  static removeTeam(String teamDocId) {
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(Authentication().userEmail)
+        .collection("teams")
+        .doc(teamDocId)
+        .delete();
   }
 }
