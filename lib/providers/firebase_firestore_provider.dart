@@ -137,15 +137,16 @@ class FirebaseFirestoreProvider {
 
   static Future<void> uploadFields(List<Map<String, dynamic>> fields,
       String fileName, String instrumentId) async {
+    String teamId = TeamProvider().getCurrentTeam.getTeamId;
+
     await FirebaseFunctions.instance
         .httpsCallable("addInstrumentReport")
         .call(<String, dynamic>{
-      "Instrument_id": instrumentId,
-      "file_name": fileName,
+      "team_id": teamId,
+      "instrument_id": instrumentId,
+      "file": fileName,
       "fields": fields,
-    }).then((_) async => {
-              print('fields uploaded'),
-            });
+    });
   }
 
   static Stream<Map<String, dynamic>> getTeamInfo(String teamDocId) {

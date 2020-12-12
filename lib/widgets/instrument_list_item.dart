@@ -19,13 +19,11 @@ class InstrumentListItem extends StatefulWidget {
 }
 
 class _InstrumentListItemState extends State<InstrumentListItem> {
-  Color _bgcolor = Colors.white;
   bool _selected = false;
-
+  Color _bgDefaultColor = Colors.white;
   void _setSelected() {
     setState(() {
       _selected = !_selected;
-      _bgcolor = _selected ? Theme.of(context).accentColor : Colors.white;
     });
   }
 
@@ -37,7 +35,17 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
         GestureDetector(
           onTap: _setSelected,
           child: Card(
-            color: _bgcolor,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                  color: _selected
+                      ? Theme.of(context).primaryColor
+                      : _bgDefaultColor,
+                  width: 3),
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
+              ),
+            ),
+            color: _bgDefaultColor,
             child: ListTile(
               leading: CircleAvatar(
                 child: Icon(widget.icon),
@@ -52,7 +60,6 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                       icon: Icon(Icons.picture_as_pdf),
                       tooltip: 'Add new form',
                       onPressed: () async {
-                        //TODO: fix this code later. FilePicker.getFilePath is deprecated
                         FilePickerResult result = await FilePicker.platform
                             .pickFiles(
                                 allowMultiple: false,
@@ -82,7 +89,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                           MaterialPageRoute(
                             builder: (context) => InstrumentListScreen(
                               widget.instrument,
-                            ), //documentID = Instrument document id
+                            ),
                           ),
                         );
                       },

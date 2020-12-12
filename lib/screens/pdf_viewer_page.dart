@@ -7,6 +7,7 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
@@ -223,8 +224,12 @@ class _PDFScreenState extends State<PDFScreen> {
       File file = File(widget.pathPDF);
 
       if (file != null && Authentication().isAuth) {
-        await FirebaseStorageProvider.uploadFile(
-                file, "instruments/" + widget.instrumentID + "/")
+        final String instrumentPath = "instruments/" +
+            TeamProvider().getCurrentTeam.getTeamId +
+            widget.instrumentID +
+            "/";
+
+        await FirebaseStorageProvider.uploadFile(file, instrumentPath)
             .then((val) async => {
                   _updateProgress(50),
                   await FirebaseFirestoreProvider.uploadFields(
@@ -241,9 +246,10 @@ class _PDFScreenState extends State<PDFScreen> {
                           })
                       .catchError((e) async => {
                             await showDialog(
-                                context: context,
-                                builder: (_) => _buildAlertDialog(
-                                    "Upload Failed: " + e.toString()))
+                              context: context,
+                              builder: (_) => _buildAlertDialog(
+                                  "Upload Failed: Fields\n$e"),
+                            )
                           })
                 })
             .catchError((e) async => {

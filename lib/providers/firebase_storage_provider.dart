@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
+import 'package:teamshare/providers/applogger.dart';
 
 class FirebaseStorageProvider {
   static Future<String> uploadFile(File file, String path,
@@ -19,18 +20,20 @@ class FirebaseStorageProvider {
         );
 
     task.snapshotEvents.listen((TaskSnapshot snapshot) {
-      print('Snapshot state: ${snapshot.state}'); // paused, running, complete
-      print('Progress: ${snapshot.totalBytes / snapshot.bytesTransferred}');
+      Applogger.consoleLog(MessegeType.info,
+          'Snapshot state: ${snapshot.state}'); // paused, running, complete
+      Applogger.consoleLog(MessegeType.info,
+          'Progress: ${snapshot.totalBytes / snapshot.bytesTransferred}');
     }, onError: (Object e) {
       print(e); // FirebaseException
+    }).onDone(() {
+      Applogger.consoleLog(MessegeType.info, "done");
     });
 
-    task.then((TaskSnapshot snapshot) async {
-      return await snapshot.ref.getDownloadURL();
+    return task.then((TaskSnapshot snapshot) async {
+      return snapshot.ref.getDownloadURL();
     }).catchError((Object e) {
-      print(e); // FirebaseException
-      return null;
+      return e;
     });
-    return null;
   }
 }

@@ -150,25 +150,20 @@ exports.addPart = functions.https.onCall(async (data, context) => {
 
 //add report's fields to instrument ducoment
 exports.addInstrumentReport = functions.https.onCall((data, context) => {
+
   const instrumentreports = admin
     .firestore()
-    .collection("username")
-    .doc("company")
+    .collection("teams")
+    .doc(data["team_id"])
     .collection("instruments")
     .doc(data["instrument_id"])
     .collection("reports")
-    .doc(data["file_name"]);
+    .doc(data["file"]);
 
-  return new Promise(async (resolve, reject) => {
-    try {
-      await instrumentreports.set(
-        Object.assign({}, data["fields"]) //map every list item to index number
+
+  return instrumentreports.set(
+    Object.assign({}, data["fields"]) //map every list item to index number
       );
-      return resolve({
-        success: true,
-      });
-    } catch (reason) {
-      return reject(reason);
-    }
-  });
+      
+
 });
