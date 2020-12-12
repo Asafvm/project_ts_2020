@@ -51,44 +51,51 @@ class AdminMenuScreen extends StatelessWidget {
         title: Text("Admin Menu"),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                      child: createButton(Icons.location_city, () {
+        padding: EdgeInsets.all(10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: createButton(
+                      Icons.group, null, 'Team Managment', context),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: createButton(Icons.location_city, () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => AdminSiteScreen()),
+                  );
+                }, 'Site', context)),
+                Expanded(
+                  child: createButton(Icons.computer, () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => AdminSiteScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => AdminInstrumentScreen()),
                     );
-                  }, 'Site', context)),
-                  Expanded(
-                    child: createButton(Icons.computer, () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (_) => AdminInstrumentScreen()),
-                      );
-                    }, 'Instruments', context),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: createButton(Icons.developer_board, () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => AdminPartScreen()),
-                      );
-                    }, 'Parts', context),
-                  ),
-                  Expanded(
-                      child: createButton(Icons.perm_contact_calendar, null,
-                          'Contacts', context)),
-                ],
-              ),
-            ],
-          ),
+                  }, 'Instruments', context),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: createButton(Icons.developer_board, () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => AdminPartScreen()),
+                    );
+                  }, 'Parts', context),
+                ),
+                Expanded(
+                    child: createButton(Icons.perm_contact_calendar, null,
+                        'Contacts', context)),
+              ],
+            ),
+          ],
         ),
       ),
     );
