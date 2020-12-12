@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
@@ -52,17 +53,24 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                       tooltip: 'Add new form',
                       onPressed: () async {
                         //TODO: fix this code later. FilePicker.getFilePath is deprecated
-                        //String filePath = await FilePicker.getFilePath(type: FileType.custom, allowedExtensions: ['pdf']);
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => PDFScreen(
-                        //         filePath,
-                        //         widget.instrument.getCodeName(),
-                        //         widget.instrument.getCodeName(),
-                        //         null), //documentID = Instrument document id
-                        //   ),
-                        // );
+                        FilePickerResult result = await FilePicker.platform
+                            .pickFiles(
+                                allowMultiple: false,
+                                type: FileType.custom,
+                                allowedExtensions: ['pdf']);
+
+                        if (result != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PDFScreen(
+                                  result.paths.first,
+                                  widget.instrument.getCodeName(),
+                                  widget.instrument.getCodeName(),
+                                  null), //documentID = Instrument document id
+                            ),
+                          );
+                        }
                       },
                     ),
                     IconButton(
