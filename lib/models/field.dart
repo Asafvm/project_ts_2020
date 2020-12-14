@@ -5,8 +5,7 @@ class Field {
   final double _minWidth = 20;
   final double _minHeight = 20;
 
-  String defaultSValue;
-  int defaultIValue;
+  String defaultValue;
   final int index;
   String hint;
   final int page;
@@ -24,8 +23,7 @@ class Field {
       @required this.isText,
       this.regexp,
       @required this.prefix,
-      this.defaultIValue,
-      this.defaultSValue,
+      this.defaultValue,
       this.suffix,
       @required this.page,
       @required this.offset,
@@ -43,9 +41,20 @@ class Field {
     }
   }
 
+  Field.basic({this.index, this.page}) {
+    this.hint = "";
+    this.isText = true;
+    this.regexp = "";
+    this.prefix = "";
+    this.defaultValue = "";
+    this.suffix = "";
+    this.offset = Offset(0, 0);
+    this.size = Size(_minWidth, _minHeight);
+    this.isMandatory = false;
+  }
+
   Field.fromJson(Map<String, dynamic> data)
-      : defaultSValue = data['defaultSValue'],
-        defaultIValue = data['defaultIValue'],
+      : defaultValue = data['defaultValue'],
         index = data['index'],
         hint = data['hint'],
         page = data['page'],
@@ -58,8 +67,7 @@ class Field {
         isMandatory = data['isMandatory'];
 
   Map<String, dynamic> toJson() => {
-        'defaultSValue': defaultSValue,
-        'defaultIValue': defaultIValue,
+        'defaultValue': defaultValue,
         'index': index,
         'hint': hint,
         'page': page,

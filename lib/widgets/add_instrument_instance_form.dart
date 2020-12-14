@@ -17,12 +17,13 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
 
   final _instrumentForm = GlobalKey<FormState>();
 
-  Widget _buildTextFormField(
-      String label, TextInputType type, Function onSave) {
+  Widget _buildSerialField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: label),
-      keyboardType: type,
-      onSaved: onSave,
+      decoration: InputDecoration(labelText: "Serial"),
+      keyboardType: TextInputType.text,
+      onSaved: (val) {
+        _newInstInstrument = InstrumentInstance(val);
+      },
     );
   }
 
@@ -48,13 +49,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  _buildTextFormField(
-                    "Serial",
-                    TextInputType.text,
-                    (val) {
-                      _newInstInstrument = InstrumentInstance(val);
-                    },
-                  ),
+                  _buildSerialField(),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(

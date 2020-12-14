@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument_instance.dart';
+import 'package:teamshare/screens/instrument_info_screen.dart';
 
 class InstrumentInstanceListItem extends StatefulWidget {
   final IconData icon;
@@ -13,20 +14,12 @@ class InstrumentInstanceListItem extends StatefulWidget {
 
 class _InstrumentListItemState extends State<InstrumentInstanceListItem> {
   var instrumentDoc;
-  Color _bgcolor = Colors.white;
-  bool _selected = false;
+  Color _bgDefaultColor = Colors.white;
 
   @override
   void initState() {
     instrumentDoc = widget.instrument;
     super.initState();
-  }
-
-  void _setSelected() {
-    setState(() {
-      _selected = !_selected;
-      _bgcolor = _selected ? Theme.of(context).accentColor : Colors.white;
-    });
   }
 
   @override
@@ -35,15 +28,22 @@ class _InstrumentListItemState extends State<InstrumentInstanceListItem> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         GestureDetector(
-          onTap: _setSelected,
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => InstrumentInfoScreen())),
           child: Card(
-            color: _bgcolor,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(color: _bgDefaultColor, width: 3),
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
+              ),
+            ),
+            color: _bgDefaultColor,
             child: ListTile(
               leading: CircleAvatar(
                 child: Icon(widget.icon),
               ),
-              title: Text(widget.instrument.getSerial),
-              subtitle: Text("TODO: Insert next maintenance here"),
+              title: Text(widget.instrument.serial),
+              subtitle: Text("Last maintenance = ???"),
             ),
           ),
         ),

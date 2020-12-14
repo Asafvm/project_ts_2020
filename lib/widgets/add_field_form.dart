@@ -38,8 +38,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
           hint: "",
           isText: true,
           suffix: "",
-          defaultIValue: 0,
-          defaultSValue: "",
+          defaultValue: "",
           prefix: "");
     }
     super.initState();
@@ -90,16 +89,11 @@ class _AddFieldFormState extends State<AddFieldForm> {
                 Flexible(
                   flex: 3,
                   child: TextFormField(
-                    initialValue: (_newField.isText)
-                        ? _newField.defaultSValue
-                        : _newField.defaultIValue.toString(),
+                    initialValue: _newField.defaultValue,
                     decoration: InputDecoration(labelText: 'Default Value'),
                     keyboardType: TextInputType.number,
                     onSaved: (val) {
-                      if (_newField.isText)
-                        _newField.defaultSValue = val;
-                      else
-                        _newField.defaultIValue = int.parse(val);
+                      _newField.defaultValue = val;
                     },
                     validator: (value) {
                       if (_newField.isText) {
@@ -113,7 +107,6 @@ class _AddFieldFormState extends State<AddFieldForm> {
                           return "Numbers only";
                         }
                       }
-
                       return null;
                     },
                   ),

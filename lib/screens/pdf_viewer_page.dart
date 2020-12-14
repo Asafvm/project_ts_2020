@@ -158,15 +158,17 @@ class _PDFScreenState extends State<PDFScreen> {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
-          Field f = Field(
-              index: _fieldIndex,
-              hint: null,
-              isText: null,
-              prefix: null,
-              page: _pageIndex,
-              offset: pos.relative,
-              size: null,
-              isMandatory: null);
+          Field f = Field.basic(index: _fieldIndex, page: _pageIndex);
+
+          // Field f = Field(
+          //     index: _fieldIndex,
+          //     hint: null,
+          //     isText: true,
+          //     prefix: null,
+          //     page: _pageIndex,
+          //     offset: pos.relative,
+          //     size: null,
+          //     isMandatory: false);
           return AddFieldForm(f);
         });
     if (f != null) {
