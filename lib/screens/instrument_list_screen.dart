@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
+import 'package:teamshare/screens/instrument_info_screen.dart';
 import 'package:teamshare/widgets/add_instrument_instance_form.dart';
 import 'package:teamshare/widgets/instrument_instance_list_item.dart';
 
@@ -82,7 +82,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
   _buildInstanceList() {
     return Expanded(
       flex: 5,
-      child: StreamBuilder<List<DocumentSnapshot>>(
+      child: StreamBuilder<List<InstrumentInstance>>(
         stream: FirebaseFirestoreProvider.getInstrumentsInstances(
             widget.instrument.getCodeName()),
         builder: (context, snapshot) {
@@ -91,14 +91,28 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
           } else {
             return ListView.builder(
               itemCount: snapshot.data.length,
-              itemBuilder: (ctx, index) => InstrumentInstanceListItem(
-                Icons.computer,
-                ctx,
-                InstrumentInstance.fromFirestore(snapshot.data[index]),
+              itemBuilder: (ctx, index) => GestureDetector(
+                onTap: () => _switchToInstrumentView(snapshot.data[index]),
+                child: InstrumentInstanceListItem(
+                  Icons.computer,
+                  ctx,
+                  snapshot.data[index].serial,
+                ),
               ),
             );
           }
         },
+      ),
+    );
+  }
+
+  _switchToInstrumentView(InstrumentInstance instance) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => InstrumentInfoScreen(
+          instrument: widget.instrument,
+          instance: instance,
+        ),
       ),
     );
   }

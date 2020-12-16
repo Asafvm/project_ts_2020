@@ -1,20 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'entry.dart';
+
 class InstrumentInstance {
-  final String _serial;
+  final String serial;
+  List<Entry> entries;
 
-  InstrumentInstance(this._serial);
+  InstrumentInstance({this.serial, this.entries});
+  InstrumentInstance.newInstrument({this.serial}) {
+    this.entries = new List<Entry>();
+    this.entries.add(Entry(
+        timestamp: Timestamp.now().millisecondsSinceEpoch,
+        details: "New Instrument Create",
+        type: ENTRY_TYPE.INFO.index));
+  }
 
-  String get serial {
-    return _serial;
+  void addEntry(Entry e) {
+    entries.add(e);
   }
 
   Map<String, dynamic> toJson() => {
-        'serial': _serial,
+        'serial': serial,
       };
 
   InstrumentInstance.fromJson(Map<String, dynamic> data)
-      : _serial = data['serial'];
+      : serial = data['serial'],
+        entries = (data['entries'] as Map)
+            .values
+            .map((e) => Entry.fromJson(e))
+            .toList();
 
   factory InstrumentInstance.fromFirestore(DocumentSnapshot documentSnapshot) {
     return InstrumentInstance.fromJson(documentSnapshot.data());

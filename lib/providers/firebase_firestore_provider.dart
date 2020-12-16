@@ -89,11 +89,13 @@ class FirebaseFirestoreProvider {
 
   static getInstrumentsInstances(String ref) {
     String instrumentRef =
-        "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments";
+        "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$ref/instances";
     return FirebaseFirestore.instance
-        .collection("$instrumentRef/$ref/instances")
+        .collection("$instrumentRef")
         .snapshots()
-        .map((list) => list.docs);
+        .map((list) => list.docs
+            .map((item) => InstrumentInstance.fromFirestore(item))
+            .toList());
   }
 
   //Cloud Functions
@@ -111,7 +113,8 @@ class FirebaseFirestoreProvider {
         .call(<String, dynamic>{
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
       "instrumentID": instrumentId,
-      "instrument": _newInstrument.toJson()
+      "instrument": _newInstrument.toJson(),
+      "entries": _newInstrument.entries.map((e) => e.toJson()).toList()
     });
   }
 

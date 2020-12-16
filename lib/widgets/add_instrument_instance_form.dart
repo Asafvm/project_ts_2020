@@ -13,7 +13,7 @@ class AddInstrumentInstanceForm extends StatefulWidget {
 
 class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
   bool _uploading = false;
-  InstrumentInstance _newInstInstrument = InstrumentInstance("0");
+  InstrumentInstance _newInstInstrument;
 
   final _instrumentForm = GlobalKey<FormState>();
 
@@ -22,7 +22,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
       decoration: InputDecoration(labelText: "Serial"),
       keyboardType: TextInputType.text,
       onSaved: (val) {
-        _newInstInstrument = InstrumentInstance(val);
+        _newInstInstrument = InstrumentInstance.newInstrument(serial: val);
       },
     );
   }

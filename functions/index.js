@@ -126,6 +126,11 @@ exports.addInstrumentInstance = functions.https.onCall(
     //   throw new functions.https.HttpsError('already-exists', 'Instrument already exists', 'Duplicate serial');
 
     await instruments.create(data["instrument"]);
+    await instruments.update({
+      "entries":
+        Object.assign({}, data["entries"])
+    } //map every list item to index number
+    );
   }
 );
 

@@ -27,6 +27,18 @@ const tabbar = TabBar(
   ],
 );
 
+const tabInstrument = TabBar(
+  labelColor: Colors.black,
+  tabs: [
+    Tab(
+      text: "Log",
+    ),
+    Tab(
+      text: "Reports",
+    ),
+  ],
+);
+
 final logoText = Container(
   //margin: EdgeInsets.only(top: 40),
   //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),

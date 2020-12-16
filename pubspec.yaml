@@ -65,6 +65,8 @@ dependencies:
   #misc
   contact_picker: ^0.0.2
   image_picker: ^0.6.7+14
+  intl: ^0.16.1 #date formatter
+
 
 dev_dependencies:
   flutter_test:
