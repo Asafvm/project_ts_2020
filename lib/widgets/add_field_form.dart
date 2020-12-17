@@ -4,45 +4,16 @@ import 'package:teamshare/models/field.dart';
 //TODO: finish form
 
 class AddFieldForm extends StatefulWidget {
-  // int index;
-  // int page;
-  // Offset offset;
   final Field field;
-//  AddFieldForm(this.index, this.page, this.offset);
   AddFieldForm(this.field);
   @override
   _AddFieldFormState createState() => _AddFieldFormState();
 }
 
 class _AddFieldFormState extends State<AddFieldForm> {
-  final double _defaultHeight = 20;
-  final double _defaultWidth = 50;
   String _typeValue = 'Text';
   String _mandatoryValue = 'No';
-  Field _newField;
   final _fieldForm = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    if (widget.field != null) {
-      _newField = widget.field;
-      _typeValue = (_newField.isText) ? "Text" : "Number";
-      _mandatoryValue = (_newField.isMandatory) ? "Yes" : "No";
-    } else {
-      _newField = Field(
-          index: widget.field.index,
-          page: widget.field.page,
-          offset: widget.field.offset,
-          size: Size(_defaultWidth, _defaultHeight),
-          isMandatory: false,
-          hint: "",
-          isText: true,
-          suffix: "",
-          defaultValue: "",
-          prefix: "");
-    }
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +30,11 @@ class _AddFieldFormState extends State<AddFieldForm> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             TextFormField(
-              initialValue: _newField.hint,
+              initialValue: widget.field.hint,
               decoration: InputDecoration(labelText: 'Description'),
               keyboardType: TextInputType.text,
               onSaved: (val) {
-                _newField.hint = val;
+                widget.field.hint = val;
               },
               validator: (value) {
                 if (value.isEmpty) return "Enter field's name";
@@ -75,11 +46,11 @@ class _AddFieldFormState extends State<AddFieldForm> {
                 Flexible(
                   flex: 3,
                   child: TextFormField(
-                    initialValue: _newField.prefix,
+                    initialValue: widget.field.prefix,
                     decoration: InputDecoration(labelText: 'Prefix'),
                     keyboardType: TextInputType.number,
                     onSaved: (val) {
-                      _newField.prefix = val;
+                      widget.field.prefix = val;
                     },
                   ),
                 ),
@@ -89,14 +60,14 @@ class _AddFieldFormState extends State<AddFieldForm> {
                 Flexible(
                   flex: 3,
                   child: TextFormField(
-                    initialValue: _newField.defaultValue,
+                    initialValue: widget.field.defaultValue,
                     decoration: InputDecoration(labelText: 'Default Value'),
                     keyboardType: TextInputType.number,
                     onSaved: (val) {
-                      _newField.defaultValue = val;
+                      widget.field.defaultValue = val;
                     },
                     validator: (value) {
-                      if (_newField.isText) {
+                      if (widget.field.isText) {
                         try {} catch (e) {
                           return "Text only";
                         }
@@ -117,11 +88,11 @@ class _AddFieldFormState extends State<AddFieldForm> {
                 Flexible(
                   flex: 3,
                   child: TextFormField(
-                    initialValue: _newField.suffix,
+                    initialValue: widget.field.suffix,
                     decoration: InputDecoration(labelText: 'Suffix'),
                     keyboardType: TextInputType.number,
                     onSaved: (val) {
-                      _newField.suffix = val;
+                      widget.field.suffix = val;
                     },
                   ),
                 ),
@@ -135,11 +106,11 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     value: _typeValue,
                     decoration: InputDecoration(labelText: 'Input Type'),
                     onSaved: (val) {
-                      _newField.isText = (val == 'Text');
+                      widget.field.isText = (val == 'Text');
                     },
                     onChanged: (newValue) {
                       setState(() {
-                        _newField.isText = (newValue == 'Text');
+                        widget.field.isText = (newValue == 'Text');
                         _typeValue = newValue;
                       });
                     },
@@ -161,12 +132,12 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     value: _mandatoryValue,
                     decoration: InputDecoration(labelText: 'Mandatory?'),
                     onSaved: (val) {
-                      _newField.isMandatory = (val == 'Yes');
+                      widget.field.isMandatory = (val == 'Yes');
                     },
                     onChanged: (String newValue) {
                       setState(() {
                         _mandatoryValue = newValue;
-                        _newField.isMandatory = (newValue == 'Yes');
+                        widget.field.isMandatory = (newValue == 'Yes');
                       });
                     },
                     items: <String>['Yes', 'No']
@@ -187,7 +158,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     if (_fieldForm.currentState.validate()) {
                       _fieldForm.currentState.save();
                       Navigator.of(context)
-                          .pop(_newField); //retuen the new Field object
+                          .pop(widget.field); //retuen the new Field object
                     }
                   },
                   child: Text(

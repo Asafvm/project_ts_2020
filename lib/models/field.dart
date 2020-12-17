@@ -41,15 +41,15 @@ class Field {
     }
   }
 
-  Field.basic({this.index, this.page}) {
+  Field.basic({this.index, this.page, Offset initialPos}) {
     this.hint = "";
     this.isText = true;
     this.regexp = "";
     this.prefix = "";
     this.defaultValue = "";
     this.suffix = "";
-    this.offset = Offset(0, 0);
-    this.size = Size(_minWidth, _minHeight);
+    this.offset = initialPos;
+    this.size = Size(60, 30);
     this.isMandatory = false;
   }
 
