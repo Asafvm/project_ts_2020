@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/widgets/instrument_list_item.dart';
-import 'package:teamshare/widgets/add_instrument_form.dart';
+import 'package:teamshare/widgets/forms/add_instrument_form.dart';
 
 class AdminInstrumentScreen extends StatefulWidget {
   @override

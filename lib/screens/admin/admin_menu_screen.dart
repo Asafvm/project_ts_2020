@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/screens/admin_instrument_screen.dart';
-import 'package:teamshare/screens/admin_part_screen.dart';
-import 'package:teamshare/screens/admin_site_screen.dart';
+import 'package:teamshare/screens/admin/admin_instrument_screen.dart';
+import 'package:teamshare/screens/admin/admin_part_screen.dart';
+import 'package:teamshare/screens/admin/admin_site_screen.dart';
 
 class AdminMenuScreen extends StatelessWidget {
   static const String routeName = '/admin_menu_screen';

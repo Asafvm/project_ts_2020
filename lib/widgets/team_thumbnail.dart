@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/screens/team_home_screen.dart';
+import 'package:teamshare/screens/team/team_home_screen.dart';
 
 class TeamThumbnail extends StatelessWidget {
   final String teamDocId;

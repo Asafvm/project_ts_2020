@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/widgets/auth_form.dart';
+import 'package:teamshare/widgets/forms/auth_form.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String routeName = '/login';

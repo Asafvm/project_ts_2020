@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/screens/team_create_screen.dart';
+import 'package:teamshare/screens/team/team_create_screen.dart';
 import 'package:teamshare/widgets/team_thumbnail.dart';
 
 class MainScreen extends StatefulWidget {

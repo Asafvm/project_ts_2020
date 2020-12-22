@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/widgets/add_part_form.dart';
+import 'package:teamshare/widgets/forms/add_part_form.dart';
 import 'package:teamshare/widgets/part_list_item.dart';
 
 class AdminPartScreen extends StatefulWidget {

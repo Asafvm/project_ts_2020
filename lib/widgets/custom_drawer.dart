@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/authentication.dart';
-import 'package:teamshare/screens/admin_menu_screen.dart';
+import 'package:teamshare/screens/admin/admin_menu_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   @override

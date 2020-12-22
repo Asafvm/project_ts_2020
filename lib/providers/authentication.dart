@@ -124,6 +124,7 @@ class Authentication with ChangeNotifier {
   void autoLogout() {
     if (_authTimer != null) _authTimer.cancel();
     final timeToExpiry = _authTokenExpiry.difference(DateTime.now()).inSeconds;
-    Timer(Duration(seconds: timeToExpiry), logout);
+    Timer(Duration(seconds: timeToExpiry), tryAutoLogin);
+    // Timer(Duration(seconds: timeToExpiry), logout);
   }
 }

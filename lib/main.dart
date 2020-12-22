@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/helpers/custom_route.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/screens/admin_menu_screen.dart';
+import 'package:teamshare/screens/admin/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';

@@ -9,7 +9,7 @@ import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/widgets/add_field_form.dart';
+import 'package:teamshare/widgets/forms/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
 
