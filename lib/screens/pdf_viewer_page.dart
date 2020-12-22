@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
@@ -13,11 +14,15 @@ import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
 
 class PDFScreen extends StatefulWidget {
-  final List<Field> _fields;
+  final List<Field> fields;
   final String pathPDF;
   final String instrumentID;
-  final String devCode;
-  PDFScreen(this.pathPDF, this.instrumentID, this.devCode, this._fields);
+  final bool onlyFields;
+  PDFScreen(
+      {this.pathPDF,
+      this.instrumentID,
+      this.fields = const [],
+      this.onlyFields = false});
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -31,7 +36,6 @@ class _PDFScreenState extends State<PDFScreen> {
   int _pageIndex = 0;
   List<Field> _fields = [];
   List<Field> _fieldsInPage = [];
-  Completer<PDFViewController> _controller = Completer<PDFViewController>();
 
   @override
   void initState() {
@@ -41,26 +45,17 @@ class _PDFScreenState extends State<PDFScreen> {
                   builder: (_) => _buildAlertDialog("Error opening file"))
               .then((_) => Navigator.of(context).pop())
         });
-
     setState(() {
-      _fields = widget._fields == null ? [] : widget._fields;
+      _fields = widget.fields == null ? [] : widget.fields;
     });
     _updateLists(0, 0);
     super.initState();
   }
 
   @override
-  void didChangeDependencies() {
-    setState(() {
-      _controller = new Completer<PDFViewController>();
-    });
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Creating Form'),
         actions: <Widget>[
@@ -80,6 +75,7 @@ class _PDFScreenState extends State<PDFScreen> {
               children: <Widget>[
                 Flexible(
                   flex: 9,
+                  fit: FlexFit.tight,
                   child: Container(
                     decoration: BoxDecoration(
                         border: Border.all(width: 2, color: Colors.black)),
@@ -87,19 +83,14 @@ class _PDFScreenState extends State<PDFScreen> {
                       children: <Widget>[
                         PositionedTapDetector(
                           behavior: HitTestBehavior.opaque,
-                          onLongPress: (pos) => _addField(context, pos),
+                          onLongPress: (pos) => {
+                            _addField(context,
+                                Offset(pos.relative.dx, pos.relative.dy)),
+                          },
                           child: PDFView(
                             filePath: widget.pathPDF,
-                            onError: (error) {
-                              print(error.toString());
-                            },
-                            onPageError: (page, error) {
-                              print('$page: ${error.toString()}');
-                            },
-                            onViewCreated:
-                                (PDFViewController pdfViewController) {
-                              _controller.complete(pdfViewController);
-                            },
+                            defaultPage: 0,
+                            enableSwipe: true,
                             onPageChanged: _updateLists,
                             onRender: (_pages) {
                               setState(() {
@@ -109,7 +100,6 @@ class _PDFScreenState extends State<PDFScreen> {
                             },
                           ),
                         ),
-
                         DragTarget<CustomField>(
                           builder: (BuildContext context,
                               List<CustomField> candidateData,
@@ -117,50 +107,49 @@ class _PDFScreenState extends State<PDFScreen> {
                             return Container();
                           },
                         ),
-                        //add rects here
-                        for (Field i in _fieldsInPage)
+                        for (Field i
+                            in _fieldsInPage) //put each field in a customfield wrapper
                           CustomField(i, MediaQuery.of(context), _editField),
                       ],
                     ),
                   ),
                 ),
-                Flexible(
-                  flex: 1,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      FlatButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              //_pageIndex--;
-                            });
-                          },
-                          icon: Icon(Icons.keyboard_arrow_left),
-                          label: const Text('Previous')),
-                      FlatButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              //_pageIndex++;
-                            });
-                          },
-                          icon: Icon(Icons.keyboard_arrow_right),
-                          label: const Text('Next')),
-                    ],
-                  ),
-                ),
+                // Flexible(
+                //   flex: 1,
+                //   child: Row(
+                //     crossAxisAlignment: CrossAxisAlignment.stretch,
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: <Widget>[
+                //       FlatButton.icon(
+                //           onPressed: () {
+                //             setState(() {
+                //               //_pageIndex--;
+                //             });
+                //           },
+                //           icon: Icon(Icons.keyboard_arrow_left),
+                //           label: const Text('Previous')),
+                //       FlatButton.icon(
+                //           onPressed: () {
+                //             setState(() {
+                //               //_pageIndex++;
+                //             });
+                //           },
+                //           icon: Icon(Icons.keyboard_arrow_right),
+                //           label: const Text('Next')),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
     );
   }
 
-  Future<void> _addField(BuildContext context, TapPosition pos) async {
+  Future<void> _addField(BuildContext context, Offset pos) async {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
-          Field f = Field.basic(
-              index: _fieldIndex, page: _pageIndex, initialPos: pos.relative);
-          return AddFieldForm(f);
+          return AddFieldForm(Field.basic(
+              index: _fieldIndex, page: _pageIndex, initialPos: pos));
         });
     if (f != null) {
       setState(() {
@@ -185,6 +174,7 @@ class _PDFScreenState extends State<PDFScreen> {
   }
 
   void _updateLists(int page, _) {
+    // update view when switching pages
     setState(() {
       _pageIndex = page;
       _fieldsInPage.clear();
@@ -206,7 +196,7 @@ class _PDFScreenState extends State<PDFScreen> {
   }
 
   Future<void> _savePDF() async {
-    print("saving");
+    Applogger.consoleLog(MessegeType.info, "Saving");
     _updateProgress(0);
     try {
       setState(() {
@@ -221,40 +211,27 @@ class _PDFScreenState extends State<PDFScreen> {
             TeamProvider().getCurrentTeam.getTeamId +
             widget.instrumentID +
             "/";
+        if (!widget.onlyFields) {
+          Applogger.consoleLog(MessegeType.info, "Saving File");
+          await FirebaseStorageProvider.uploadFile(file, instrumentPath)
+              .catchError((_) => {
+                    _showDialog("Failed to upload file"),
+                  });
+        }
 
-        await FirebaseStorageProvider.uploadFile(file, instrumentPath)
-            .then((val) async => {
-                  _updateProgress(50),
-                  await FirebaseFirestoreProvider.uploadFields(
-                          fields,
-                          path.basenameWithoutExtension(file.path),
-                          widget.instrumentID)
-                      .then((val) async => {
-                            _updateProgress(100),
-                            await showDialog(
-                                    context: context,
-                                    builder: (_) => _buildAlertDialog(
-                                        "Upload completed successfuly"))
-                                .then((_) => Navigator.of(context).pop())
-                          })
-                      .catchError((e) async => {
-                            await showDialog(
-                              context: context,
-                              builder: (_) => _buildAlertDialog(
-                                  "Upload Failed: Fields\n$e"),
-                            )
-                          })
-                })
-            .catchError((e) async => {
-                  await showDialog(
-                      context: context,
-                      builder: (_) => _buildAlertDialog("Upload Failed: File"))
+        _updateProgress(50);
+        Applogger.consoleLog(MessegeType.info, "Saving Fields");
+        await FirebaseFirestoreProvider.uploadFields(fields,
+                path.basenameWithoutExtension(file.path), widget.instrumentID)
+            .catchError((_) => {
+                  _showDialog("Failed to upload fields"),
                 });
+        _updateProgress(100);
+        Applogger.consoleLog(MessegeType.info, "Saving Operation Finished");
+
+        _showDialog("Upload Completed Successfully");
       } else {
-        await showDialog(
-            context: context,
-            builder: (_) =>
-                _buildAlertDialog("Must be logged in to upload files"));
+        _showDialog("Must be logged in to upload files");
       }
 
       setState(() {
@@ -262,16 +239,22 @@ class _PDFScreenState extends State<PDFScreen> {
       });
     } catch (e) {
       setState(() {
+        _showDialog("Unknown error. Please try again later\n$e");
         _uploading = false;
       });
     }
   }
 
   //TOOD: finish uploading
-
   _updateProgress(double p) {
     setState(() {
       _progressValue = p;
     });
+  }
+
+  void _showDialog(String messege) async {
+    await showDialog(
+            context: context, builder: (_) => _buildAlertDialog(messege))
+        .then((value) => Navigator.of(context).pop());
   }
 }

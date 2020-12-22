@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/instrument_list_screen.dart';
 import 'package:teamshare/screens/pdf_viewer_page.dart';
@@ -71,11 +72,10 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => PDFScreen(
-                                  result.paths.first,
-                                  widget.instrument.getCodeName(),
-                                  widget.instrument.getCodeName(),
-                                  null), //documentID = Instrument document id
-                            ),
+                                pathPDF: result.paths.first,
+                                instrumentID: widget.instrument.getCodeName(),
+                              ),
+                            ), //documentID = Instrument document id
                           );
                         }
                       },
@@ -104,6 +104,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
         //list of related reports for selected Instrument
         if (Authentication().isAuth)
           StreamBuilder<List<DocumentSnapshot>>(
+            //list of files related to instrument
             stream: FirebaseFirestore.instance
                 .collection(
                     "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrument.getCodeName()}/reports")
@@ -125,27 +126,20 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                       trailing: FittedBox(
                         child: Row(
                           children: <Widget>[
-                            IconButton(
-                                icon: Icon(Icons.file_upload),
-                                onPressed:
-                                    () {}), //TODO: replace file at storage
+                            // IconButton(
+                            //     icon: Icon(Icons.file_upload),
+                            //     onPressed:
+                            //         () {}), //TODO: replace file at storage
                             IconButton(
                               icon: Icon(Icons.edit),
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PDFScreen(
-                                      snapshot.data[index].id +
-                                          ".pdf", //TODO: get file path from Instrument automaticly,
-                                      widget.instrument.getCodeName(),
-                                      widget.instrument.getCodeName(),
-                                      snapshot.data[index]
-                                          .data()
-                                          .entries
-                                          .map((e) => Field.fromJson(
-                                              e.value.cast<String, dynamic>()))
-                                          .toList()),
-                                ),
+                              onPressed: () => _openPDF(
+                                snapshot.data[index].id,
+                                snapshot.data[index]
+                                    .data()
+                                    .entries
+                                    .map((e) => Field.fromJson(
+                                        e.value.cast<String, dynamic>()))
+                                    .toList(),
                               ),
                             ),
                           ],
@@ -161,5 +155,24 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
           ),
       ],
     );
+  }
+
+  _openPDF(String pdf, List<Field> fields) async {
+    final String instrumentPath = "instruments/" +
+        TeamProvider().getCurrentTeam.getTeamId +
+        widget.instrument.getCodeName() +
+        "/";
+    String path =
+        await FirebaseStorageProvider.downloadFile('$instrumentPath/$pdf');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PDFScreen(
+            pathPDF: path,
+            fields: fields,
+            instrumentID: widget.instrument.getCodeName(),
+            onlyFields: true,
+          ),
+        ));
   }
 }

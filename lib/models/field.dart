@@ -2,8 +2,10 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
 class Field {
-  final double _minWidth = 20;
-  final double _minHeight = 20;
+  final double _minWidth = 10;
+  final double _minHeight = 10;
+  final double _defWidth = 40;
+  final double _defHeight = 20;
 
   String defaultValue;
   final int index;
@@ -48,8 +50,9 @@ class Field {
     this.prefix = "";
     this.defaultValue = "";
     this.suffix = "";
-    this.offset = initialPos;
-    this.size = Size(60, 30);
+    this.offset = Offset(initialPos.dx - _defWidth / 2,
+        initialPos.dy - _defHeight / 2); // center around click point
+    this.size = Size(_defWidth, _defHeight);
     this.isMandatory = false;
   }
 
