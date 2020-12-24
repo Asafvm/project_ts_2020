@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/applogger.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
@@ -108,28 +109,37 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   }
 
   Future<void> _preview() async {
-    //PdfMutableDocument doc = await PdfMutableDocument.path(widget.pdfPath);
-    PdfMutableDocument doc =
-        await PdfMutableDocument.asset("assets/pdf/blank.pdf");
+    try {
+      PdfMutableDocument doc = await PdfMutableDocument.path(widget.pdfPath);
 
-    for (Field field in fields) {
-      var page = doc.getPage(field.page);
-      page.add(
-        item: pdfWidgets.Positioned(
-          left: field.offset.dx,
-          top: field.offset.dy,
-          child: pdfWidgets.Text(
-            field.defaultValue,
-            // style:
-            //     pdfWidgets.TextStyle(fontSize: 32, color: pdf.PdfColors.red),
+      // PdfMutableDocument doc =
+      //     await PdfMutableDocument.asset("assets/pdf/blank.pdf");
+
+      for (Field field in fields) {
+        var page = doc.getPage(field.page);
+        page.add(
+          item: pdfWidgets.Positioned(
+            left: field.offset.dx,
+            top: field.offset.dy,
+            child: pdfWidgets.Text(
+              field.defaultValue,
+              // style:
+              //     pdfWidgets.TextStyle(fontSize: 32, color: pdf.PdfColors.red),
+            ),
           ),
-        ),
-      );
-    }
+        );
+      }
 
-    File result =
-        await doc.save(filename: '${DateTime.now().toIso8601String()}.pdf');
-    print("PDF Edition Done");
-    result.copy((await getExternalCacheDirectories()).first.path);
+      File result =
+          await doc.save(filename: '${DateTime.now().toIso8601String()}.pdf');
+      Applogger.consoleLog(MessegeType.info, "PDF Editing Done");
+
+      result.copy((await getExternalCacheDirectories()).first.path);
+      Navigator.of(context).pop(true); //formFilled = true
+    } catch (e, s) {
+      Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
+      Navigator.of(context).pop(false); //formFilled = false
+
+    }
   }
 }

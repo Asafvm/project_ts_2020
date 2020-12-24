@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart' as pdf;
 import 'package:pdf/widgets.dart' as pdfWidgets;
-import 'package:pdf_image_renderer/pdf_image_renderer.dart' as pdfRender;
+// import 'package:pdf_image_renderer/pdf_image_renderer.dart';
+import 'package:native_pdf_renderer/native_pdf_renderer.dart' as pdfRender;
 
 class PdfRawImage {
   final Uint8List data;
@@ -29,44 +30,44 @@ class _PdfFileHandler {
   }
 
   static Future<List<PdfRawImage>> loadPdf(String path) async {
-    var file = pdfRender.PdfImageRendererPdf(path: path);
-    await file.open();
-    var count = await file.getPageCount();
+    var file = await pdfRender.PdfDocument.openFile(path);
+    // var file = pdfRender.PdfImageRendererPdf(path: path);
+    // await file.open();
+    // var count = await file.getPageCount();
+    int count = file.pagesCount;
     var images = List<PdfRawImage>();
-    var size = await file.getPageSize(pageIndex: 0);
 
     for (int i = 0; i < count; i++) {
-      await file
-          .renderPage(
-            pageIndex: i,
-            x: 0,
-            y: 0,
-            width: size.width,
-            height: size.height,
-            scale: 1,
-            background: Colors.transparent,
+      pdfRender.PdfPage page = await file.getPage(i);
+      page
+          .render(
+            width: page.width,
+            height: page.height,
           )
-          .then((value) => {
-                images.add(PdfRawImage(
-                  data: value,
-                  size: Size(size.width.toDouble(), size.height.toDouble()),
-                ))
-              });
-      // await file.openPage(pageIndex: 0);
+          .then((value) => images.add(
+                PdfRawImage(
+                  data: value.bytes,
+                  size: Size(value.width.toDouble(), value.height.toDouble()),
+                ),
+              ));
+      await page.close();
+      //TODO: find fix for multipage
+      // await file.openPage(pageIndex: i);
       // var rawImage = await file.renderPage(
       //   background: Colors.transparent,
       //   x: 0,
       //   y: 0,
-      //   width: size.width,
-      //   height: size.height,
+      //   width: page.width,
+      //   height: page.height,
       //   scale: 1.0,
-      //   pageIndex: 0,
+      //   pageIndex: i,
       // );
       // images.add(PdfRawImage(
       //   data: rawImage,
       //   size: Size(size.width.toDouble(), size.height.toDouble()),
       // ));
     }
+
     return images;
   }
 

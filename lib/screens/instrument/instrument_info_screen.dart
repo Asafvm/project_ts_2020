@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
@@ -143,16 +144,32 @@ class InstrumentInfoScreen extends StatelessWidget {
                                                   await FirebaseStorageProvider
                                                       .downloadFile(
                                                           '$instrumentPath/${snapshot.data[index].id}');
-                                              Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      GenericFormScreen(
-                                                    fields: snapshot.data[index]
-                                                        .data(),
-                                                    pdfPath: downloadedPdfPath,
-                                                  ),
-                                                ),
-                                              );
+                                              Navigator.of(context)
+                                                  .push(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          GenericFormScreen(
+                                                        fields: snapshot
+                                                            .data[index]
+                                                            .data(),
+                                                        pdfPath:
+                                                            downloadedPdfPath,
+                                                      ),
+                                                    ),
+                                                  )
+                                                  .then((formFilled) => {
+                                                        if (formFilled = true)
+                                                          instance.addEntry(
+                                                            Entry(
+                                                                type: ENTRY_TYPE
+                                                                    .INFO.index,
+                                                                details:
+                                                                    "Uploaded new ${snapshot.data[index].id} form",
+                                                                timestamp: Timestamp
+                                                                        .now()
+                                                                    .millisecondsSinceEpoch),
+                                                          ),
+                                                      });
                                             },
                                             child: Text(
                                               "Create",
