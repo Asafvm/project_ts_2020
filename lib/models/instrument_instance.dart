@@ -8,7 +8,7 @@ class InstrumentInstance {
 
   InstrumentInstance({this.serial, this.entries});
   InstrumentInstance.newInstrument({this.serial}) {
-    this.entries = new List<Entry>();
+    this.entries = new List<Entry>.empty(growable: true);
     this.entries.add(Entry(
         timestamp: Timestamp.now().millisecondsSinceEpoch,
         details: "New Instrument Create",

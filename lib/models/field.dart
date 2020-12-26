@@ -50,8 +50,8 @@ class Field {
     this.prefix = "";
     this.defaultValue = "";
     this.suffix = "";
-    this.offset = Offset(initialPos.dx - _defWidth / 2,
-        initialPos.dy - _defHeight / 2); // center around click point
+    this.offset =
+        Offset(initialPos.dx, initialPos.dy); // center around click point
     this.size = Size(_defWidth, _defHeight);
     this.isMandatory = false;
   }

@@ -10,7 +10,6 @@ import 'package:teamshare/providers/applogger.dart';
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
   final Map<String, dynamic> fields;
-
   const GenericFormScreen({this.fields, this.pdfPath});
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
@@ -119,8 +118,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         var page = doc.getPage(field.page);
         page.add(
           item: pdfWidgets.Positioned(
-            left: field.offset.dx,
-            top: field.offset.dy,
+            left: field.offset.dx * page.size.width,
+            top: field.offset.dy * page.size.height,
             child: pdfWidgets.Text(
               field.defaultValue,
               // style:
@@ -134,7 +133,11 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           await doc.save(filename: '${DateTime.now().toIso8601String()}.pdf');
       Applogger.consoleLog(MessegeType.info, "PDF Editing Done");
 
-      result.copy((await getExternalCacheDirectories()).first.path);
+      String dest = (await getApplicationDocumentsDirectory()).path;
+
+      result.copy(dest + '/test.pdf');
+      Applogger.consoleLog(MessegeType.info, "Saved to: $dest");
+
       Navigator.of(context).pop(true); //formFilled = true
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");

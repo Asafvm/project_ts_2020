@@ -35,10 +35,10 @@ class _PdfFileHandler {
     // await file.open();
     // var count = await file.getPageCount();
     int count = file.pagesCount;
-    var images = List<PdfRawImage>();
+    var images = List<PdfRawImage>.empty(growable: true);
 
     for (int i = 0; i < count; i++) {
-      pdfRender.PdfPage page = await file.getPage(i);
+      pdfRender.PdfPage page = await file.getPage(i + 1); // count starts from 1
       page
           .render(
             width: page.width,
@@ -102,10 +102,12 @@ class PdfMutablePage {
         build: (context) {
           return pdfWidgets.Stack(
             children: [
-              pdfWidgets.Image(pdf.PdfImage.file(
-                document.document,
-                bytes: _background.data,
-              )),
+              pdfWidgets.Image(
+                pdf.PdfImage.file(
+                  document.document,
+                  bytes: _background.data,
+                ),
+              ),
               ..._stackedItems,
             ],
           );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:teamshare/models/field.dart';
 
 //TODO: finish form
@@ -48,7 +49,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
                   child: TextFormField(
                     initialValue: widget.field.prefix,
                     decoration: InputDecoration(labelText: 'Prefix'),
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     onSaved: (val) {
                       widget.field.prefix = val;
                     },

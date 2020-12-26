@@ -5,7 +5,9 @@ class CustomField extends StatefulWidget {
   final Field field;
   final MediaQueryData mqd;
   final Function editFunction;
-  CustomField(this.field, this.mqd, this.editFunction);
+  final Size pdfSizeOnScreen;
+
+  CustomField(this.field, this.mqd, this.editFunction, this.pdfSizeOnScreen);
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -35,8 +37,8 @@ class _CustomFieldState extends State<CustomField> {
     }
 
     return Positioned(
-      top: widget.field.offset.dy,
-      left: widget.field.offset.dx,
+      top: widget.field.offset.dy * widget.pdfSizeOnScreen.height,
+      left: widget.field.offset.dx * widget.pdfSizeOnScreen.width,
       child: GestureDetector(
         onTap: () => setState(() {
           _selected = !_selected;
@@ -52,8 +54,10 @@ class _CustomFieldState extends State<CustomField> {
             : Draggable(
                 data: widget.field.index,
                 onDragEnd: (details) {
-                  //if (details.wasAccepted)
-                  _relocate(details.offset);
+                  Offset newPos = Offset(
+                      details.offset.dx / widget.pdfSizeOnScreen.width,
+                      details.offset.dy / widget.pdfSizeOnScreen.height);
+                  _relocate(newPos);
                 },
                 feedback: _createRect(Colors.orange, 4, rectSize),
                 child: _createRect(Colors.green, 2, rectSize),
@@ -64,12 +68,15 @@ class _CustomFieldState extends State<CustomField> {
   }
 
   void _relocate(Offset offset) {
+    Offset viewRatio = Offset(
+        widget.mqd.viewPadding.topLeft.dx / widget.pdfSizeOnScreen.width,
+        widget.mqd.viewPadding.topLeft.dy / widget.pdfSizeOnScreen.height);
+
+    Offset factor =
+        Offset(0, 60 / widget.pdfSizeOnScreen.height); //TODO: figure this out
+
     setState(() {
-      widget.field.offset = offset -
-          widget.mqd.viewPadding.topLeft -
-          widget.mqd.viewInsets.topLeft -
-          widget
-              .mqd.padding.topLeft; //consider space outside of main Stack view
+      widget.field.offset = offset - viewRatio - factor;
     });
   }
 

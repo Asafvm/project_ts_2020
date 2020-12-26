@@ -63,3 +63,6 @@ final logoText = Container(
     ),
   ),
 );
+
+const double a4Width = 1240; //150dpi
+const double a4Height = 1754; //150dpi

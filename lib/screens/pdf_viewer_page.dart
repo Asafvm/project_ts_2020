@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
@@ -36,6 +38,8 @@ class _PDFScreenState extends State<PDFScreen> {
   int _pageIndex = 0;
   List<Field> _fields = [];
   List<Field> _fieldsInPage = [];
+  GlobalKey _keyPDF = GlobalKey();
+  RenderBox pdfBox;
 
   @override
   void initState() {
@@ -46,7 +50,8 @@ class _PDFScreenState extends State<PDFScreen> {
               .then((_) => Navigator.of(context).pop())
         });
     setState(() {
-      _fields = widget.fields == null ? [] : widget.fields;
+      if (widget.fields != null)
+        _fields = List.from(widget.fields, growable: true);
     });
     _updateLists(0, 0);
     super.initState();
@@ -70,27 +75,31 @@ class _PDFScreenState extends State<PDFScreen> {
               backgroundColor: Colors.grey,
               value: _progressValue,
             ))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
-                  flex: 9,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 2, color: Colors.black)),
-                    child: Stack(
-                      children: <Widget>[
-                        PositionedTapDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onLongPress: (pos) => {
-                            _addField(context,
-                                Offset(pos.relative.dx, pos.relative.dy)),
-                          },
+          : Container(
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                border: Border.all(width: 2, color: Colors.black),
+              ),
+              child: Column(
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      PositionedTapDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onLongPress: (pos) => {
+                          _addField(context,
+                              Offset(pos.relative.dx, pos.relative.dy)),
+                        },
+                        child: AspectRatio(
+                          aspectRatio: a4Width / a4Height,
                           child: PDFView(
+                            onViewCreated: (controller) => pdfBox =
+                                _keyPDF.currentContext.findRenderObject(),
+                            key: _keyPDF,
                             filePath: widget.pathPDF,
                             defaultPage: 0,
                             enableSwipe: true,
+                            swipeHorizontal: true,
                             onPageChanged: _updateLists,
                             onRender: (_pages) {
                               setState(() {
@@ -100,46 +109,22 @@ class _PDFScreenState extends State<PDFScreen> {
                             },
                           ),
                         ),
-                        DragTarget<CustomField>(
-                          builder: (BuildContext context,
-                              List<CustomField> candidateData,
-                              List<dynamic> rejectedData) {
-                            return Container();
-                          },
-                        ),
-                        for (Field i
-                            in _fieldsInPage) //put each field in a customfield wrapper
-                          CustomField(i, MediaQuery.of(context), _editField),
-                      ],
-                    ),
+                      ),
+                      DragTarget<CustomField>(
+                        builder: (BuildContext context,
+                            List<CustomField> candidateData,
+                            List<dynamic> rejectedData) {
+                          return Container();
+                        },
+                      ),
+                      for (Field i
+                          in _fieldsInPage) //put each field in a customfield wrapper
+                        CustomField(
+                            i, MediaQuery.of(context), _editField, pdfBox.size),
+                    ],
                   ),
-                ),
-                // Flexible(
-                //   flex: 1,
-                //   child: Row(
-                //     crossAxisAlignment: CrossAxisAlignment.stretch,
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: <Widget>[
-                //       FlatButton.icon(
-                //           onPressed: () {
-                //             setState(() {
-                //               //_pageIndex--;
-                //             });
-                //           },
-                //           icon: Icon(Icons.keyboard_arrow_left),
-                //           label: const Text('Previous')),
-                //       FlatButton.icon(
-                //           onPressed: () {
-                //             setState(() {
-                //               //_pageIndex++;
-                //             });
-                //           },
-                //           icon: Icon(Icons.keyboard_arrow_right),
-                //           label: const Text('Next')),
-                //     ],
-                //   ),
-                // ),
-              ],
+                ],
+              ),
             ),
     );
   }
@@ -148,8 +133,14 @@ class _PDFScreenState extends State<PDFScreen> {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
-          return AddFieldForm(Field.basic(
-              index: _fieldIndex, page: _pageIndex, initialPos: pos));
+          return AddFieldForm(
+            Field.basic(
+              index: _fieldIndex,
+              page: _pageIndex,
+              initialPos: Offset(pos.dx / pdfBox.size.width,
+                  pos.dy / pdfBox.size.height), //save offset as ratio
+            ),
+          );
         });
     if (f != null) {
       setState(() {
