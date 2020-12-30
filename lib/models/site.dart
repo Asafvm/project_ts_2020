@@ -1,6 +1,6 @@
 class Site {
-  final String name;
-  final Address address;
+  String name;
+  Address address;
 
   Site({this.name, this.address});
 }

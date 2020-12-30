@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:flutter/foundation.dart';
 
 class Field {
   final double _minWidth = 10;
@@ -20,17 +19,17 @@ class Field {
   bool isMandatory;
 
   Field(
-      {@required this.index,
-      @required this.hint,
-      @required this.isText,
-      this.regexp,
-      @required this.prefix,
-      this.defaultValue,
-      this.suffix,
-      @required this.page,
-      @required this.offset,
-      @required this.size,
-      @required this.isMandatory});
+      {this.index,
+      this.hint,
+      this.isText,
+      this.regexp = '',
+      this.prefix,
+      this.defaultValue = '',
+      this.suffix = '',
+      this.page,
+      this.offset,
+      this.size,
+      this.isMandatory});
 
   set setSize(Offset o) {
     Size _tmp = this.size + o;
@@ -59,14 +58,14 @@ class Field {
   Field.fromJson(Map<String, dynamic> data)
       : defaultValue = data['defaultValue'],
         index = data['index'],
-        hint = data['hint'],
+        hint = data['hint'] ?? '',
         page = data['page'],
         offset = Offset(data['offsetX'], data['offsetY']),
         size = Size(data['sizeW'].toDouble(), data['sizeH'].toDouble()),
         isText = data['isText'],
-        regexp = data['regexp'],
-        prefix = data['prefix'],
-        suffix = data['suffix'],
+        regexp = data['regexp'] ?? '',
+        prefix = data['prefix'] ?? '',
+        suffix = data['suffix'] ?? '',
         isMandatory = data['isMandatory'];
 
   Map<String, dynamic> toJson() => {

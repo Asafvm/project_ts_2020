@@ -7,6 +7,14 @@ class Instrument {
   String _model;
   double _price;
 
+  Instrument() {
+    _manifacturer = "";
+    _reference = "";
+    _codeName = "";
+    _model = "";
+    _price = 0.0;
+  }
+
   String getManifacturer() {
     return this._manifacturer;
   }
@@ -45,14 +53,6 @@ class Instrument {
 
   void setPrice(double price) {
     this._price = price;
-  }
-
-  Instrument() {
-    _manifacturer = "";
-    _reference = "";
-    _codeName = "";
-    _model = "";
-    _price = 0.0;
   }
 
   Map<String, dynamic> toJson() => {

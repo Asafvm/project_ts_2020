@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/authentication.dart';
@@ -176,7 +178,8 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
 
   _setSigningMode() {
     setState(() {
-      _loginKey.currentState.reset();
+      FormState formState = _loginKey.currentState;
+      if (formState != null) formState.reset();
       if (signMode == AuthState.signup)
         signMode = AuthState.signin;
       else
@@ -193,38 +196,41 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   }
 
   Future<void> _authUser(BuildContext context) async {
-    _loginKey.currentState.save();
-    if (_loginKey.currentState.validate()) {
-      FocusScope.of(context).unfocus();
-      try {
-        setState(() {
-          _logging = true;
-        });
+    FormState formState = _loginKey.currentState;
+    if (formState != null) {
+      formState.save();
+      if (formState.validate()) {
+        FocusScope.of(context).unfocus();
+        try {
+          setState(() {
+            _logging = true;
+          });
 
-        await Provider.of<Authentication>(context, listen: false)
-            .authenticate(_authData['email'], _authData['password'],
-                signMode == AuthState.signup)
-            .then((value) => _setLogging());
-      } catch (error) {
-        var errorMessage = 'Authentication failed';
-        if (error.toString().contains('EMAIL_EXISTS'))
-          errorMessage = 'Email already in use';
-        else if (error.toString().contains('ERROR_EMAIL_ALREADY_IN_USE'))
-          errorMessage = 'This email already registered';
-        else if (error.toString().contains('ERROR_WRONG_PASSWORD'))
-          errorMessage = 'Wrong password';
-        else if (error.toString().contains('INVALID_EMAIL'))
-          errorMessage = 'Please use a valid email';
-        else if (error.toString().contains('WEAK_PASSWORD'))
-          errorMessage = 'Your password is too weak';
-        else if (error.toString().contains('INVALID_PASSWORD'))
-          errorMessage = 'Wrong password';
-        else if (error.toString().contains('EMAIL_NOT_FOUND'))
-          errorMessage = 'This email is not registered';
-        else
-          errorMessage = 'Unknown problem occured. $error';
-        showMessage(errorMessage);
-        _setLogging();
+          await Provider.of<Authentication>(context, listen: false)
+              .authenticate(_authData['email'], _authData['password'],
+                  signMode == AuthState.signup)
+              .then((value) => _setLogging());
+        } catch (error) {
+          var errorMessage = 'Authentication failed';
+          if (error.toString().contains('EMAIL_EXISTS'))
+            errorMessage = 'Email already in use';
+          else if (error.toString().contains('ERROR_EMAIL_ALREADY_IN_USE'))
+            errorMessage = 'This email already registered';
+          else if (error.toString().contains('ERROR_WRONG_PASSWORD'))
+            errorMessage = 'Wrong password';
+          else if (error.toString().contains('INVALID_EMAIL'))
+            errorMessage = 'Please use a valid email';
+          else if (error.toString().contains('WEAK_PASSWORD'))
+            errorMessage = 'Your password is too weak';
+          else if (error.toString().contains('INVALID_PASSWORD'))
+            errorMessage = 'Wrong password';
+          else if (error.toString().contains('EMAIL_NOT_FOUND'))
+            errorMessage = 'This email is not registered';
+          else
+            errorMessage = 'Unknown problem occured. $error';
+          showMessage(errorMessage);
+          _setLogging();
+        }
       }
     }
   }

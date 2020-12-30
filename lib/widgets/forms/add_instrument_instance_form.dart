@@ -54,35 +54,39 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                       margin: EdgeInsets.symmetric(vertical: 20),
                       child: FlatButton(
                         onPressed: () async {
-                          _instrumentForm.currentState.save();
-                          setState(() {
-                            _uploading = true;
-                          });
-                          //send to server
-                          try {
-                            await FirebaseFirestoreProvider
-                                    .uploadInstrumentInstance(
-                                        _newInstInstrument,
-                                        widget.instrumentCodeName)
-                                .then((_) => Navigator.of(context).pop());
-                          } catch (error) {
-                            showDialog(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                      title: Text('Error!'),
-                                      content: Text('Operation failed\n' +
-                                          error.toString()),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          onPressed: Navigator.of(context).pop,
-                                          child: Text('Ok'),
-                                        ),
-                                      ],
-                                    ));
-                          } finally {
+                          FormState formState = _instrumentForm.currentState;
+                          if (formState != null) {
+                            formState.save();
                             setState(() {
-                              _uploading = false;
+                              _uploading = true;
                             });
+                            //send to server
+                            try {
+                              await FirebaseFirestoreProvider
+                                      .uploadInstrumentInstance(
+                                          _newInstInstrument,
+                                          widget.instrumentCodeName)
+                                  .then((_) => Navigator.of(context).pop());
+                            } catch (error) {
+                              showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                        title: Text('Error!'),
+                                        content: Text('Operation failed\n' +
+                                            error.toString()),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            onPressed:
+                                                Navigator.of(context).pop,
+                                            child: Text('Ok'),
+                                          ),
+                                        ],
+                                      ));
+                            } finally {
+                              setState(() {
+                                _uploading = false;
+                              });
+                            }
                           }
                         },
                         child: Text(

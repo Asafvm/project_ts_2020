@@ -15,7 +15,7 @@ class ContactListTile extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
         ),
         Checkbox(
-          onChanged: (bool value) {},
+          onChanged: (value) {},
           value: false,
         ),
       ],

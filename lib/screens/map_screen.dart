@@ -13,6 +13,9 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   LatLng _pickedLocation;
+  Set<Marker> markers = Set<Marker>();
+
+  void _addMarker(Marker marker) => markers.add(marker);
 
   @override
   Widget build(BuildContext context) {
@@ -32,25 +35,25 @@ class _MapScreenState extends State<MapScreen> {
         ],
       ),
       body: GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: widget.initialLocation == null
-                ? LatLng(32.113540, 34.817882) // default = afeka's location
-                : LatLng(widget.initialLocation.address.lat,
-                    widget.initialLocation.address.lng),
-            zoom: 18,
-          ),
-          onTap: widget.isSelecting ? _selectLocation : null,
-          markers: _pickedLocation == null
-              ? null
-              : {
-                  Marker(markerId: MarkerId('m1'), position: _pickedLocation),
-                }),
+        initialCameraPosition: CameraPosition(
+          target: widget.initialLocation == null
+              ? LatLng(32.113540, 34.817882) // default = afeka's location
+              : LatLng(widget.initialLocation.address.lat,
+                  widget.initialLocation.address.lng),
+          zoom: 18,
+        ),
+        onTap: _selectLocation,
+        markers: markers, // _pickedLocation == null
+      ),
     );
   }
 
   void _selectLocation(LatLng position) {
-    setState(() {
-      _pickedLocation = position;
-    });
+    if (widget.isSelecting) {
+      setState(() {
+        _pickedLocation = position;
+        _addMarker(Marker(markerId: MarkerId('1'), position: position));
+      });
+    }
   }
 }

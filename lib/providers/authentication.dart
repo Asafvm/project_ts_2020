@@ -13,16 +13,14 @@ class Authentication with ChangeNotifier {
   String _authUserId;
   String _authUserEmail;
   DateTime _authTokenExpiry;
+  User _user;
+  IdTokenResult _usertoken;
+  Timer _authTimer;
 
   factory Authentication() => _instance;
 
   Authentication._internal();
-
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  User _user;
-  IdTokenResult _usertoken;
-
-  Timer _authTimer;
 
   bool get isAuth {
     return _authToken != null;
@@ -93,12 +91,12 @@ class Authentication with ChangeNotifier {
     final extractedUserData =
         json.decode(pref.getString('userData')) as Map<String, Object>;
 
-    _authTokenExpiry = DateTime.parse(extractedUserData['expiry']);
+    _authTokenExpiry = DateTime.parse(extractedUserData['expiry'] as String);
     if (_authTokenExpiry.isBefore(DateTime.now())) return false;
 
-    _authUserEmail = extractedUserData['userEmail'];
-    _authUserId = extractedUserData['userId'];
-    _authToken = extractedUserData['token'];
+    _authUserEmail = extractedUserData['userEmail'] as String;
+    _authUserId = extractedUserData['userId'] as String;
+    _authToken = extractedUserData['token'] as String;
 
     notifyListeners();
     autoLogout();
@@ -107,13 +105,10 @@ class Authentication with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _user = null;
-    _usertoken = null;
     _authToken = null;
-    _authUserId = null;
-    _authUserEmail = null;
+
     if (_authTimer != null) {
-      _authTimer.cancel();
+      _authTimer?.cancel();
       _authTimer = null;
     }
     final pref = await SharedPreferences.getInstance();
@@ -122,7 +117,7 @@ class Authentication with ChangeNotifier {
   }
 
   void autoLogout() {
-    if (_authTimer != null) _authTimer.cancel();
+    if (_authTimer != null) _authTimer?.cancel();
     final timeToExpiry = _authTokenExpiry.difference(DateTime.now()).inSeconds;
     Timer(Duration(seconds: timeToExpiry), tryAutoLogin);
     // Timer(Duration(seconds: timeToExpiry), logout);

@@ -14,6 +14,7 @@ import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/forms/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
+import 'package:after_layout/after_layout.dart';
 
 class PDFScreen extends StatefulWidget {
   final List<Field> fields;
@@ -30,7 +31,8 @@ class PDFScreen extends StatefulWidget {
   _PDFScreenState createState() => _PDFScreenState();
 }
 
-class _PDFScreenState extends State<PDFScreen> {
+class _PDFScreenState extends State<PDFScreen>
+    with AfterLayoutMixin<PDFScreen> {
   bool _uploading = false;
   double _progressValue = 0.0;
   AlwaysStoppedAnimation<Color> _progressColor;
@@ -54,7 +56,16 @@ class _PDFScreenState extends State<PDFScreen> {
         _fields = List.from(widget.fields, growable: true);
     });
     _updateLists(0, 0);
+
     super.initState();
+  }
+
+  void afterFirstLayout(BuildContext context) {
+    // Calling the same function "after layout" to resolve the issue.
+    if (_keyPDF.currentContext != null)
+      setState(() {
+        pdfBox = _keyPDF.currentContext.findRenderObject() as RenderBox;
+      });
   }
 
   @override
@@ -93,8 +104,6 @@ class _PDFScreenState extends State<PDFScreen> {
                         child: AspectRatio(
                           aspectRatio: a4Width / a4Height,
                           child: PDFView(
-                            onViewCreated: (controller) => pdfBox =
-                                _keyPDF.currentContext.findRenderObject(),
                             key: _keyPDF,
                             filePath: widget.pathPDF,
                             defaultPage: 0,
@@ -117,10 +126,11 @@ class _PDFScreenState extends State<PDFScreen> {
                           return Container();
                         },
                       ),
-                      for (Field i
-                          in _fieldsInPage) //put each field in a customfield wrapper
-                        CustomField(
-                            i, MediaQuery.of(context), _editField, pdfBox.size),
+                      if (pdfBox != null)
+                        for (Field i
+                            in _fieldsInPage) //put each field in a customfield wrapper
+                          CustomField(i, MediaQuery.of(context), _editField,
+                              pdfBox.size),
                     ],
                   ),
                 ],

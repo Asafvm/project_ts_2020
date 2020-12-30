@@ -38,7 +38,20 @@ const tabInstrument = TabBar(
     ),
   ],
 );
-
+const tabSite = TabBar(
+  labelColor: Colors.black,
+  tabs: [
+    Tab(
+      text: "Rooms",
+    ),
+    Tab(
+      text: "Instruments",
+    ),
+    Tab(
+      text: "Contacts",
+    ),
+  ],
+);
 final logoText = Container(
   //margin: EdgeInsets.only(top: 40),
   //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),

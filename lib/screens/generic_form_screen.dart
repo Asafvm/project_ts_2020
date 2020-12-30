@@ -91,7 +91,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
               ),
             ),
           ),
-          if (field.suffix.isNotEmpty)
+          if (field.suffix != null)
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
@@ -121,7 +121,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
             child: pdfWidgets.Text(
-              field.defaultValue,
+              field.defaultValue ?? '!!!',
               // style:
               //     pdfWidgets.TextStyle(fontSize: 32, color: pdf.PdfColors.red),
             ),

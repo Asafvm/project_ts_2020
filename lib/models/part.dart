@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 
 class Part {
   String manifacturer;
@@ -103,12 +102,12 @@ class Part {
   }
 
   Part(
-      {@required this.manifacturer,
-      @required this.reference,
+      {this.manifacturer,
+      this.reference,
       this.altreference = "",
-      @required this.instrumentId,
+      this.instrumentId,
       this.model = "",
-      @required this.description,
+      this.description,
       this.price = 0.0,
       this.mainStockMin = 0,
       this.personalStockMin = 0,
@@ -136,7 +135,7 @@ class Part {
         instrumentId = data['instrumentId'],
         model = data['model'] ?? "",
         description = data['description'],
-        price = data['price'] as double ?? 0.0,
+        price = double.tryParse(data['price']) ?? 0.0,
         mainStockMin = data['mainStockMin'] ?? 0,
         personalStockMin = data['personalStockMin'] ?? 0,
         serialTracking = data['serialTracking'] ?? false,

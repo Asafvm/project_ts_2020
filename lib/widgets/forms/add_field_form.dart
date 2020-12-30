@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/applogger.dart';
 
 //TODO: finish form
 
@@ -35,7 +36,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
               decoration: InputDecoration(labelText: 'Description'),
               keyboardType: TextInputType.text,
               onSaved: (val) {
-                widget.field.hint = val;
+                widget.field.hint = val ?? '';
               },
               validator: (value) {
                 if (value.isEmpty) return "Enter field's name";
@@ -51,7 +52,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     decoration: InputDecoration(labelText: 'Prefix'),
                     keyboardType: TextInputType.text,
                     onSaved: (val) {
-                      widget.field.prefix = val;
+                      widget.field.prefix = val ?? '';
                     },
                   ),
                 ),
@@ -109,10 +110,10 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     onSaved: (val) {
                       widget.field.isText = (val == 'Text');
                     },
-                    onChanged: (newValue) {
+                    onChanged: (String newValue) {
                       setState(() {
                         widget.field.isText = (newValue == 'Text');
-                        _typeValue = newValue;
+                        _typeValue = newValue ?? 'Text';
                       });
                     },
                     items: <String>['Text', 'Number', 'Decimal']
@@ -137,8 +138,8 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     },
                     onChanged: (String newValue) {
                       setState(() {
-                        _mandatoryValue = newValue;
-                        widget.field.isMandatory = (newValue == 'Yes');
+                        _mandatoryValue = newValue ?? 'No';
+                        widget.field.isMandatory = (newValue == 'No');
                       });
                     },
                     items: <String>['Yes', 'No']
@@ -156,10 +157,16 @@ class _AddFieldFormState extends State<AddFieldForm> {
                 margin: EdgeInsets.symmetric(vertical: 20),
                 child: FlatButton(
                   onPressed: () async {
-                    if (_fieldForm.currentState.validate()) {
-                      _fieldForm.currentState.save();
-                      Navigator.of(context)
-                          .pop(widget.field); //retuen the new Field object
+                    FormState formState = _fieldForm.currentState;
+                    if (formState != null) {
+                      if (formState.validate()) {
+                        formState.save();
+                        Navigator.of(context)
+                            .pop(widget.field); //retuen the new Field object}
+                      }
+                    } else {
+                      Applogger.consoleLog(
+                          MessegeType.error, 'Error saving form');
                     }
                   },
                   child: Text(

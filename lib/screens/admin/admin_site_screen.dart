@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/screens/map_screen.dart';
 
 class AdminSiteScreen extends StatefulWidget {
@@ -55,42 +56,92 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Manage Sites'),
-        ),
-        body: Column(
-          children: [
-            Container(
-                width: double.infinity,
-                height: 200,
-                margin: EdgeInsets.symmetric(vertical: 10),
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: Colors.grey,
+      appBar: AppBar(
+        title: Text('Manage Sites'),
+      ),
+      body: Column(
+        children: [
+          Flexible(
+            flex: 4,
+            fit: FlexFit.tight,
+            child: Row(
+              children: [
+                Flexible(
+                  flex: 4,
+                  fit: FlexFit.tight,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          child: _previewImageUrl == null
+                              ? Text('Choose a site')
+                              : Image.network(_previewImageUrl),
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.location_on),
+                            tooltip: 'Current Location',
+                            onPressed: _getCurrentLocation,
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.map),
+                            tooltip: 'Select On Map',
+                            onPressed: _selectOnMap,
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.directions),
+                            tooltip: 'Directions',
+                            onPressed: null, //TOFO: open maps or waze
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                child: _previewImageUrl == null
-                    ? Text('Choose a site')
-                    : Image.network(_previewImageUrl)),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FlatButton.icon(
-                  onPressed: _getCurrentLocation,
-                  icon: Icon(Icons.location_on),
-                  label: Text('Current Location'),
-                ),
-                FlatButton.icon(
-                  onPressed: _selectOnMap,
-                  icon: Icon(Icons.map),
-                  label: Text('Select On Map'),
-                ),
+                Flexible(flex: 6, fit: FlexFit.tight, child: Container()),
               ],
-            )
-          ],
-        ));
+            ),
+          ),
+          Flexible(
+            flex: 7,
+            fit: FlexFit.tight,
+            child: DefaultTabController(
+              initialIndex: 0,
+              length: 3,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  tabSite, //defined in cons(
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        //Rooms
+                        Container(),
+
+                        ///Instruments
+                        Container(),
+                        //Contacts
+                        Container(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -99,13 +99,13 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
       keyboardType:
           TextInputType.numberWithOptions(decimal: true, signed: false),
       onChanged: (val) {
-        double price = double.tryParse(val);
-        _newInstrument.setPrice(price == null ? "" : price);
+        double price = double.tryParse(val) ?? 0.0;
+        _newInstrument.setPrice(price);
       },
       onSaved: (val) {
         if (val.isEmpty) val = "0.0";
-        double price = double.tryParse(val);
-        _newInstrument.setPrice(price == null ? 0.0 : price);
+        double price = double.tryParse(val) ?? 0.0;
+        _newInstrument.setPrice(price);
       },
       initialValue:
           _newInstrument != null ? _newInstrument.getPrice().toString() : "",
@@ -172,14 +172,18 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                           style: TextStyle(color: Colors.white),
                         ),
                         onPressed: () async {
-                          if (manualValidation()) {
-                            //_instrumentForm.currentState.validate()) {
-                            _instrumentForm.currentState.save();
-                            setState(() {
-                              _uploading = true;
-                            });
-                            //send to server
-                            await _uploadInstrument();
+                          FormState formState = _instrumentForm.currentState;
+
+                          if (formState != null) {
+                            if (manualValidation()) {
+                              //_instrumentForm.currentState.validate()) {
+                              formState.save();
+                              setState(() {
+                                _uploading = true;
+                              });
+                              //send to server
+                              await _uploadInstrument();
+                            }
                           }
                         },
                         color: Theme.of(context).primaryColor,

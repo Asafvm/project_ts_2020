@@ -48,8 +48,8 @@ class _AddPartFormState extends State<AddPartForm> {
       decoration: InputDecoration(labelText: "Main Storage Min"),
       keyboardType: TextInputType.number,
       onSaved: (val) {
-        int min = int.tryParse(val);
-        _newPart.setmainStockMin(min == null ? 0 : min);
+        int min = int.tryParse(val) ?? 0;
+        _newPart.setmainStockMin(min);
       },
     );
   }
@@ -59,8 +59,8 @@ class _AddPartFormState extends State<AddPartForm> {
       decoration: InputDecoration(labelText: 'Personal Storage Min'),
       keyboardType: TextInputType.number,
       onSaved: (val) {
-        int min = int.tryParse(val);
-        _newPart.setpersonalStockMin(min == null ? 0 : min);
+        int min = int.tryParse(val) ?? 0;
+        _newPart.setpersonalStockMin(min);
       },
     );
   }
@@ -110,8 +110,8 @@ class _AddPartFormState extends State<AddPartForm> {
       decoration: InputDecoration(labelText: 'Price'),
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       onSaved: (val) {
-        var price = double.tryParse(val);
-        _newPart.setPrice(price == null ? 0.0 : price);
+        var price = double.tryParse(val) ?? 0.0;
+        _newPart.setPrice(price);
       },
     );
   }
@@ -202,7 +202,7 @@ class _AddPartFormState extends State<AddPartForm> {
                               ),
                               Expanded(
                                 flex: 3,
-                                child: instrumentList == null
+                                child: instrumentList.isEmpty
                                     ? Text(
                                         "No Instruments listed",
                                         style: TextStyle(color: Colors.red),
@@ -210,7 +210,8 @@ class _AddPartFormState extends State<AddPartForm> {
                                     : DropdownButton(
                                         hint: Text("Device"),
                                         items: instrumentList
-                                            .map((e) => DropdownMenuItem(
+                                            .map((e) =>
+                                                DropdownMenuItem<String>(
                                                   child: Text(e.getCodeName()),
                                                 ))
                                             .toList(),
@@ -269,49 +270,63 @@ class _AddPartFormState extends State<AddPartForm> {
                         margin: EdgeInsets.symmetric(vertical: 20),
                         child: FlatButton(
                           onPressed: () async {
-                            _partForm.currentState.save();
-                            setState(() {
-                              _uploading = true;
-                            });
-                            //send to server
-                            try {
-                              await FirebaseFirestoreProvider.uploadPart(
-                                      _newPart)
-                                  .then((_) async => await showDialog(
-                                      context: context,
-                                      builder: (ctx) => AlertDialog(
-                                            title: Text('Success!'),
-                                            content:
-                                                Text('New Part created!\n'),
-                                            actions: <Widget>[
-                                              FlatButton(
-                                                onPressed:
-                                                    Navigator.of(context).pop,
-                                                child: Text('Ok'),
-                                              ),
-                                            ],
-                                          )).then(
-                                      (_) => Navigator.of(context).pop()));
-                            } catch (error) {
-                              showDialog(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                        title: Text('Error!'),
-                                        content: Text('Operation failed\n' +
-                                            error.toString()),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                            onPressed:
-                                                Navigator.of(context).pop,
-                                            child: Text('Ok'),
-                                          ),
-                                        ],
-                                      ));
-                            } finally {
+                            FormState formState = _partForm.currentState;
+                            if (formState != null) {
+                              formState.save();
                               setState(() {
-                                _newPart = null;
-                                _uploading = false;
+                                _uploading = true;
                               });
+                              //send to server
+                              try {
+                                await FirebaseFirestoreProvider.uploadPart(
+                                        _newPart)
+                                    .then((_) async => await showDialog(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                              title: Text('Success!'),
+                                              content:
+                                                  Text('New Part created!\n'),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  onPressed:
+                                                      Navigator.of(context).pop,
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            )).then(
+                                        (_) => Navigator.of(context).pop()));
+                              } catch (error) {
+                                showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                          title: Text('Error!'),
+                                          content: Text('Operation failed\n' +
+                                              error.toString()),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              onPressed:
+                                                  Navigator.of(context).pop,
+                                              child: Text('Ok'),
+                                            ),
+                                          ],
+                                        ));
+                              } finally {
+                                setState(() {
+                                  _newPart = Part(
+                                      manifacturer: "",
+                                      reference: "",
+                                      altreference: "",
+                                      instrumentId: "",
+                                      model: "",
+                                      description: "",
+                                      price: 0.0,
+                                      mainStockMin: 0,
+                                      personalStockMin: 0,
+                                      serialTracking: false,
+                                      active: true);
+                                  _uploading = false;
+                                });
+                              }
                             }
                           },
                           child: Text(

@@ -6,8 +6,8 @@ import 'package:teamshare/screens/admin/admin_site_screen.dart';
 class AdminMenuScreen extends StatelessWidget {
   static const String routeName = '/admin_menu_screen';
 
-  Widget createButton(
-      IconData icon, Function click, String title, BuildContext context) {
+  Widget createButton(IconData icon, void Function() click, String title,
+      BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(width: 3, color: Colors.black),

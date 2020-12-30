@@ -4,9 +4,10 @@ import 'entry.dart';
 
 class InstrumentInstance {
   final String serial;
-  List<Entry> entries;
+  List<Entry> entries = [];
 
   InstrumentInstance({this.serial, this.entries});
+
   InstrumentInstance.newInstrument({this.serial}) {
     this.entries = new List<Entry>.empty(growable: true);
     this.entries.add(Entry(
