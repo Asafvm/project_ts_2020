@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:contact_picker/contact_picker.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
@@ -20,6 +20,7 @@ class TeamCreateScreen extends StatefulWidget {
 }
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
+  List<String> members = [];
   bool __imgPicked = false;
   String _picUrl = 'assets/pics/add_image.png';
 
@@ -126,10 +127,11 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
               content: Container(
                 child: FlatButton(
                   onPressed: () async {
-                    final Contact contact =
-                        await ContactPicker().selectContact();
+                    final EmailContact contact =
+                        await FlutterContactPicker.pickEmailContact(
+                            askForPermission: true);
 
-                    print(contact);
+                    members.add(contact.email.email);
                   },
                   child: Text("Contacts"),
                 ),
@@ -176,8 +178,9 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                       setState(() {
                         _loading = true;
                       }),
-                      await FirebaseFirestoreProvider.addTeam(
-                          _name, _description, __imgPicked ? _picUrl : null),
+                      members.add(Authentication().userEmail),
+                      await FirebaseFirestoreProvider.addTeam(_name,
+                          _description, members, __imgPicked ? _picUrl : null),
                       setState(() {
                         _loading = false;
                       }),

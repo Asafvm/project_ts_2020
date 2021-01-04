@@ -8,24 +8,36 @@ const path = require("path");
 const os = require("os");
 const fs = require("fs");
 const { exception, info } = require("console");
+const { firebaseConfig } = require("firebase-functions");
 
 //create new team
 exports.addTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
-  var teamid = await teams.add(data); //add will give each entry a random id
-  console.log("Team id:"+teamid.id+"\n");
+  var teamid = await teams.add(data["teamInfo"]); //add will give each entry a random id
+  console.log("Team id:" + teamid.id + "\n");
 
   // eslint-disable-next-line promise/no-nesting
-  await teams
-    .doc(teamid.id)
-    .collection("members")
-    .doc(data["creatorEmail"])
-    .set({})
-    .then((val) => console.log("success: added member"))
-    .catch((err) => console.log("could not add member. error: " + err));
+  try {
+    const members = data["members"];
 
-    return teamid.id;
+    const promises = [];
+    for (const m in members){ //WHY IS m AN INDEX?!?!
+      console.log("member "+ members[m]);
+      const p = teams
+      .doc(teamid.id)
+      .collection("members").doc(members[m]).set({})
+ 
+      promises.push(p);
+    }
+    await Promise.all(promises);
+    
+    
+  } catch (e) {
+    console.log('Error adding members ::' + e);
+  }
+  return teamid.id;
 });
+
 
 //add field to team document
 exports.updateTeam = functions.https.onCall(async (data, context) => {
@@ -33,7 +45,7 @@ exports.updateTeam = functions.https.onCall(async (data, context) => {
   // eslint-disable-next-line promise/no-nesting
   await teams
     .doc(data['teamid'])
-    .update(data['data'])
+0    .update(data['data'])
     .then((val) => {
       console.log("success: updated team info ");
       return true;
@@ -70,7 +82,8 @@ exports.autoTeamManagement = functions.firestore
       .collection("teams")
       .doc(context.params.teamId)
       .delete();
-  });
+  }
+  );
 
 //case user exited from
 exports.autoUserManagement = functions.firestore
@@ -168,7 +181,7 @@ exports.addInstrumentReport = functions.https.onCall((data, context) => {
 
   return instrumentreports.set(
     Object.assign({}, data["fields"]) //map every list item to index number
-      );
-      
+  );
+
 
 });

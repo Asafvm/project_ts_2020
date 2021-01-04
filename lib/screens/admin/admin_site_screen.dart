@@ -82,7 +82,10 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
                           ),
                           child: _previewImageUrl == null
                               ? Text('Choose a site')
-                              : Image.network(_previewImageUrl),
+                              : Image.network(
+                                  _previewImageUrl,
+                                  fit: BoxFit.fill,
+                                ),
                         ),
                       ),
                       Row(
@@ -109,7 +112,21 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
                     ],
                   ),
                 ),
-                Flexible(flex: 6, fit: FlexFit.tight, child: Container()),
+                Flexible(
+                    flex: 6,
+                    fit: FlexFit.tight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Name'),
+                          Text('City'),
+                          Text('Street'),
+                        ],
+                      ),
+                    )),
               ],
             ),
           ),
@@ -122,7 +139,14 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  tabSite, //defined in cons(
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 1,
+                            color: Colors.black,
+                            style: BorderStyle.solid)),
+                    child: tabSite,
+                  ), //defined in cons(
                   Expanded(
                     child: TabBarView(
                       children: [

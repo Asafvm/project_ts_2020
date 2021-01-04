@@ -16,17 +16,20 @@ import 'authentication.dart';
 class FirebaseFirestoreProvider {
   static const String instruments = "instruments";
   static const String teams = "teams";
-
 //Get from Firebase
 
-  static addTeam(String name, String description, [String picUrl]) async {
+  static Future<void> addTeam(String name, String description,
+      [List<String> members = const [], String picUrl]) async {
     //step 1: upload team and get id
     HttpsCallableResult teaminfo = await FirebaseFunctions.instance
         .httpsCallable("addTeam")
         .call(<String, dynamic>{
-      "name": name,
-      "description": description,
-      "creatorEmail": Authentication().userEmail,
+      "teamInfo": {
+        "name": name,
+        "description": description,
+        "creatorEmail": Authentication().userEmail,
+      },
+      "members": members,
     }).catchError((err) => Applogger.consoleLog(
             MessegeType.error, 'Failed to create team: ${err.toString()}'));
 
