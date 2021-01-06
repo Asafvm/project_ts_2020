@@ -7,7 +7,9 @@ import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspath;
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/widgets/member_list_item.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
 int _currentStep = STEPS.INFO.index;
@@ -20,7 +22,7 @@ class TeamCreateScreen extends StatefulWidget {
 }
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
-  List<String> members = [];
+  Set<String> members = Set<String>(); //using set to avoid duplicates
   bool __imgPicked = false;
   String _picUrl = 'assets/pics/add_image.png';
 
@@ -125,15 +127,63 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
               //INVITE TEAM MEMBERS
               title: Text("Invite"),
               content: Container(
-                child: FlatButton(
-                  onPressed: () async {
-                    final EmailContact contact =
-                        await FlutterContactPicker.pickEmailContact(
-                            askForPermission: true);
-
-                    members.add(contact.email.email);
-                  },
-                  child: Text("Contacts"),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: members.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return MemberListItem(
+                            key: UniqueKey(),
+                            name: members.elementAt(index),
+                            removeFunction: _removeFromList);
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        FlatButton(
+                          color: Theme.of(context).accentColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(25)),
+                            side: BorderSide(
+                                color: Colors.black,
+                                width: 1,
+                                style: BorderStyle.solid),
+                          ),
+                          onPressed: () async {
+                            final EmailContact contact =
+                                await FlutterContactPicker.pickEmailContact(
+                                    askForPermission: true);
+                            setState(() {
+                              members.add(contact.email.email);
+                            });
+                          },
+                          child: Text("Add From Contacts"),
+                        ),
+                        FlatButton(
+                          color: Theme.of(context).accentColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(25)),
+                            side: BorderSide(
+                                color: Colors.black,
+                                width: 1,
+                                style: BorderStyle.solid),
+                          ),
+                          onPressed: () async {
+                            String email = await _getMailManually(context);
+                            if (email.isNotEmpty) {
+                              setState(() {
+                                members.add(email);
+                              });
+                            }
+                          },
+                          child: Text("Enter Manually"),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               isActive: _currentStep == STEPS.INVITE.index ? true : false,
@@ -179,8 +229,11 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                         _loading = true;
                       }),
                       members.add(Authentication().userEmail),
-                      await FirebaseFirestoreProvider.addTeam(_name,
-                          _description, members, __imgPicked ? _picUrl : null),
+                      await FirebaseFirestoreProvider.addTeam(
+                          _name,
+                          _description,
+                          members.toList(),
+                          __imgPicked ? _picUrl : null),
                       setState(() {
                         _loading = false;
                       }),
@@ -218,5 +271,67 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
       _picUrl = savedImage.path;
       __imgPicked = true;
     });
+  }
+
+  _removeFromList(String value) {
+    setState(() {
+      members.remove(value);
+    });
+  }
+
+  Future<String> _getMailManually(BuildContext context) {
+    TextEditingController _textController = TextEditingController();
+    bool _valid = true;
+
+    return showDialog(
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Enter Email"),
+              content: TextField(
+                controller: _textController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  errorText: _valid ? null : "Must be a valid email",
+                ),
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    if (_textController.text.isEmpty ||
+                        !emailRegExp.hasMatch(_textController.text)) {
+                      setState(() {
+                        _valid = false;
+                      });
+                    } else {
+                      setState(() {
+                        _valid = true;
+                      });
+
+                      Navigator.of(context).pop(_textController.text);
+                    }
+                  },
+                  child: Text(
+                    "OK",
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop("");
+                  },
+                  child: Text(
+                    "Cancel",
+                  ),
+                ),
+              ],
+              elevation: 10,
+            );
+          },
+        );
+      },
+      context: context,
+    );
   }
 }

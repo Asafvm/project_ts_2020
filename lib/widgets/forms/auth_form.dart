@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/consts.dart';
 
 enum AuthState { signin, signup }
 
@@ -93,13 +94,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                           Icons.email, "Email", "Enter Email"),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        RegExp regExp = RegExp(
-                            r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",
-                            //r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
-                            caseSensitive: false,
-                            multiLine: false);
-
-                        if (value.isEmpty || !regExp.hasMatch(value))
+                        if (value.isEmpty || !emailRegExp.hasMatch(value))
                           return 'Insert a valid Email address';
                         return null;
                       },
