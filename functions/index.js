@@ -42,16 +42,21 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
 //add field to team document
 exports.updateTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
+  const teamid = data['teamid'];
+  const teamdata = data['data'];
+  
+  console.log(teamid +' Url='+teamdata);
+  console.log('Url2='+teamdata['logoUrl']);
   // eslint-disable-next-line promise/no-nesting
-  await teams
-    .doc(data['teamid'])
+  teams
+    .doc(teamid)
 0    .update(data['data'])
     .then((val) => {
       console.log("success: updated team info ");
       return true;
     })
     .catch((err) => {
-      console.log("could updated team info. error: " + err);
+      console.log("could not updated team info. error: " + err);
       return false;
     });
 });

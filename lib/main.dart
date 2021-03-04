@@ -54,6 +54,7 @@ class TeamShare extends StatelessWidget {
             child: Consumer<Authentication>(
               builder: (ctx, auth, _) {
                 return MaterialApp(
+                  debugShowCheckedModeBanner: false,
                   title: 'Team Share',
                   theme: ThemeData(
                     primarySwatch: Colors.blue,
@@ -86,6 +87,7 @@ class TeamShare extends StatelessWidget {
 
         // splash screen while loading
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           home: SplashScreen(),
         );
       },

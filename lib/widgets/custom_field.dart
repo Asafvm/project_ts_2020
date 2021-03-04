@@ -6,8 +6,10 @@ class CustomField extends StatefulWidget {
   final MediaQueryData mqd;
   final Function editFunction;
   final Size pdfSizeOnScreen;
-
-  CustomField(this.field, this.mqd, this.editFunction, this.pdfSizeOnScreen);
+  final double scale;
+  final Offset focalPoint;
+  CustomField(this.field, this.mqd, this.editFunction, this.pdfSizeOnScreen,
+      this.scale, this.focalPoint);
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -18,7 +20,7 @@ class _CustomFieldState extends State<CustomField> {
 
   @override
   Widget build(BuildContext context) {
-    Size rectSize = widget.field.size;
+    Size rectSize = widget.field.size * widget.scale;
 
     Widget _createRect(Color color, double w, Size size) {
       Size _size = size;
@@ -37,8 +39,10 @@ class _CustomFieldState extends State<CustomField> {
     }
 
     return Positioned(
-      top: widget.field.offset.dy * widget.pdfSizeOnScreen.height,
-      left: widget.field.offset.dx * widget.pdfSizeOnScreen.width,
+      top:
+          widget.field.offset.dy * widget.pdfSizeOnScreen.height / widget.scale,
+      left:
+          widget.field.offset.dx * widget.pdfSizeOnScreen.width / widget.scale,
       child: GestureDetector(
         onTap: () => setState(() {
           _selected = !_selected;
@@ -59,8 +63,8 @@ class _CustomFieldState extends State<CustomField> {
                       details.offset.dy / widget.pdfSizeOnScreen.height);
                   _relocate(newPos);
                 },
-                feedback: _createRect(Colors.orange, 4, rectSize),
-                child: _createRect(Colors.green, 2, rectSize),
+                feedback: _createRect(Colors.orange, 1, rectSize),
+                child: _createRect(Colors.green, 1, rectSize),
                 childWhenDragging: Container(),
               ),
       ),

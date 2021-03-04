@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
@@ -42,6 +42,9 @@ class _PDFScreenState extends State<PDFScreen>
   List<Field> _fieldsInPage = [];
   GlobalKey _keyPDF = GlobalKey();
   RenderBox pdfBox;
+  double _scale = 1.0;
+  double _previousScale = 1.0;
+  Offset _focalPoint = Offset(0, 0);
 
   @override
   void initState() {
@@ -89,57 +92,93 @@ class _PDFScreenState extends State<PDFScreen>
           : Container(
               decoration: BoxDecoration(
                 color: Colors.grey,
-                border: Border.all(width: 2, color: Colors.black),
               ),
-              child: Column(
-                children: <Widget>[
-                  Stack(
-                    children: <Widget>[
-                      PositionedTapDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onLongPress: (pos) => {
-                          _addField(context,
-                              Offset(pos.relative.dx, pos.relative.dy)),
-                        },
-                        child: AspectRatio(
+              child: GestureDetector(
+                behavior: HitTestBehavior.deferToChild,
+                onDoubleTap: () {},
+                onScaleStart: (details) {
+                  _scale = _previousScale;
+                  _focalPoint = details.localFocalPoint;
+                  setState(() {});
+                },
+                onScaleUpdate: (details) {
+                  if (_previousScale * details.scale < 1.0)
+                    _scale = 1.0;
+                  else
+                    _scale = _previousScale * details.scale;
+                  setState(() {});
+                },
+                onScaleEnd: (_) {
+                  _previousScale = _scale;
+                  setState(() {});
+                },
+                child: Column(
+                  children: <Widget>[
+                    Stack(
+                      clipBehavior: Clip.hardEdge,
+                      children: <Widget>[
+                        AspectRatio(
                           aspectRatio: a4Width / a4Height,
                           child: PDFView(
                             key: _keyPDF,
                             filePath: widget.pathPDF,
                             defaultPage: 0,
-                            enableSwipe: true,
+                            //enableSwipe: true,
                             swipeHorizontal: true,
                             onPageChanged: _updateLists,
+                            gestureRecognizers: Set()
+                              ..add(Factory<ScaleGestureRecognizer>(() =>
+                                  ScaleGestureRecognizer(
+                                      kind: PointerDeviceKind.touch)
+                                    ..onStart = (details) {
+                                      print('Start');
+                                    }
+                                    ..onUpdate = (details) {
+                                      print('Update');
+                                    }
+                                    ..onEnd = (_) {
+                                      print('End');
+                                    }))
+                              ..add(Factory<LongPressGestureRecognizer>(
+                                  () => LongPressGestureRecognizer()
+                                    ..onLongPressStart = (details) {
+                                      _addField(Offset(details.localPosition.dx,
+                                          details.localPosition.dy));
+                                    })),
                             onRender: (_pages) {
                               setState(() {
                                 // pages = _pages;
                                 // isReady = true;
                               });
                             },
+                            onError: (err) {
+                              Applogger.consoleLog(
+                                  MessegeType.error, 'PDF Error::$err');
+                            },
                           ),
                         ),
-                      ),
-                      DragTarget<CustomField>(
-                        builder: (BuildContext context,
-                            List<CustomField> candidateData,
-                            List<dynamic> rejectedData) {
-                          return Container();
-                        },
-                      ),
-                      if (pdfBox != null)
-                        for (Field i
-                            in _fieldsInPage) //put each field in a customfield wrapper
-                          CustomField(i, MediaQuery.of(context), _editField,
-                              pdfBox.size),
-                    ],
-                  ),
-                ],
+                        // DragTarget<CustomField>(
+                        //   builder: (BuildContext context,
+                        //       List<CustomField> candidateData,
+                        //       List<dynamic> rejectedData) {
+                        //     return Container();
+                        //   },
+                        // ),
+                        if (pdfBox != null)
+                          for (Field i
+                              in _fieldsInPage) //put each field in a customfield wrapper
+                            CustomField(i, MediaQuery.of(context), _editField,
+                                pdfBox.size, _scale, _focalPoint),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
     );
   }
 
-  Future<void> _addField(BuildContext context, Offset pos) async {
+  Future<void> _addField(Offset pos) async {
     final Field f = await showModalBottomSheet(
         context: context,
         builder: (_) {
