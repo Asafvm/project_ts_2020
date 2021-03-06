@@ -84,3 +84,18 @@ final RegExp emailRegExp =
         //r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
         caseSensitive: false,
         multiLine: false);
+
+//Button colors
+Color getColor(Set<MaterialState> states) {
+  const Set<MaterialState> interactiveStates = <MaterialState>{
+    MaterialState.pressed,
+    MaterialState.hovered,
+    MaterialState.focused,
+    MaterialState.selected,
+  };
+
+  if (states.any(interactiveStates.contains)) {
+    return Colors.lightBlue;
+  }
+  return Colors.blue;
+}

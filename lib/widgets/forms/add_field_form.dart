@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/consts.dart';
 
 //TODO: finish form
 
@@ -154,27 +155,30 @@ class _AddFieldFormState extends State<AddFieldForm> {
               ],
             ),
             Container(
-                margin: EdgeInsets.symmetric(vertical: 20),
-                child: FlatButton(
-                  onPressed: () async {
-                    FormState formState = _fieldForm.currentState;
-                    if (formState != null) {
-                      if (formState.validate()) {
-                        formState.save();
-                        Navigator.of(context)
-                            .pop(widget.field); //retuen the new Field object}
-                      }
-                    } else {
-                      Applogger.consoleLog(
-                          MessegeType.error, 'Error saving form');
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: TextButton(
+                onPressed: () async {
+                  FormState formState = _fieldForm.currentState;
+                  if (formState != null) {
+                    if (formState.validate()) {
+                      formState.save();
+                      Navigator.of(context)
+                          .pop(widget.field); //retuen the new Field object}
                     }
-                  },
-                  child: Text(
-                    'Save Field',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  color: Theme.of(context).primaryColor,
-                ))
+                  } else {
+                    Applogger.consoleLog(
+                        MessegeType.error, 'Error saving form');
+                  }
+                },
+                child: Text(
+                  'Save Field',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith(getColor),
+                ),
+              ),
+            )
           ],
         ),
       ),

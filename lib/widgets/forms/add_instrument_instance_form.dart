@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument_instance.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddInstrumentInstanceForm extends StatefulWidget {
@@ -52,7 +53,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                   _buildSerialField(),
                   Container(
                       margin: EdgeInsets.symmetric(vertical: 20),
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: () async {
                           FormState formState = _instrumentForm.currentState;
                           if (formState != null) {
@@ -75,7 +76,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                                         content: Text('Operation failed\n' +
                                             error.toString()),
                                         actions: <Widget>[
-                                          FlatButton(
+                                          TextButton(
                                             onPressed:
                                                 Navigator.of(context).pop,
                                             child: Text('Ok'),
@@ -93,7 +94,10 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                           'Add New Instrument',
                           style: TextStyle(color: Colors.white),
                         ),
-                        color: Theme.of(context).primaryColor,
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith(getColor),
+                        ),
                       ))
                 ],
               ),

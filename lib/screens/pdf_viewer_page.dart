@@ -227,7 +227,7 @@ class _PDFScreenState extends State<PDFScreen>
       title: Text("Status Update"),
       content: Text(msg),
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: Text("Confirm"),
           onPressed: () => Navigator.of(context).pop(),
         ),

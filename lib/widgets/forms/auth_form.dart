@@ -156,14 +156,14 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                         ],
                       ),
                     ),
-                    FlatButton(
-                      child: Text(
-                        "Forgot password?",
-                        style: TextStyle(color: Theme.of(context).accentColor),
-                        textAlign: TextAlign.start,
+                    if (signMode == AuthState.signin)
+                      TextButton(
+                        child: Text(
+                          "Forgot password?",
+                          textAlign: TextAlign.start,
+                        ),
+                        onPressed: () {},
                       ),
-                      onPressed: () {},
-                    ),
                   ],
                 ),
               ),
@@ -237,7 +237,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
         title: Text("An Error Occured!"),
         content: Text(errorMessage),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text('Confirm'),
           ),
@@ -253,13 +253,17 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
         width: screenWidth - _buttonAnimation.value,
         child: ch,
       ),
-      child: RaisedButton(
-        textColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-        color: signMode == AuthState.signin
-            ? Theme.of(context).accentColor
-            : Colors.blueGrey,
-        elevation: 12,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          textStyle: TextStyle(
+            color: Colors.white,
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+          primary: signMode == AuthState.signin
+              ? Theme.of(context).accentColor
+              : Colors.blueGrey,
+          elevation: 12,
+        ),
         child: Text('Signin'),
         onPressed: signMode == AuthState.signin
             ? () => _authUser(context)
@@ -275,13 +279,17 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
         width: _buttonAnimation.value,
         child: ch,
       ),
-      child: RaisedButton(
-        textColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-        color: signMode == AuthState.signup
-            ? Theme.of(context).accentColor
-            : Colors.blueGrey,
-        elevation: 12,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          textStyle: TextStyle(
+            color: Colors.white,
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+          primary: signMode == AuthState.signup
+              ? Theme.of(context).accentColor
+              : Colors.blueGrey,
+          elevation: 12,
+        ),
         child: Text('Signup'),
         onPressed: signMode == AuthState.signup
             ? () => _authUser(context)

@@ -48,27 +48,27 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                 children: <Widget>[
                   if (_currentStep == STEPS.INFO.index) //first step
                     ...[
-                    FlatButton(
+                    TextButton(
                       onPressed: () => _changeStep(_currentStep + 1),
                       child: const Text('NEXT'),
                     ),
                   ] else if (_currentStep == STEPS.CONFIRM.index) //last step
                     ...[
-                    FlatButton(
+                    TextButton(
                       onPressed: () => _changeStep(_currentStep - 1),
                       child: const Text('BACK'),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: _createTeam,
                       child: const Text('FINISH'),
                     ),
                   ] else //any other step
                     ...[
-                    FlatButton(
+                    TextButton(
                       onPressed: () => _changeStep(_currentStep - 1),
                       child: const Text('BACK'),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: () => _changeStep(_currentStep + 1),
                       child: const Text('NEXT'),
                     ),
@@ -88,7 +88,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: FlatButton(
+                    child: TextButton(
                       child: __imgPicked
                           ? Image.file(File(_picUrl))
                           : Image.asset(_picUrl),
@@ -143,15 +143,11 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        FlatButton(
-                          color: Theme.of(context).accentColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
-                            side: BorderSide(
-                                color: Colors.black,
-                                width: 1,
-                                style: BorderStyle.solid),
-                          ),
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith(getColor),
+                          ), // shape: RoundedRectangleBorder
                           onPressed: () async {
                             final EmailContact contact =
                                 await FlutterContactPicker.pickEmailContact(
@@ -162,15 +158,17 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                           },
                           child: Text("Add From Contacts"),
                         ),
-                        FlatButton(
-                          color: Theme.of(context).accentColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
-                            side: BorderSide(
-                                color: Colors.black,
-                                width: 1,
-                                style: BorderStyle.solid),
-                          ),
+                        TextButton(
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith(getColor),
+                          ), // shape: RoundedRectangleBorder(
+                          //   borderRadius: BorderRadius.all(Radius.circular(25)),
+                          //   side: BorderSide(
+                          //       color: Colors.black,
+                          //       width: 1,
+                          //       style: BorderStyle.solid),
+                          // ),
                           onPressed: () async {
                             String email = await _getMailManually(context);
                             if (email.isNotEmpty) {
@@ -221,7 +219,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
             title: Text("Confirm"),
             content: Text("Create $_name?"),
             actions: [
-              FlatButton(
+              TextButton(
                 onPressed: () async => {
                   if (Authentication().isAuth)
                     {
@@ -245,7 +243,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                 },
                 child: _loading ? CircularProgressIndicator() : Text("Ok"),
               ),
-              FlatButton(
+              TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text("Cancel"),
               ),
@@ -298,7 +296,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                 ),
               ),
               actions: [
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     if (_textController.text.isEmpty ||
                         !emailRegExp.hasMatch(_textController.text)) {
@@ -317,7 +315,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                     "OK",
                   ),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).pop("");
                   },

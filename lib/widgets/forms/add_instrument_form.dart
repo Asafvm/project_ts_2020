@@ -166,7 +166,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
-                      child: FlatButton(
+                      child: TextButton(
                         child: Text(
                           'Add New Instrument',
                           style: TextStyle(color: Colors.white),
@@ -186,7 +186,10 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                             }
                           }
                         },
-                        color: Theme.of(context).primaryColor,
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith(getColor),
+                        ),
                       ),
                     )
                   ],
@@ -205,7 +208,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
             title: Text('Success!'),
             content: Text('New Instrument created!\n'),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 onPressed: Navigator.of(context).pop,
                 child: Text('Ok'),
               ),
@@ -222,7 +225,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
           title: Text('Error!'),
           content: Text('Operation failed\n' + error.toString()),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               onPressed: Navigator.of(context).pop,
               child: Text('Ok'),
             ),

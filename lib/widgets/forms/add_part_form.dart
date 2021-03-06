@@ -268,7 +268,7 @@ class _AddPartFormState extends State<AddPartForm> {
 
                     Container(
                         margin: EdgeInsets.symmetric(vertical: 20),
-                        child: FlatButton(
+                        child: TextButton(
                           onPressed: () async {
                             FormState formState = _partForm.currentState;
                             if (formState != null) {
@@ -287,7 +287,7 @@ class _AddPartFormState extends State<AddPartForm> {
                                               content:
                                                   Text('New Part created!\n'),
                                               actions: <Widget>[
-                                                FlatButton(
+                                                TextButton(
                                                   onPressed:
                                                       Navigator.of(context).pop,
                                                   child: Text('Ok'),
@@ -303,7 +303,7 @@ class _AddPartFormState extends State<AddPartForm> {
                                           content: Text('Operation failed\n' +
                                               error.toString()),
                                           actions: <Widget>[
-                                            FlatButton(
+                                            TextButton(
                                               onPressed:
                                                   Navigator.of(context).pop,
                                               child: Text('Ok'),
@@ -333,7 +333,10 @@ class _AddPartFormState extends State<AddPartForm> {
                             'Add New Part',
                             style: TextStyle(color: Colors.white),
                           ),
-                          color: Theme.of(context).primaryColor,
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith(getColor),
+                          ),
                         ))
                   ],
                 ),

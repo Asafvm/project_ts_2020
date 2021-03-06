@@ -136,9 +136,12 @@ class InstrumentInfoScreen extends StatelessWidget {
                                         leading: Icon(Icons.picture_as_pdf),
                                         title: Text(snapshot.data[index].id),
                                         trailing: FittedBox(
-                                          child: FlatButton(
-                                            color:
-                                                Theme.of(context).primaryColor,
+                                          child: TextButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith(getColor),
+                                            ),
                                             onPressed: () async {
                                               String downloadedPdfPath =
                                                   await FirebaseStorageProvider

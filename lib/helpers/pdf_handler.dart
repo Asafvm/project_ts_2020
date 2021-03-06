@@ -75,7 +75,7 @@ class _PdfFileHandler {
       {String directory}) async {
     final dir = directory ?? (await getExternalCacheDirectories()).first.path;
     final file = File('$dir${Platform.pathSeparator}$filename');
-    return file.writeAsBytes(document.save());
+    return file.writeAsBytes(await document.save());
   }
 }
 
@@ -101,13 +101,23 @@ class PdfMutablePage {
         orientation: pdfWidgets.PageOrientation.portrait,
         build: (context) {
           return pdfWidgets.Stack(
-            children: [
-              pdfWidgets.Image(
-                pdf.PdfImage.file(
-                  document.document,
-                  bytes: _background.data,
+            children: <pdfWidgets.Widget>[
+              //TODO:: fixthis
+
+              // pdfWidgets.Image(
+              //   pdf.PdfImage.file(
+              //   document.document,
+              //   bytes: _background.data,
+              // ),
+              // ),
+              pdfWidgets.Container(
+                decoration: pdfWidgets.BoxDecoration(
+                  image: pdfWidgets.DecorationImage(
+                    image: pdfWidgets.MemoryImage(_background.data),
+                  ),
                 ),
               ),
+
               ..._stackedItems,
             ],
           );

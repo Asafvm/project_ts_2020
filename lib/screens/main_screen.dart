@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
                       Text("You are not part of a team... yet"),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: RaisedButton.icon(
+                        child: ElevatedButton.icon(
                           onPressed: () {
                             createTeam(context);
                           },

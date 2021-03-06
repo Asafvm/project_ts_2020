@@ -29,7 +29,7 @@ class TeamThumbnail extends StatelessWidget {
                 Expanded(
                   child: Text('Team deleted!'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {}, //TODO: reverse time here!
                   child: Text(
                     'Undo',
