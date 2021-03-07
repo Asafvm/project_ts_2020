@@ -14,7 +14,7 @@ import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/forms/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
-import 'package:after_layout/after_layout.dart';
+//import 'package:after_layout/after_layout.dart';
 
 class PDFScreen extends StatefulWidget {
   final List<Field> fields;
@@ -31,8 +31,7 @@ class PDFScreen extends StatefulWidget {
   _PDFScreenState createState() => _PDFScreenState();
 }
 
-class _PDFScreenState extends State<PDFScreen>
-    with AfterLayoutMixin<PDFScreen> {
+class _PDFScreenState extends State<PDFScreen> {
   bool _uploading = false;
   double _progressValue = 0.0;
   AlwaysStoppedAnimation<Color> _progressColor;
@@ -48,6 +47,8 @@ class _PDFScreenState extends State<PDFScreen>
 
   @override
   void initState() {
+    super.initState();
+
     File(widget.pathPDF).exists().catchError((e) async => {
           await showDialog(
                   context: context,
@@ -60,7 +61,9 @@ class _PDFScreenState extends State<PDFScreen>
     });
     _updateLists(0, 0);
 
-    super.initState();
+    //set function to run once after first frame
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => afterFirstLayout(context));
   }
 
   void afterFirstLayout(BuildContext context) {
