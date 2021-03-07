@@ -27,7 +27,8 @@ class _MainScreenState extends State<MainScreen> {
                   child: CircularProgressIndicator(),
                 );
               }
-              final List<QueryDocumentSnapshot> documents = snapshot.data.docs;
+              final List<QueryDocumentSnapshot> documents =
+                  snapshot.data.docs ?? [];
 
               if (documents.length == 0) {
                 return Center(
