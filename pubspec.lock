@@ -113,6 +113,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
+  contact_picker_platform_interface:
+    dependency: transitive
+    description:
+      name: contact_picker_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.3.1"
+  contact_picker_web:
+    dependency: transitive
+    description:
+      name: contact_picker_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.3.1"
   crypto:
     dependency: "direct main"
     description:
@@ -330,7 +344,7 @@ packages:
       name: fluttercontactpicker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.1"
+    version: "4.3.1"
   google_maps_flutter:
     dependency: "direct main"
     description:

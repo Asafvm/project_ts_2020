@@ -12,45 +12,50 @@ const { firebaseConfig } = require("firebase-functions");
 
 //create new team
 exports.addTeam = functions.https.onCall(async (data, context) => {
-  const teams = admin.firestore().collection("teams");
-  var teamid = await teams.add(data["teamInfo"]); //add will give each entry a random id
-  console.log("Team id:" + teamid.id + "\n");
+  const teams = admin.firestore().collection("teams");  //setting referance
 
+  //creating a team
+  var teamid = await teams.add(data["teamInfo"]); //add will give each entry a random id
+  if (teamid) console.log("Team created with id:" + teamid.id + "\n");
+  else {
+    console.log("Faild to create team\n");
+    return null;
+  }
   // eslint-disable-next-line promise/no-nesting
   try {
     const members = data["members"];
 
     const promises = [];
-    for (const m in members){ //WHY IS m AN INDEX?!?!
-      console.log("member "+ members[m]);
+    for (const m in members) {
+      //WHY IS m AN INDEX?!?!
+      console.log("member " + members[m]);
       const p = teams
-      .doc(teamid.id)
-      .collection("members").doc(members[m]).set({})
- 
+        .doc(teamid.id)
+        .collection("members")
+        .doc(members[m])
+        .set({});
+
       promises.push(p);
     }
     await Promise.all(promises);
-    
-    
   } catch (e) {
-    console.log('Error adding members ::' + e);
+    console.log("Error adding members ::" + e);
   }
   return teamid.id;
 });
 
-
 //add field to team document
 exports.updateTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
-  const teamid = data['teamid'];
-  const teamdata = data['data'];
-  
-  console.log(teamid +' Url='+teamdata);
-  console.log('Url2='+teamdata['logoUrl']);
+  const teamid = data["teamid"];
+  const teamdata = data["data"];
+
+  console.log(teamid + " Url=" + teamdata);
+  console.log("Url2=" + teamdata["logoUrl"]);
   // eslint-disable-next-line promise/no-nesting
   teams
     .doc(teamid)
-0    .update(data['data'])
+    .update(teamdata)
     .then((val) => {
       console.log("success: updated team info ");
       return true;
@@ -87,8 +92,7 @@ exports.autoTeamManagement = functions.firestore
       .collection("teams")
       .doc(context.params.teamId)
       .delete();
-  }
-  );
+  });
 
 //case user exited from
 exports.autoUserManagement = functions.firestore
@@ -144,36 +148,34 @@ exports.addInstrumentInstance = functions.https.onCall(
     //   throw new functions.https.HttpsError('already-exists', 'Instrument already exists', 'Duplicate serial');
 
     await instruments.create(data["instrument"]);
-    await instruments.update({
-      "entries":
-        Object.assign({}, data["entries"])
-    } //map every list item to index number
+    await instruments.update(
+      {
+        entries: Object.assign({}, data["entries"]),
+      } //map every list item to index number
     );
   }
 );
 
 //add part to team's inventory
 exports.addPart = functions.https.onCall(async (data, context) => {
+  
+  const teamid = data["teamID"];
+  const partdata = data["part"];
+
+  console.log('Team: '+teamid);
+  console.log('Part: '+partdata);
+  
   const parts = admin
     .firestore()
     .collection("teams")
-    .doc(data["teamID"])
+    .doc(teamid)
     .collection("parts");
 
-  //var snapshot = await parts.get();
-  // snapshot.forEach(doc => {
-  //   //check for duplicates
-  //   if (doc.data()["reference"] === data["part"]["reference"])
-  //     //throw error message if found
-  //     throw new functions.https.HttpsError('already-exists' ,'Part already exists', 'Duplicate reference code');
-  // });
-  //upload new instrument
-  await parts.create(data["part"]);
+    await parts.add(partdata);
 });
 
 //add report's fields to instrument ducoment
 exports.addInstrumentReport = functions.https.onCall((data, context) => {
-
   const instrumentreports = admin
     .firestore()
     .collection("teams")
@@ -183,10 +185,7 @@ exports.addInstrumentReport = functions.https.onCall((data, context) => {
     .collection("reports")
     .doc(data["file"]);
 
-
   return instrumentreports.set(
     Object.assign({}, data["fields"]) //map every list item to index number
   );
-
-
 });

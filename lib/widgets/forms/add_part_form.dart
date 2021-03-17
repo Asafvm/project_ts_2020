@@ -31,7 +31,7 @@ class _AddPartFormState extends State<AddPartForm> {
   var _isTracking = false;
   var _isActive = true;
   StreamSubscription<List<Instrument>> subscription;
-  List<Instrument> instrumentList;
+  List<Instrument> instrumentList = List.empty();
 
   Widget _buildDescFormField() {
     return TextFormField(
@@ -267,81 +267,76 @@ class _AddPartFormState extends State<AddPartForm> {
                     ),
 
                     Container(
-                        margin: EdgeInsets.symmetric(vertical: 20),
-                        child: TextButton(
-                          onPressed: () async {
-                            FormState formState = _partForm.currentState;
-                            if (formState != null) {
-                              formState.save();
-                              setState(() {
-                                _uploading = true;
-                              });
-                              //send to server
-                              try {
-                                await FirebaseFirestoreProvider.uploadPart(
-                                        _newPart)
-                                    .then((_) async => await showDialog(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                              title: Text('Success!'),
-                                              content:
-                                                  Text('New Part created!\n'),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  onPressed:
-                                                      Navigator.of(context).pop,
-                                                  child: Text('Ok'),
-                                                ),
-                                              ],
-                                            )).then(
-                                        (_) => Navigator.of(context).pop()));
-                              } catch (error) {
-                                showDialog(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                          title: Text('Error!'),
-                                          content: Text('Operation failed\n' +
-                                              error.toString()),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed:
-                                                  Navigator.of(context).pop,
-                                              child: Text('Ok'),
-                                            ),
-                                          ],
-                                        ));
-                              } finally {
-                                setState(() {
-                                  _newPart = Part(
-                                      manifacturer: "",
-                                      reference: "",
-                                      altreference: "",
-                                      instrumentId: "",
-                                      model: "",
-                                      description: "",
-                                      price: 0.0,
-                                      mainStockMin: 0,
-                                      personalStockMin: 0,
-                                      serialTracking: false,
-                                      active: true);
-                                  _uploading = false;
-                                });
-                              }
-                            }
-                          },
-                          child: Text(
-                            'Add New Part',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith(getColor),
-                          ),
-                        ))
+                      margin: EdgeInsets.symmetric(vertical: 20),
+                      child: TextButton(
+                        onPressed: _addPart,
+                        child: Text(
+                          'Add New Part',
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           );
+  }
+
+  void _addPart() async {
+    {
+      FormState formState = _partForm.currentState;
+      if (formState != null) {
+        formState.save();
+        setState(() {
+          _uploading = true;
+        });
+        //send to server
+        try {
+          await FirebaseFirestoreProvider.uploadPart(_newPart)
+              .then((_) async => await showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                        title: Text('Success!'),
+                        content: Text('New Part created!\n'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: Navigator.of(context).pop,
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      )).then((_) => Navigator.of(context).pop()));
+        } catch (error) {
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text('Error!'),
+                    content: Text('Operation failed\n' + error.toString()),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: Navigator.of(context).pop,
+                        child: Text('Ok'),
+                      ),
+                    ],
+                  ));
+        } finally {
+          setState(() {
+            _newPart = Part(
+                manifacturer: "",
+                reference: "",
+                altreference: "",
+                instrumentId: "",
+                model: "",
+                description: "",
+                price: 0.0,
+                mainStockMin: 0,
+                personalStockMin: 0,
+                serialTracking: false,
+                active: true);
+            _uploading = false;
+          });
+        }
+      }
+    }
+    ;
   }
 }

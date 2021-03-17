@@ -106,7 +106,10 @@ class FirebaseFirestoreProvider {
   static Future<void> uploadPart(Part _newPart) async {
     await FirebaseFunctions.instance
         .httpsCallable("addPart")
-        .call(<String, dynamic>{"part": _newPart.toJson()});
+        .call(<String, dynamic>{
+      "teamID": TeamProvider().getCurrentTeam.getTeamId,
+      "part": _newPart.toJson()
+    });
   }
 
   static Future<void> uploadInstrumentInstance(
