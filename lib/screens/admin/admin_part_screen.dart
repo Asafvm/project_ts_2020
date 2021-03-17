@@ -27,7 +27,9 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
         child: StreamBuilder(
           stream: FirebaseFirestoreProvider.getParts(),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else {
               if (!snapshot.hasData || snapshot.data.length == 0)
                 return Center(
                     child: Text("You haven't registered any parts yet"));
@@ -40,12 +42,6 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                   ),
                   itemCount: snapshot.data.length,
                 );
-            } else {
-              if (!snapshot.hasData || snapshot.data.length == 0)
-                return Center(
-                    child: Text("You haven't registered any parts yet"));
-              else
-                return Center(child: CircularProgressIndicator());
             }
           },
         ),
