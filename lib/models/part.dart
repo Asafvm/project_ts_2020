@@ -115,17 +115,17 @@ class Part {
       this.active = true});
 
   Map<String, dynamic> toJson() => {
-        'manifacturer': manifacturer,
+        'manifacturer': manifacturer ?? '',
         'reference': reference,
         'altreference': altreference,
-        'InstrumentId': instrumentId,
-        'model': model,
+        'InstrumentId': instrumentId ?? '',
+        'model': model ?? '',
         'description': description,
-        'price': price,
-        'mainStockMin': mainStockMin,
-        'personalStockMin': personalStockMin,
-        'serialTracking': serialTracking,
-        'active': active,
+        'price': price ?? 0,
+        'mainStockMin': mainStockMin ?? 0,
+        'personalStockMin': personalStockMin ?? 0,
+        'serialTracking': serialTracking ?? false,
+        'active': active ?? true,
       };
 
   Part.fromJson(Map<String, dynamic> data)
