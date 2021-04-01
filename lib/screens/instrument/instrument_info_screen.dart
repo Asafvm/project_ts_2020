@@ -7,7 +7,7 @@ import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/generic_form_screen.dart';
-import 'package:teamshare/widgets/entry_list_item.dart';
+import 'package:teamshare/widgets/list_items/entry_list_item.dart';
 
 class InstrumentInfoScreen extends StatelessWidget {
   final Instrument instrument;

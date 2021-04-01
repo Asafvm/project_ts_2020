@@ -5,6 +5,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
@@ -16,6 +17,7 @@ import 'authentication.dart';
 class FirebaseFirestoreProvider {
   static const String instruments = "instruments";
   static const String teams = "teams";
+  static const String sites = "sites";
 //Get from Firebase
 
   static Future<void> addTeam(String name, String description,
@@ -174,5 +176,24 @@ class FirebaseFirestoreProvider {
         .collection("teams")
         .doc(teamDocId)
         .delete();
+  }
+
+  static uploadSite(Site newSite) async {
+    await FirebaseFunctions.instance
+        .httpsCallable("addSite")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "site": newSite.toJson(),
+    });
+  }
+
+  static getSites() {
+    String sitesRef =
+        "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites";
+    return FirebaseFirestore.instance
+        .collection(sitesRef)
+        .get()
+        .then((value) => value.docs.map((e) => Site.fromFirestore(e)).toList())
+        .asStream();
   }
 }

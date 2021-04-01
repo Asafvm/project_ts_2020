@@ -189,3 +189,16 @@ exports.addInstrumentReport = functions.https.onCall((data, context) => {
     Object.assign({}, data["fields"]) //map every list item to index number
   );
 });
+
+exports.addSite = functions.https.onCall((data, context) => {
+  const sites = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("sites");
+    
+
+  return sites.add(
+    data["site"]);
+  
+});

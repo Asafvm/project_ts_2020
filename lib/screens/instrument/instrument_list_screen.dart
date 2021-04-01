@@ -6,7 +6,7 @@ import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_info_screen.dart';
 import 'package:teamshare/widgets/forms/add_instrument_instance_form.dart';
-import 'package:teamshare/widgets/instrument_instance_list_item.dart';
+import 'package:teamshare/widgets/list_items/instrument_instance_list_item.dart';
 
 class InstrumentListScreen extends StatefulWidget {
   final Instrument instrument;

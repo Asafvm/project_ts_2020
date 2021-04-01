@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:teamshare/helpers/location_helper.dart';
-import 'package:teamshare/providers/applogger.dart';
-import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/screens/map_screen.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/screens/site_info_screen.dart';
+import 'package:teamshare/widgets/forms/add_site_form.dart';
+import 'package:teamshare/widgets/list_items/instrument_list_item.dart';
+import 'package:teamshare/widgets/list_items/site_list_item.dart';
 
 class AdminSiteScreen extends StatefulWidget {
   @override
@@ -12,160 +11,61 @@ class AdminSiteScreen extends StatefulWidget {
 }
 
 class _AdminSiteScreenState extends State<AdminSiteScreen> {
-  String _previewImageUrl;
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      final locData = await Location().getLocation();
-      _showPreview(locData.latitude, locData.longitude);
-    } on Exception catch (_) {
-      return;
-    }
-  }
-
-  void _showPreview(double lat, double lng) {
-    final staticMapImageUrl = LocationHelper.generateLocationPreviewImage(
-      lat: lat,
-      lng: lng,
-    );
-    setState(() {
-      _previewImageUrl = staticMapImageUrl;
-    });
-  }
-
-  Future<void> _selectOnMap() async {
-    final selectedLocation = await Navigator.of(context).push<LatLng>(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (ctx) => MapScreen(
-          initialLocation: null,
-          isSelecting: true,
-        ),
-      ),
-    );
-    if (selectedLocation == null)
-      return;
-    else {
-      _showPreview(selectedLocation.latitude, selectedLocation.longitude);
-      String add = await LocationHelper.getPlaceAddress(
-          selectedLocation.latitude, selectedLocation.longitude);
-      Applogger.consoleLog(MessegeType.info, add);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Manage Sites'),
+        title: Text("Manage Sites"),
       ),
-      body: Column(
-        children: [
-          Flexible(
-            flex: 4,
-            fit: FlexFit.tight,
-            child: Row(
-              children: [
-                Flexible(
-                  flex: 4,
-                  fit: FlexFit.tight,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: Colors.grey,
-                            ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        onPressed: () => _openAddSite(context),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: StreamBuilder(
+          stream: FirebaseFirestoreProvider.getSites(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (!snapshot.hasData || snapshot.data.length == 0)
+                return Center(
+                    child: Text("You haven't registered any sites yet"));
+              else
+                return ListView.builder(
+                  key: UniqueKey(), //new Key(Strings.randomString(20)),
+                  itemBuilder: (ctx, index) => GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => SiteInfoScreen(
+                            site: snapshot.data.elementAt(index),
                           ),
-                          child: _previewImageUrl == null
-                              ? Text('Choose a site')
-                              : Image.network(
-                                  _previewImageUrl,
-                                  fit: BoxFit.fill,
-                                ),
                         ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.location_on),
-                            tooltip: 'Current Location',
-                            onPressed: _getCurrentLocation,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.map),
-                            tooltip: 'Select On Map',
-                            onPressed: _selectOnMap,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.directions),
-                            tooltip: 'Directions',
-                            onPressed: null, //TOFO: open maps or waze
-                          ),
-                        ],
-                      ),
-                    ],
+                      );
+                    },
+                    child: SiteItemList(
+                        key: UniqueKey(), site: snapshot.data.elementAt(index)),
                   ),
-                ),
-                Flexible(
-                    flex: 6,
-                    fit: FlexFit.tight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Name'),
-                          Text('City'),
-                          Text('Street'),
-                        ],
-                      ),
-                    )),
-              ],
-            ),
-          ),
-          Flexible(
-            flex: 7,
-            fit: FlexFit.tight,
-            child: DefaultTabController(
-              initialIndex: 0,
-              length: 3,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 1,
-                            color: Colors.black,
-                            style: BorderStyle.solid)),
-                    child: tabSite,
-                  ), //defined in cons(
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        //Rooms
-                        Container(),
-
-                        ///Instruments
-                        Container(),
-                        //Contacts
-                        Container(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+                  itemCount: snapshot.data.length,
+                );
+            } else
+              return Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
+  }
+
+  void _openAddSite(BuildContext ctx) {
+    showModalBottomSheet(
+        enableDrag: false,
+        isDismissible: true,
+        context: ctx,
+        builder: (_) {
+          return AddSiteForm();
+        }).whenComplete(() => setState(() {}));
   }
 }
