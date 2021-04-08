@@ -35,8 +35,7 @@ dependencies:
   json_annotation:
   #http requests
   http: ^0.13.0
-
-  geocoder: ^0.2.1
+  geocode: 1.0.1
   location: ^4.0.2
   google_maps_flutter: ^2.0.1
   sqflite: ^2.0.0+2

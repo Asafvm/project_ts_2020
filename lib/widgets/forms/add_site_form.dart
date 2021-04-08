@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocode/geocode.dart' as geo;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/instrument.dart';
-import 'package:geocoder/geocoder.dart' as geo;
+//import 'package:geocoder/geocoder.dart' as geo;
 import 'package:teamshare/models/site.dart';
-import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/map_screen.dart';
 
@@ -40,20 +40,20 @@ class _AddSiteFormState extends State<AddSiteForm> {
   }
 
   Future<void> _showPreview(double lat, double lng) async {
+    geo.GeoCode geoCode = geo.GeoCode();
+
     final staticMapImageUrl = LocationHelper.generateLocationPreviewImage(
       lat: lat,
       lng: lng,
     );
-    var addresses = await geo.Geocoder.local
-        .findAddressesFromCoordinates(geo.Coordinates(lat, lng));
-    var address = addresses.first;
-    ;
+    var address = await geoCode.reverseGeocoding(latitude: lat, longitude: lng);
+
     _selectedAddress = Address(lat, lng,
-        area: address.adminArea,
-        city: address.locality,
+        area: address.region,
+        city: address.city,
         country: address.countryName,
-        street: address.thoroughfare,
-        houseNumber: address.subThoroughfare);
+        street: address.streetAddress,
+        houseNumber: address.streetNumber.toString());
     _newSite.address = _selectedAddress;
     setState(() {
       _previewImageUrl = staticMapImageUrl;
