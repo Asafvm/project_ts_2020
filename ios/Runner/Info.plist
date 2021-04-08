@@ -22,6 +22,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>canLaunch </key>
+	<string>LSApplicationQueriesSchemes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need permission to get your location</string>
 	<key>NSLocationAlwaysUsageDescription</key>
