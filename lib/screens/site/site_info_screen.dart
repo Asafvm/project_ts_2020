@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pdf/widgets.dart' as widgets;
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';

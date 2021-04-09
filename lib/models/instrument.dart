@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Instrument {
-  String _manifacturer;
-  String _reference;
-  String _codeName;
-  String _model;
-  double _price;
+  String _manifacturer = "";
+  String _reference = "";
+  String _codeName = "";
+  String _model = "";
+  double _price = 0.0;
 
   Instrument() {
     _manifacturer = "";

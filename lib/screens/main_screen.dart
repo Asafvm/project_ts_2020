@@ -22,54 +22,58 @@ class _MainScreenState extends State<MainScreen> {
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestoreProvider.getUserTeamList(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              final List<QueryDocumentSnapshot> documents =
-                  snapshot.data.docs ?? [];
-
-              if (documents.length == 0) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              if (snapshot .connectionState == ConnectionState.done ||
+                  snapshot.connectionState == ConnectionState.active) {
+                if (snapshot.error == null && snapshot.hasData) {
+                  var data = snapshot.data.docs;
+                  return Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("You are not part of a team... yet"),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            createTeam(context);
+                      Expanded(
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(10),
+                          itemBuilder: (ctx, index) {
+                            return TeamThumbnail(
+                              key: UniqueKey(),
+                              teamDocId: data[index].id,
+                            );
                           },
-                          icon: Icon(Icons.create),
-                          label: Text("Create"),
+                          itemCount: data.length,
+                          shrinkWrap: true,
                         ),
                       ),
-                      Text("Your team now!"),
                     ],
-                  ),
-                );
-              } else {
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(10),
-                        itemBuilder: (ctx, index) {
-                          return TeamThumbnail(
-                            key: UniqueKey(),
-                            teamDocId: documents[index].id,
-                          );
-                        },
-                        itemCount: documents.length,
-                        shrinkWrap: true,
-                      ),
+                  );
+                } else {
+                  if (snapshot.error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Error getting data from server!')));
+                  }
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("You are not part of a team... yet"),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              createTeam(context);
+                            },
+                            icon: Icon(Icons.create),
+                            label: Text("Create"),
+                          ),
+                        ),
+                        Text("Your team now!"),
+                      ],
                     ),
-                  ],
+                  );
+                }
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
                 );
               }
             }),

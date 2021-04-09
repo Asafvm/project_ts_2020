@@ -30,7 +30,7 @@ class FirebaseStorageProvider {
     return task.then((TaskSnapshot snapshot) async {
       return snapshot.ref.getDownloadURL();
     }).catchError((Object e) {
-      return e;
+      return e.toString();
     });
   }
 

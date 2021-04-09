@@ -32,8 +32,7 @@ class FirebaseFirestoreProvider {
         "creatorEmail": Authentication().userEmail,
       },
       "members": members,
-    }).catchError((err) => Applogger.consoleLog(
-            MessegeType.error, 'Failed to create team: ${err.toString()}'));
+    });
 
     String teamid = teaminfo.data;
     Applogger.consoleLog(MessegeType.info,
@@ -46,14 +45,11 @@ class FirebaseFirestoreProvider {
       await FirebaseFunctions.instance
           .httpsCallable("updateTeam")
           .call(<String, dynamic>{
-            'teamid': teamid,
-            'data': {
-              'logoUrl': firestoragePicUrl,
-            }
-          })
-          .catchError((err) => Applogger.consoleLog(MessegeType.error,
-              'Failed to update team logo path: ${err.toString()}'))
-          .then((value) => Applogger.consoleLog(
+        'teamid': teamid,
+        'data': {
+          'logoUrl': firestoragePicUrl,
+        }
+      }).then((value) => Applogger.consoleLog(
               MessegeType.info, "Team created successfuly"));
     }
   }

@@ -102,14 +102,6 @@ class PdfMutablePage {
         build: (context) {
           return pdfWidgets.Stack(
             children: <pdfWidgets.Widget>[
-              //TODO:: fixthis
-
-              // pdfWidgets.Image(
-              //   pdf.PdfImage.file(
-              //   document.document,
-              //   bytes: _background.data,
-              // ),
-              // ),
               pdfWidgets.Container(
                 decoration: pdfWidgets.BoxDecoration(
                   image: pdfWidgets.DecorationImage(
@@ -117,8 +109,7 @@ class PdfMutablePage {
                   ),
                 ),
               ),
-
-              ..._stackedItems,
+              if (_stackedItems != null) ..._stackedItems,
             ],
           );
         });
