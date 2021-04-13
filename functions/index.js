@@ -196,9 +196,22 @@ exports.addSite = functions.https.onCall((data, context) => {
     .collection("teams")
     .doc(data["teamId"])
     .collection("sites");
-    
-
+  
   return sites.add(
     data["site"]);
+  
+});
+
+exports.addRoom = functions.https.onCall((data, context) => {
+  const sites = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("sites")
+    .doc(data["siteId"])
+    .collection("rooms");
+  
+  return sites.add(
+    data["room"]);
   
 });

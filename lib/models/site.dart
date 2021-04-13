@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart';
+import 'package:teamshare/models/instrument.dart';
 
 class Site {
+  String id;
   String name;
   Address address;
-  //List<Contact> contacts; //TBA
+  List<Contact> contacts = [];
 
   Site({this.name, this.address});
 
@@ -14,12 +17,68 @@ class Site {
     };
   }
 
-  Site.fromJson(Map<String, dynamic> data)
-      : name = data['name'].toString().trim(),
+  Site.fromJson(Map<String, dynamic> data, String id)
+      : id = id,
+        name = data['name'].toString().trim(),
         address = Address.fromJson(data['address']);
 
   factory Site.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Site.fromJson(documentSnapshot.data());
+    return Site.fromJson(documentSnapshot.data(), documentSnapshot.id);
+  }
+}
+
+class Room {
+  String building;
+  String floor;
+  String roomNumber;
+  String roomTitle;
+  String decription;
+  List<String> instruments = [];
+
+  Room({
+    this.building = "",
+    this.floor = "",
+    this.roomNumber = "",
+    this.roomTitle = "",
+    this.decription = "",
+  }) {
+    this.instruments = [];
+  }
+
+  List<String> get getInstruments {
+    return instruments;
+  }
+
+  void addInstrument(String instrumentId) {
+    instruments.add(instrumentId);
+  }
+
+  @override
+  String toString() {
+    return 'Room deatils - bla bla bla';
+  }
+
+  Room.fromJson(Map<String, dynamic> data)
+      : building = data['building'],
+        floor = data['floor'],
+        roomNumber = data['roomNumber'],
+        roomTitle = data['roomTitle'],
+        decription = data['decription'],
+        instruments = data['instruments'];
+
+  factory Room.fromFirestore(DocumentSnapshot documentSnapshot) {
+    return Room.fromJson(documentSnapshot.data());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'building': building,
+      'floor': floor,
+      'roomNumber': roomNumber,
+      'roomTitle': roomTitle,
+      'decription': decription,
+      'instruments': instruments ?? []
+    };
   }
 }
 

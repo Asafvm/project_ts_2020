@@ -22,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestoreProvider.getUserTeamList(),
             builder: (context, snapshot) {
-              if (snapshot .connectionState == ConnectionState.done ||
+              if (snapshot.connectionState == ConnectionState.done ||
                   snapshot.connectionState == ConnectionState.active) {
                 if (snapshot.error == null && snapshot.hasData) {
                   var data = snapshot.data.docs;
@@ -47,10 +47,10 @@ class _MainScreenState extends State<MainScreen> {
                     ],
                   );
                 } else {
-                  if (snapshot.error != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Error getting data from server!')));
-                  }
+                  // if (snapshot.error != null) {
+                  //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  //       content: Text('Error getting data from server!')));
+                  // }
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

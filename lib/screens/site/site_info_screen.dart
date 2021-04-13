@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/site.dart';
-import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/widgets/forms/add_room_form.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SiteInfoScreen extends StatefulWidget {
@@ -13,9 +14,21 @@ class SiteInfoScreen extends StatefulWidget {
   _SiteInfoScreenState createState() => _SiteInfoScreenState();
 }
 
-class _SiteInfoScreenState extends State<SiteInfoScreen> {
+class _SiteInfoScreenState extends State<SiteInfoScreen>
+    with SingleTickerProviderStateMixin {
+  MediaQueryData mediaQuery;
   String _previewImageUrl;
+  List<Room> rooms;
+  var _buttonColor = Colors.green;
 
+  var _buttonLocation = 30.0;
+
+  TabController _tabController;
+  List<Tab> _tabList = [
+    Tab(text: "Rooms"),
+    Tab(text: "Instruments"),
+    Tab(text: "Contacts"),
+  ];
   void _showPreview(double lat, double lng) {
     final staticMapImageUrl = LocationHelper.generateLocationPreviewImage(
       lat: lat,
@@ -28,12 +41,16 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
 
   @override
   void initState() {
+    _tabController = TabController(length: _tabList.length, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     _showPreview(widget.site.address.lat, widget.site.address.lng);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    mediaQuery = MediaQuery.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Manage Sites'),
@@ -126,22 +143,82 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 1,
-                            color: Colors.black,
-                            style: BorderStyle.solid)),
-                    child: tabSite,
+                      border: Border.all(
+                          width: 1,
+                          color: Colors.black,
+                          style: BorderStyle.solid),
+                    ),
+                    child: TabBar(
+                      controller: _tabController,
+                      labelColor: Colors.black,
+                      indicatorColor: _buttonColor,
+                      tabs: _tabList,
+                    ),
                   ), //defined in cons(
                   Expanded(
-                    child: TabBarView(
+                    child: Stack(
                       children: [
-                        //Rooms
-                        Container(),
+                        TabBarView(
+                          children: [
+                            //Rooms
+                            FutureBuilder(
+                              future: FirebaseFirestoreProvider.getRooms(
+                                  widget.site.id),
+                              initialData: [],
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting)
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                else
+                                  return ListView.builder(
+                                    itemBuilder: (context, index) {
+                                      return Card(
+                                        child: ListTile(
+                                          title: Text(
+                                              snapshot.data[index].roomTitle),
+                                          subtitle: Text(
+                                              snapshot.data[index].decription),
+                                          trailing: FittedBox(
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                    icon: Icon(
+                                                      Icons.contact_phone_sharp,
+                                                    ),
+                                                    onPressed: () => {}),
+                                                IconButton(
+                                                    icon: Icon(
+                                                      Icons.computer,
+                                                    ),
+                                                    onPressed: _registerInstrument),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: snapshot.data.length,
+                                  );
+                              },
+                            ),
 
-                        ///Instruments
-                        Container(),
-                        //Contacts
-                        Container(),
+                            ///Instruments
+                            Container(),
+                            //Contacts
+                            Container(),
+                          ],
+                        ),
+                        Positioned(
+                          bottom: mediaQuery.size.height * .02,
+                          left: _buttonLocation,
+                          child: FloatingActionButton(
+                            onPressed: _tabActionButton,
+                            backgroundColor: _buttonColor,
+                            child: Icon(Icons.add),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -182,5 +259,58 @@ class _SiteInfoScreenState extends State<SiteInfoScreen> {
     } catch (e) {
       await launch(fallbackUrl, forceSafariVC: false, forceWebView: false);
     }
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      switch (_tabController.index) {
+        case 0:
+          _buttonColor = Colors.green;
+          _buttonLocation = mediaQuery.size.width * .45;
+          break;
+
+        case 1:
+          _buttonColor = Colors.orange;
+          _buttonLocation = mediaQuery.size.width * .45;
+          break;
+
+        case 2:
+          _buttonColor = Colors.red;
+          _buttonLocation = mediaQuery.size.width * .8;
+          break;
+      }
+      setState(() {});
+    }
+  }
+
+  void _tabActionButton() {
+    switch (_tabController.index) {
+      case 0:
+        _openAddRoomForm(context);
+        break;
+
+      case 1:
+        break;
+
+      case 2:
+        break;
+    }
+  }
+
+  void _openAddRoomForm(BuildContext ctx) {
+    showModalBottomSheet(
+        enableDrag: false,
+        isDismissible: true,
+        context: ctx,
+        builder: (_) {
+          return AddRoomForm(siteId: widget.site.id);
+        }).whenComplete(() => setState(() {}));
+  }
+
+  void _registerInstrument() {
+
+      
+
+
   }
 }

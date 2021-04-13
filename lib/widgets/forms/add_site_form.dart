@@ -252,6 +252,5 @@ class _AddSiteFormState extends State<AddSiteForm> {
         }
       }
     }
-    ;
   }
 }

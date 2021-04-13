@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    Fore more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-  -->
     <base href="/" />
 
     <meta charset="UTF-8" />
@@ -28,6 +18,32 @@
 
     <title>teamshare</title>
     <link rel="manifest" href="manifest.json" />
+        <!-- Firebase Configuration-->
+        <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-analytics.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.10/firebase-auth.js"></script>
+    
+    
+        <!-- Initialize Firebase -->
+        <script>
+          // Your web app's Firebase configuration
+          // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+          var firebaseConfig = {
+            apiKey: "AIzaSyAfy1vsq7uZuBvrFH831MAqtRh1zywnJ68",
+            authDomain: "teamshare-2020.firebaseapp.com",
+            databaseURL: "https://teamshare-2020.firebaseio.com",
+            projectId: "teamshare-2020",
+            storageBucket: "teamshare-2020.appspot.com",
+            messagingSenderId: "181561501538",
+            appId: "1:181561501538:web:a6eaab085534073115ee3b",
+            measurementId: "G-Y0TRXGDGNG",
+          };
+          // Initialize Firebase
+          firebase.initializeApp(firebaseConfig);
+          firebase.analytics();
+        </script>
+        <!-- End Firebase Configuration-->
   </head>
   <body>
     <!-- This script installs service_worker.js to provide PWA functionality to
@@ -40,31 +56,8 @@
         });
       }
     </script>
-    
-    <script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-auth.js"></script>
 
 
-    <!-- Initialize Firebase -->
-    <script>
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      var firebaseConfig = {
-        apiKey: "AIzaSyAfy1vsq7uZuBvrFH831MAqtRh1zywnJ68",
-        authDomain: "teamshare-2020.firebaseapp.com",
-        databaseURL: "https://teamshare-2020.firebaseio.com",
-        projectId: "teamshare-2020",
-        storageBucket: "teamshare-2020.appspot.com",
-        messagingSenderId: "181561501538",
-        appId: "1:181561501538:web:a6eaab085534073115ee3b",
-        measurementId: "G-Y0TRXGDGNG",
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      firebase.analytics();
-    </script>
 
 
     <script src="main.dart.js" type="application/javascript"></script>

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/site/site_info_screen.dart';
 import 'package:teamshare/widgets/forms/add_site_form.dart';
-import 'package:teamshare/widgets/list_items/instrument_list_item.dart';
 import 'package:teamshare/widgets/list_items/site_list_item.dart';
 
 class AdminSiteScreen extends StatefulWidget {

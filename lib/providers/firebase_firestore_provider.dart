@@ -18,6 +18,7 @@ class FirebaseFirestoreProvider {
   static const String instruments = "instruments";
   static const String teams = "teams";
   static const String sites = "sites";
+  static const String rooms = "rooms";
 //Get from Firebase
 
   static Future<void> addTeam(String name, String description,
@@ -183,13 +184,37 @@ class FirebaseFirestoreProvider {
     });
   }
 
-  static getSites() {
+  static Stream<List<Site>> getSites() {
     String sitesRef =
         "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites";
     return FirebaseFirestore.instance
         .collection(sitesRef)
         .get()
-        .then((value) => value.docs.map((e) => Site.fromFirestore(e)).toList())
+        .then((value) =>
+            value.docs.map((site) => Site.fromFirestore(site)).toList())
         .asStream();
+  }
+
+  static Future<List<Room>> getRooms(String siteId) async {
+    String roomRef =
+        "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$rooms";
+
+    List<Room> roomList = await FirebaseFirestore.instance
+        .collection(roomRef)
+        .get()
+        .then((value) =>
+            value.docs.map((room) => Room.fromFirestore(room)).toList());
+
+    return roomList;
+  }
+
+  static uploadRoom(String siteId, Room newRoom) async {
+    await FirebaseFunctions.instance
+        .httpsCallable("addRoom")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "siteId": siteId,
+      "room": newRoom.toJson(),
+    });
   }
 }
