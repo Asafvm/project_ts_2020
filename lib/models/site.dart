@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
-import 'package:teamshare/models/instrument.dart';
 
 class Site {
   String id;
@@ -55,7 +54,7 @@ class Room {
 
   @override
   String toString() {
-    return 'Room deatils - bla bla bla';
+    return '$building building, Floor: $floor, Room Number: $roomNumber';
   }
 
   Room.fromJson(Map<String, dynamic> data)
@@ -64,7 +63,8 @@ class Room {
         roomNumber = data['roomNumber'],
         roomTitle = data['roomTitle'],
         decription = data['decription'],
-        instruments = data['instruments'];
+        instruments =
+            List<String>.from(data['instruments']) ?? [] as List<String>;
 
   factory Room.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Room.fromJson(documentSnapshot.data());

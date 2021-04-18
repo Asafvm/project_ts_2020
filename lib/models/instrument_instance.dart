@@ -34,4 +34,8 @@ class InstrumentInstance {
   factory InstrumentInstance.fromFirestore(DocumentSnapshot documentSnapshot) {
     return InstrumentInstance.fromJson(documentSnapshot.data());
   }
+
+  String get getCurrentLocation {
+    return 'Default Location';
+  }
 }

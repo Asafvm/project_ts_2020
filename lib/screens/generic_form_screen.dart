@@ -6,7 +6,6 @@ import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
-import 'package:teamshare/providers/consts.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
@@ -44,19 +43,11 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 TextButton.icon(
                   icon: Icon(Icons.preview),
                   onPressed: _preview,
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith(getColor),
-                  ),
                   label: Text("Preview"),
                 ),
                 TextButton.icon(
                   icon: Icon(Icons.send),
                   onPressed: () {},
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith(getColor),
-                  ),
                   label: Text("Submit"),
                 )
               ],

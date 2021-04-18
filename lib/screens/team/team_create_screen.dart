@@ -8,7 +8,7 @@ import 'package:teamshare/providers/authentication.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspath;
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/widgets/list_items/member_list_item.dart';
 
 enum STEPS { INFO, INVITE, CONFIRM }
@@ -227,7 +227,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                         _loading = true;
                       }),
                       members.add(Authentication().userEmail),
-                      await FirebaseFirestoreProvider.addTeam(
+                      await FirebaseFirestoreCloudFunctions.addTeam(
                           _name,
                           _description,
                           members.toList(),

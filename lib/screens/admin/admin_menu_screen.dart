@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/part.dart';
+import 'package:teamshare/models/site.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/admin/admin_instrument_screen.dart';
 import 'package:teamshare/screens/admin/admin_part_screen.dart';
 import 'package:teamshare/screens/admin/admin_site_screen.dart';
@@ -68,14 +73,27 @@ class AdminMenuScreen extends StatelessWidget {
                 Expanded(
                     child: createButton(Icons.location_city, () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => AdminSiteScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => StreamProvider<List<Site>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getSites(),
+                        initialData: [],
+                        child: AdminSiteScreen(),
+                      ),
+                    ),
                   );
                 }, 'Site', context)),
                 Expanded(
                   child: createButton(Icons.computer, () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (_) => AdminInstrumentScreen()),
+                        builder: (_) => StreamProvider<List<Instrument>>(
+                          create: (context) =>
+                              FirebaseFirestoreProvider.getInstruments(),
+                          initialData: [],
+                          child: AdminInstrumentScreen(),
+                        ),
+                      ),
                     );
                   }, 'Instruments', context),
                 ),
@@ -86,7 +104,14 @@ class AdminMenuScreen extends StatelessWidget {
                 Expanded(
                   child: createButton(Icons.developer_board, () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => AdminPartScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => StreamProvider<List<Part>>(
+                          create: (context) =>
+                              FirebaseFirestoreProvider.getParts(),
+                          initialData: [],
+                          child: AdminPartScreen(),
+                        ),
+                      ),
                     );
                   }, 'Parts', context),
                 ),

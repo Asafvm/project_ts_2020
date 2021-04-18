@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/team/team_home_screen.dart';
 
@@ -21,7 +22,7 @@ class TeamThumbnail extends StatelessWidget {
         ]),
       ),
       onDismissed: (_) => {
-        FirebaseFirestoreProvider.removeTeam(teamDocId),
+        FirebaseFirestoreCloudFunctions.removeTeam(teamDocId),
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(

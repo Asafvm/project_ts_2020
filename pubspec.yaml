@@ -53,7 +53,7 @@ dependencies:
   image_picker: ^0.7.2
   intl: ^0.17.0 #date formatter
   shared_preferences: ^2.0.3
-  provider: ^5.0.0-nullsafety.5
+  provider: ^5.0.0
   crypto: ^3.0.0
   plugin_platform_interface: ^2.0.0
   ffi: ^1.0.0

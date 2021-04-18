@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/widgets/forms/add_instrument_form.dart';
 import 'package:teamshare/widgets/list_items/instrument_list_item.dart';
 
@@ -11,6 +12,9 @@ class AdminInstrumentScreen extends StatefulWidget {
 class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
   @override
   Widget build(BuildContext context) {
+    List<Instrument> _instrumentList =
+        Provider.of<List<Instrument>>(context, listen: true);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Instruments"),
@@ -24,24 +28,14 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: StreamBuilder(
-          stream: FirebaseFirestoreProvider.getInstruments(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (!snapshot.hasData || snapshot.data.length == 0)
-                return Center(
-                    child: Text("You haven't registered any instruments yet"));
-              else
-                return ListView.builder(
-                  key: UniqueKey(), //new Key(Strings.randomString(20)),
-                  itemBuilder: (ctx, index) => InstrumentListItem(
-                      Icons.computer, ctx, snapshot.data.elementAt(index)),
-                  itemCount: snapshot.data.length,
-                );
-            } else
-              return Center(child: CircularProgressIndicator());
-          },
-        ),
+        child: _instrumentList.isEmpty
+            ? Center(child: Text("You haven't registered any instruments yet"))
+            : ListView.builder(
+                key: UniqueKey(), //new Key(Strings.randomString(20)),
+                itemBuilder: (ctx, index) => InstrumentListItem(
+                    Icons.computer, ctx, _instrumentList.elementAt(index)),
+                itemCount: _instrumentList.length,
+              ),
       ),
     );
   }

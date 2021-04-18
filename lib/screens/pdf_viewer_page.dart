@@ -8,7 +8,7 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/forms/add_field_form.dart';
@@ -49,12 +49,12 @@ class _PDFScreenState extends State<PDFScreen> {
   void initState() {
     super.initState();
 
-    File(widget.pathPDF).exists().catchError((e) async => {
-          await showDialog(
-                  context: context,
-                  builder: (_) => _buildAlertDialog("Error opening file"))
-              .then((_) => Navigator.of(context).pop())
-        });
+    // File(widget.pathPDF).exists().catchError((e) async => {
+    //       await showDialog(
+    //               context: context,
+    //               builder: (_) => _buildAlertDialog("Error opening file"))
+    //           .then((_) => Navigator.of(context).pop())
+    //     });
     setState(() {
       if (widget.fields != null)
         _fields = List.from(widget.fields, growable: true);
@@ -257,14 +257,12 @@ class _PDFScreenState extends State<PDFScreen> {
         if (!widget.onlyFields) {
           Applogger.consoleLog(MessegeType.info, "Saving File");
           await FirebaseStorageProvider.uploadFile(file, instrumentPath)
-              .catchError((_) => {
-                    _showDialog("Failed to upload file"),
-                  });
+              .catchError((e) => e.toString());
         }
 
         _updateProgress(50);
         Applogger.consoleLog(MessegeType.info, "Saving Fields");
-        await FirebaseFirestoreProvider.uploadFields(fields,
+        await FirebaseFirestoreCloudFunctions.uploadFields(fields,
                 path.basenameWithoutExtension(file.path), widget.instrumentID)
             .catchError((_) => {
                   _showDialog("Failed to upload fields"),

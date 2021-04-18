@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 
 class AddInstrumentForm extends StatefulWidget {
   @override
@@ -201,7 +201,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   _uploadInstrument() {
     try {
-      FirebaseFirestoreProvider.uploadInstrument(_newInstrument).then(
+      FirebaseFirestoreCloudFunctions.uploadInstrument(_newInstrument).then(
         (_) async => await showDialog(
           context: context,
           builder: (ctx) => AlertDialog(

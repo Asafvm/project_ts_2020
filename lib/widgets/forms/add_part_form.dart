@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class AddPartForm extends StatefulWidget {
@@ -292,7 +293,7 @@ class _AddPartFormState extends State<AddPartForm> {
         });
         //send to server
         try {
-          await FirebaseFirestoreProvider.uploadPart(_newPart)
+          await FirebaseFirestoreCloudFunctions.uploadPart(_newPart)
               .then((_) async => await showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -337,6 +338,5 @@ class _AddPartFormState extends State<AddPartForm> {
         }
       }
     }
-    ;
   }
 }

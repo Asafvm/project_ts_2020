@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/helpers/location_helper.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -161,7 +163,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                         TabBarView(
                           children: [
                             //Rooms
-                            FutureBuilder(
+                            FutureBuilder<List<Room>>(
                               future: FirebaseFirestoreProvider.getRooms(
                                   widget.site.id),
                               initialData: [],
@@ -171,7 +173,10 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
-                                else
+                                else if (snapshot.hasError) {
+                                  //_showErrorSnackbar();
+                                  return Container();
+                                } else if (snapshot.hasData) {
                                   return ListView.builder(
                                     itemBuilder: (context, index) {
                                       return Card(
@@ -179,7 +184,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                           title: Text(
                                               snapshot.data[index].roomTitle),
                                           subtitle: Text(
-                                              snapshot.data[index].decription),
+                                              snapshot.data[index].toString()),
                                           trailing: FittedBox(
                                             child: Row(
                                               children: [
@@ -192,7 +197,8 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                                     icon: Icon(
                                                       Icons.computer,
                                                     ),
-                                                    onPressed: _registerInstrument),
+                                                    onPressed:
+                                                        _registerInstrument),
                                               ],
                                             ),
                                           ),
@@ -201,6 +207,9 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                     },
                                     itemCount: snapshot.data.length,
                                   );
+                                } else
+                                  return Center(
+                                      child: CircularProgressIndicator());
                               },
                             ),
 
@@ -307,10 +316,18 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
         }).whenComplete(() => setState(() {}));
   }
 
-  void _registerInstrument() {
+  Future<void> _registerInstrument() async {
+    List<Instrument> selected =
+        await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) {
+                return InstrumentSelectionScreen();
+              },
+            )) as List<Instrument> ??
+            [];
+  }
 
-      
-
-
+  void _showErrorSnackbar() {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Error getting room list')));
   }
 }

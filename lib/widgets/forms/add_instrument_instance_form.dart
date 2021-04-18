@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 
 class AddInstrumentInstanceForm extends StatefulWidget {
   final String instrumentCodeName;
@@ -63,7 +63,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                             });
                             //send to server
                             try {
-                              await FirebaseFirestoreProvider
+                              await FirebaseFirestoreCloudFunctions
                                       .uploadInstrumentInstance(
                                           _newInstInstrument,
                                           widget.instrumentCodeName)

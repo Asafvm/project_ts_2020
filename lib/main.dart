@@ -2,12 +2,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/helpers/custom_route.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/admin/admin_menu_screen.dart';
 import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/screens/splash_screen.dart';
+
+import 'models/instrument.dart';
+import 'models/part.dart';
+import 'models/site.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,7 +82,24 @@ class TeamShare extends StatelessWidget {
                                   : LoginScreen()),
                   routes: {
                     MainScreen.routeName: (ctx) => MainScreen(),
-                    AdminMenuScreen.routeName: (ctx) => AdminMenuScreen(),
+                    AdminMenuScreen.routeName: (ctx) =>
+                        MultiProvider(providers: [
+                          StreamProvider<List<Instrument>>(
+                            create: (context) =>
+                                FirebaseFirestoreProvider.getInstruments(),
+                            initialData: [],
+                          ),
+                          StreamProvider<List<Part>>(
+                            create: (context) =>
+                                FirebaseFirestoreProvider.getParts(),
+                            initialData: [],
+                          ),
+                          StreamProvider<List<Site>>(
+                            create: (context) =>
+                                FirebaseFirestoreProvider.getSites(),
+                            initialData: [],
+                          )
+                        ], child: AdminMenuScreen()),
                   },
                 );
               },

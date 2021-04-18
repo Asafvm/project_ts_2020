@@ -9,7 +9,7 @@ import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 //import 'package:geocoder/geocoder.dart' as geo;
 import 'package:teamshare/models/site.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/screens/map_screen.dart';
 
 class AddSiteForm extends StatefulWidget {
@@ -217,7 +217,7 @@ class _AddSiteFormState extends State<AddSiteForm> {
         });
         //send to server
         try {
-          await FirebaseFirestoreProvider.uploadSite(_newSite)
+          await FirebaseFirestoreCloudFunctions.uploadSite(_newSite)
               .then((_) async => await showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(

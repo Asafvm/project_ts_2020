@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 
 class AddRoomForm extends StatefulWidget {
   final String siteId;
@@ -144,7 +144,8 @@ class _AddRoomFormState extends State<AddRoomForm> {
       });
       //send to server
       try {
-        await FirebaseFirestoreProvider.uploadRoom(widget.siteId, _newRoom)
+        await FirebaseFirestoreCloudFunctions.uploadRoom(
+                widget.siteId, _newRoom)
             .then((_) async => await showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
