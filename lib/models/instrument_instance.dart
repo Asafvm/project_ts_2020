@@ -3,12 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'entry.dart';
 
 class InstrumentInstance {
+  final String instrumentCode;
   final String serial;
   List<Entry> entries = [];
 
-  InstrumentInstance({this.serial, this.entries});
+  InstrumentInstance({this.instrumentCode, this.serial, this.entries});
 
-  InstrumentInstance.newInstrument({this.serial}) {
+  InstrumentInstance.newInstrument({this.instrumentCode, this.serial}) {
     this.entries = new List<Entry>.empty(growable: true);
     this.entries.add(Entry(
         timestamp: Timestamp.now().millisecondsSinceEpoch,
@@ -21,11 +22,13 @@ class InstrumentInstance {
   }
 
   Map<String, dynamic> toJson() => {
+        'instrumentCode': instrumentCode,
         'serial': serial,
       };
 
   InstrumentInstance.fromJson(Map<String, dynamic> data)
-      : serial = data['serial'],
+      : instrumentCode = data['instrumentCode'],
+        serial = data['serial'],
         entries = (data['entries'] as Map)
             .values
             .map((e) => Entry.fromJson(e))

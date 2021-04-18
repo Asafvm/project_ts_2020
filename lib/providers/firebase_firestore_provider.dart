@@ -50,11 +50,21 @@ class FirebaseFirestoreProvider {
         .asStream();
   }
 
-  static getInstrumentsInstances(String instrumentCode) {
+  static Stream<List<InstrumentInstance>> getInstrumentsInstances(
+      String instrumentCode) {
     String instrumentRef =
         "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentCode/instances";
     return FirebaseFirestore.instance
         .collection("$instrumentRef")
+        .snapshots()
+        .map((list) => list.docs
+            .map((item) => InstrumentInstance.fromFirestore(item))
+            .toList());
+  }
+
+  static Stream<List<InstrumentInstance>> getAllInstrumentsInstances() {
+    return FirebaseFirestore.instance
+        .collectionGroup("instances")
         .snapshots()
         .map((list) => list.docs
             .map((item) => InstrumentInstance.fromFirestore(item))

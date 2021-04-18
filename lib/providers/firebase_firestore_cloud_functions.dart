@@ -65,12 +65,12 @@ class FirebaseFirestoreCloudFunctions {
   }
 
   static Future<void> uploadInstrumentInstance(
-      InstrumentInstance _newInstrument, String instrumentId) async {
+      InstrumentInstance _newInstrument) async {
     await FirebaseFunctions.instance
         .httpsCallable("addInstrumentInstance")
         .call(<String, dynamic>{
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
-      "instrumentID": instrumentId,
+      "instrumentID": _newInstrument.instrumentCode,
       "instrument": _newInstrument.toJson(),
       "entries": _newInstrument.entries.map((e) => e.toJson()).toList()
     });
@@ -137,4 +137,6 @@ class FirebaseFirestoreCloudFunctions {
       "room": newRoom.toJson(),
     });
   }
+
+  static void linkInstruments(List<InstrumentInstance> selected) {}
 }

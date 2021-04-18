@@ -23,7 +23,8 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
       decoration: InputDecoration(labelText: "Serial"),
       keyboardType: TextInputType.text,
       onSaved: (val) {
-        _newInstInstrument = InstrumentInstance.newInstrument(serial: val);
+        _newInstInstrument = InstrumentInstance.newInstrument(
+            instrumentCode: widget.instrumentCodeName, serial: val);
       },
     );
   }
@@ -65,8 +66,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
                             try {
                               await FirebaseFirestoreCloudFunctions
                                       .uploadInstrumentInstance(
-                                          _newInstInstrument,
-                                          widget.instrumentCodeName)
+                                          _newInstInstrument)
                                   .then((_) => Navigator.of(context).pop());
                             } catch (error) {
                               showDialog(

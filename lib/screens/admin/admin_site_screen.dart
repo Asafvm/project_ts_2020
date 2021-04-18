@@ -14,7 +14,7 @@ class AdminSiteScreen extends StatefulWidget {
 class _AdminSiteScreenState extends State<AdminSiteScreen> {
   @override
   Widget build(BuildContext context) {
-    List<Site> _siteList = Provider.of<List<Site>>(context);
+    List<Site> _siteList = Provider.of<List<Site>>(context, listen: true);
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Sites"),
@@ -36,10 +36,16 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (BuildContext context) => SiteInfoScreen(
-                          site: _siteList.elementAt(index),
-                        ),
-                      ),
+                          builder: (BuildContext context) =>
+                              FutureProvider<List<Room>>(
+                                create: (context) =>
+                                    FirebaseFirestoreProvider.getRooms(
+                                        _siteList.elementAt(index).id),
+                                initialData: [],
+                                child: SiteInfoScreen(
+                                  site: _siteList.elementAt(index),
+                                ),
+                              )),
                     );
                   },
                   child: SiteItemList(

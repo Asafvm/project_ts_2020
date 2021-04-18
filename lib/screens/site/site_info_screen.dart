@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';
@@ -51,6 +54,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
 
   @override
   Widget build(BuildContext context) {
+    List<Room> roomList = Provider.of<List<Room>>(context);
     mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
@@ -163,54 +167,33 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                         TabBarView(
                           children: [
                             //Rooms
-                            FutureBuilder<List<Room>>(
-                              future: FirebaseFirestoreProvider.getRooms(
-                                  widget.site.id),
-                              initialData: [],
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting)
-                                  return Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                else if (snapshot.hasError) {
-                                  //_showErrorSnackbar();
-                                  return Container();
-                                } else if (snapshot.hasData) {
-                                  return ListView.builder(
-                                    itemBuilder: (context, index) {
-                                      return Card(
-                                        child: ListTile(
-                                          title: Text(
-                                              snapshot.data[index].roomTitle),
-                                          subtitle: Text(
-                                              snapshot.data[index].toString()),
-                                          trailing: FittedBox(
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                    icon: Icon(
-                                                      Icons.contact_phone_sharp,
-                                                    ),
-                                                    onPressed: () => {}),
-                                                IconButton(
-                                                    icon: Icon(
-                                                      Icons.computer,
-                                                    ),
-                                                    onPressed:
-                                                        _registerInstrument),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    itemCount: snapshot.data.length,
-                                  );
-                                } else
-                                  return Center(
-                                      child: CircularProgressIndicator());
+
+                            ListView.builder(
+                              itemBuilder: (context, index) {
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(roomList[index].roomTitle),
+                                    subtitle: Text(roomList[index].toString()),
+                                    trailing: FittedBox(
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                              icon: Icon(
+                                                Icons.contact_phone_sharp,
+                                              ),
+                                              onPressed: () => {}),
+                                          IconButton(
+                                              icon: Icon(
+                                                Icons.computer,
+                                              ),
+                                              onPressed: _registerInstrument),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
                               },
+                              itemCount: roomList.length,
                             ),
 
                             ///Instruments
@@ -317,13 +300,26 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
   }
 
   Future<void> _registerInstrument() async {
-    List<Instrument> selected =
-        await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) {
-                return InstrumentSelectionScreen();
-              },
-            )) as List<Instrument> ??
-            [];
+    List<InstrumentInstance> selected = await Navigator.of(context)
+            .push(MaterialPageRoute(
+          builder: (context) {
+            return MultiProvider(
+              providers: [
+                StreamProvider<List<Instrument>>(
+                    create: (context) =>
+                        FirebaseFirestoreProvider.getInstruments(),
+                    initialData: []),
+                StreamProvider<List<InstrumentInstance>>(
+                    create: (context) =>
+                        FirebaseFirestoreProvider.getAllInstrumentsInstances(),
+                    initialData: []),
+              ],
+              child: InstrumentSelectionScreen(),
+            );
+          },
+        )) as List<InstrumentInstance> ??
+        [];
+    FirebaseFirestoreCloudFunctions.linkInstruments(selected);
   }
 
   void _showErrorSnackbar() {
