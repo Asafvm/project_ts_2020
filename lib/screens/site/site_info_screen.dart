@@ -8,6 +8,7 @@ import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';
+import 'package:teamshare/widgets/list_items/instrument_instance_list_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SiteInfoScreen extends StatefulWidget {
@@ -34,6 +35,8 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
     Tab(text: "Instruments"),
     Tab(text: "Contacts"),
   ];
+
+  var _tabActionButton;
   void _showPreview(double lat, double lng) {
     final staticMapImageUrl = LocationHelper.generateLocationPreviewImage(
       lat: lat,
@@ -165,9 +168,9 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                     child: Stack(
                       children: [
                         TabBarView(
+                          controller: _tabController,
                           children: [
                             //Rooms
-
                             ListView.builder(
                               itemBuilder: (context, index) {
                                 return Card(
@@ -186,7 +189,9 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                               icon: Icon(
                                                 Icons.computer,
                                               ),
-                                              onPressed: _registerInstrument),
+                                              onPressed: () =>
+                                                  _registerInstrument(
+                                                      roomList[index].id)),
                                         ],
                                       ),
                                     ),
@@ -197,20 +202,51 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                             ),
 
                             ///Instruments
-                            Container(),
+                            Container(
+                                child: StreamBuilder<List<InstrumentInstance>>(
+                              stream: FirebaseFirestoreProvider
+                                  .getAllInstrumentsInstances(),
+                              initialData: [],
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  List<InstrumentInstance> list = snapshot.data
+                                      .where((element) =>
+                                          element.currentSiteId ==
+                                          widget.site.id)
+                                      .toList();
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: list.length,
+                                    itemBuilder: (context, index) {
+                                      return InstrumentInstanceListItem(
+                                          Icons.computer,
+                                          context,
+                                          list[index].serial);
+                                    },
+                                  );
+                                } else
+                                  return Container();
+                              },
+                            )),
                             //Contacts
-                            Container(),
+                            Container(
+                              child: Center(
+                                child: Text("There"),
+                              ),
+                            ),
                           ],
                         ),
-                        Positioned(
-                          bottom: mediaQuery.size.height * .02,
-                          left: _buttonLocation,
-                          child: FloatingActionButton(
-                            onPressed: _tabActionButton,
-                            backgroundColor: _buttonColor,
-                            child: Icon(Icons.add),
-                          ),
-                        ),
+                        _tabController.index == 1
+                            ? Container()
+                            : Positioned(
+                                bottom: mediaQuery.size.height * .02,
+                                left: _buttonLocation,
+                                child: FloatingActionButton(
+                                  onPressed: _tabActionButton,
+                                  backgroundColor: _buttonColor,
+                                  child: Icon(Icons.add),
+                                ),
+                              ),
                       ],
                     ),
                   ),
@@ -257,17 +293,19 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
     if (_tabController.indexIsChanging) {
       switch (_tabController.index) {
         case 0:
+          _tabActionButton = () => _openAddRoomForm(context);
           _buttonColor = Colors.green;
-          _buttonLocation = mediaQuery.size.width * .45;
+          _buttonLocation = mediaQuery.size.width * .1;
           break;
 
-        case 1:
-          _buttonColor = Colors.orange;
-          _buttonLocation = mediaQuery.size.width * .45;
+        case 1: //button removed in widget tree
+          _tabActionButton = null;
           break;
 
         case 2:
-          _buttonColor = Colors.red;
+          _tabActionButton = () => _openAddContactForm(context);
+
+          _buttonColor = Colors.lightBlue;
           _buttonLocation = mediaQuery.size.width * .8;
           break;
       }
@@ -275,18 +313,35 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
     }
   }
 
-  void _tabActionButton() {
-    switch (_tabController.index) {
-      case 0:
-        _openAddRoomForm(context);
-        break;
+  Future<void> _registerInstrument(String room) async {
+    List<InstrumentInstance> selected =
+        await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) {
+        return MultiProvider(
+          providers: [
+            StreamProvider<List<Instrument>>(
+                create: (context) => FirebaseFirestoreProvider.getInstruments(),
+                initialData: []),
+            StreamProvider<List<InstrumentInstance>>(
+                create: (context) =>
+                    FirebaseFirestoreProvider.getAllInstrumentsInstances(),
+                initialData: []),
+          ],
+          child: InstrumentSelectionScreen(
+            siteId: widget.site.id,
+            roomId: room,
+          ),
+        );
+      },
+    ));
+    // as List<InstrumentInstance> ??[];
+    FirebaseFirestoreCloudFunctions.linkInstruments(
+        selected, widget.site.id, room);
+  }
 
-      case 1:
-        break;
-
-      case 2:
-        break;
-    }
+  void _showErrorSnackbar() {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Error getting room list')));
   }
 
   void _openAddRoomForm(BuildContext ctx) {
@@ -299,31 +354,5 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
         }).whenComplete(() => setState(() {}));
   }
 
-  Future<void> _registerInstrument() async {
-    List<InstrumentInstance> selected = await Navigator.of(context)
-            .push(MaterialPageRoute(
-          builder: (context) {
-            return MultiProvider(
-              providers: [
-                StreamProvider<List<Instrument>>(
-                    create: (context) =>
-                        FirebaseFirestoreProvider.getInstruments(),
-                    initialData: []),
-                StreamProvider<List<InstrumentInstance>>(
-                    create: (context) =>
-                        FirebaseFirestoreProvider.getAllInstrumentsInstances(),
-                    initialData: []),
-              ],
-              child: InstrumentSelectionScreen(),
-            );
-          },
-        )) as List<InstrumentInstance> ??
-        [];
-    FirebaseFirestoreCloudFunctions.linkInstruments(selected);
-  }
-
-  void _showErrorSnackbar() {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Error getting room list')));
-  }
+  _openAddContactForm(BuildContext context) {}
 }

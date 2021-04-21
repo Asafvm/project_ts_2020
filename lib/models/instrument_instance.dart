@@ -5,6 +5,8 @@ import 'entry.dart';
 class InstrumentInstance {
   final String instrumentCode;
   final String serial;
+  String currentSiteId = 'Main';
+  String currentRoomId = '';
   List<Entry> entries = [];
 
   InstrumentInstance({this.instrumentCode, this.serial, this.entries});
@@ -23,11 +25,15 @@ class InstrumentInstance {
 
   Map<String, dynamic> toJson() => {
         'instrumentCode': instrumentCode,
+        'currentSiteId': currentSiteId,
+        'currentRoomId': currentRoomId,
         'serial': serial,
       };
 
   InstrumentInstance.fromJson(Map<String, dynamic> data)
       : instrumentCode = data['instrumentCode'],
+        currentSiteId = data['currentSiteId'],
+        currentRoomId = data['currentRoomId'],
         serial = data['serial'],
         entries = (data['entries'] as Map)
             .values
@@ -39,6 +45,6 @@ class InstrumentInstance {
   }
 
   String get getCurrentLocation {
-    return 'Default Location';
+    return currentSiteId;
   }
 }

@@ -27,6 +27,7 @@ class Site {
 }
 
 class Room {
+  String id = '';
   String building;
   String floor;
   String roomNumber;
@@ -57,8 +58,9 @@ class Room {
     return '$building building, Floor: $floor, Room Number: $roomNumber';
   }
 
-  Room.fromJson(Map<String, dynamic> data)
-      : building = data['building'],
+  Room.fromJson(Map<String, dynamic> data, String id)
+      : id = id,
+        building = data['building'],
         floor = data['floor'],
         roomNumber = data['roomNumber'],
         roomTitle = data['roomTitle'],
@@ -67,7 +69,7 @@ class Room {
             List<String>.from(data['instruments']) ?? [] as List<String>;
 
   factory Room.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Room.fromJson(documentSnapshot.data());
+    return Room.fromJson(documentSnapshot.data(), documentSnapshot.id);
   }
 
   Map<String, dynamic> toJson() {

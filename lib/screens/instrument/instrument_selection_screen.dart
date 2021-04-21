@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
 
 class InstrumentSelectionScreen extends StatefulWidget {
+  final String siteId;
+  final String roomId;
+
+  const InstrumentSelectionScreen({this.siteId, this.roomId});
   @override
   _InstrumentSelectionScreenState createState() =>
       _InstrumentSelectionScreenState();
@@ -72,17 +75,22 @@ class _InstrumentSelectionScreenState extends State<InstrumentSelectionScreen> {
                             (instance) => CheckboxListTile(
                               value: _selectableList[
                                   _instanceList.indexOf(instance)],
-                              onChanged: (value) => {
-                                setState(() {
-                                  if (value)
-                                    _selectedInstruments.add(instance);
-                                  else
-                                    _selectedInstruments.remove(instance);
+                              onChanged: (instance.currentSiteId ==
+                                          widget.siteId &&
+                                      instance.currentRoomId == widget.roomId)
+                                  ? null
+                                  : (value) => {
+                                        setState(() {
+                                          if (value)
+                                            _selectedInstruments.add(instance);
+                                          else
+                                            _selectedInstruments
+                                                .remove(instance);
 
-                                  _selectableList[
-                                      _instanceList.indexOf(instance)] = value;
-                                })
-                              },
+                                          _selectableList[_instanceList
+                                              .indexOf(instance)] = value;
+                                        })
+                                      },
                               title: Text(instance.serial),
                             ),
                           )

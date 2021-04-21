@@ -138,5 +138,18 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static void linkInstruments(List<InstrumentInstance> selected) {}
+  static Future<void> linkInstruments(
+      List<InstrumentInstance> selected, String siteId, String roomId) async {
+    await FirebaseFunctions.instance
+        .httpsCallable("linkInstruments")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "instruments": selected
+          .map((e) =>
+              {"instrumentCode": e.instrumentCode, "instanceSerial": e.serial})
+          .toList(),
+      "siteId": siteId,
+      "roomId": roomId,
+    });
+  }
 }

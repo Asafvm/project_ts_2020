@@ -33,7 +33,7 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
             : ListView.builder(
                 key: UniqueKey(), //new Key(Strings.randomString(20)),
                 itemBuilder: (ctx, index) => InstrumentListItem(
-                    Icons.computer, ctx, _instrumentList.elementAt(index)),
+                    Icons.computer, ctx, _instrumentList[index]),
                 itemCount: _instrumentList.length,
               ),
       ),

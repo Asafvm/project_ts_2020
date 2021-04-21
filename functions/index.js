@@ -21,7 +21,6 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
     console.log("Faild to create team\n");
     return null;
   }
-  // eslint-disable-next-line promise/no-nesting
   try {
     const members = data["members"];
 
@@ -215,3 +214,76 @@ exports.addRoom = functions.https.onCall((data, context) => {
     data["room"]);
   
 });
+
+exports.linkInstruments = functions.https.onCall((data, context) => {
+  const room = admin
+  .firestore()
+  .collection("teams")
+  .doc(data["teamId"])
+  .collection("sites")
+  .doc(data["siteId"])
+  .collection("rooms")
+  .doc(data["roomId"])
+  .collection("assigned");
+
+  const promises = [];
+  const instruments = data["instruments"];
+  instruments.map((instrument) => { 
+    const p = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("instruments")
+    .doc(instrument.instrumentCode)
+    .collection("instances")
+    .doc(instrument.instanceSerial).update({"currentSiteId" : data["siteId"],
+    "currentRoomId" : data["roomId"],});
+    
+    const r = room.add(instrument);
+    promises.push(p);
+    promises.push(r);
+
+    return Promise.all(promises);
+  });
+});
+
+//case user exited from
+
+  exports.autoInstanceOnUpdate = functions.firestore
+  .document("teams/{teamId}/instruments/{instrumentId}/instances/{instanceId}")
+  
+  //remove from old location on update
+  .onUpdate((change,context)=>{
+    var deviceBefore = change.before.data();
+    var deviceAfter = change.after.data();
+
+    console.log(deviceBefore['instrumentCode']+" : "+deviceBefore['serial']
+    +" moved from "+deviceBefore['currentSiteId']+", room:"+deviceBefore['currentRoomId']
+    +" to "+deviceAfter['currentSiteId']+", room:"+deviceAfter['currentRoomId']);
+
+    var assigned = admin
+    .firestore()
+    .collection("teams")
+    .doc(context.params.teamId)
+    .collection("sites")
+    .doc(deviceBefore['currentSiteId'])
+    .collection("rooms")
+    .doc(deviceBefore['currentRoomId'])
+    .collection("assigned");
+    
+    var docs = assigned.get()
+    .then((val)=>{
+      val.docs.forEach((doc)=>{
+      if(doc.data()['instanceSerial'] === deviceBefore['serial'] && doc.data()['instrumentCode'] === deviceBefore['instrumentCode'])  {
+        assigned.doc(doc.id).delete();
+      }
+    });      
+    return null;
+  })
+ .catch((e)=>e);
+});
+
+    
+
+
+  
