@@ -12,7 +12,7 @@ const { firebaseConfig } = require("firebase-functions");
 
 //create new team
 exports.addTeam = functions.https.onCall(async (data, context) => {
-  const teams = admin.firestore().collection("teams");  //setting referance
+  const teams = admin.firestore().collection("teams"); //setting referance
 
   //creating a team
   var teamid = await teams.add(data["teamInfo"]); //add will give each entry a random id
@@ -25,17 +25,16 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
     const members = data["members"];
 
     const promises = [];
-    for (const m in members) {
-      //WHY IS m AN INDEX?!?!
-      console.log("member " + members[m]);
+    members.forEach((member) => {
+      console.log("Adding member " + member);
       const p = teams
         .doc(teamid.id)
         .collection("members")
-        .doc(members[m])
+        .doc(member)
         .set({});
 
       promises.push(p);
-    }
+    });
     await Promise.all(promises);
   } catch (e) {
     console.log("Error adding members ::" + e);
@@ -157,20 +156,19 @@ exports.addInstrumentInstance = functions.https.onCall(
 
 //add part to team's inventory
 exports.addPart = functions.https.onCall(async (data, context) => {
-  
   const teamid = data["teamID"];
   const partdata = data["part"];
 
-  console.log('Team: '+teamid);
-  console.log('Part: '+partdata);
-  
+  console.log("Team: " + teamid);
+  console.log("Part: " + partdata);
+
   const parts = admin
     .firestore()
     .collection("teams")
     .doc(teamid)
     .collection("parts");
 
-    await parts.add(partdata);
+  await parts.add(partdata);
 });
 
 //add report's fields to instrument ducoment
@@ -195,10 +193,8 @@ exports.addSite = functions.https.onCall((data, context) => {
     .collection("teams")
     .doc(data["teamId"])
     .collection("sites");
-  
-  return sites.add(
-    data["site"]);
-  
+
+  return sites.add(data["site"]);
 });
 
 exports.addRoom = functions.https.onCall((data, context) => {
@@ -209,81 +205,133 @@ exports.addRoom = functions.https.onCall((data, context) => {
     .collection("sites")
     .doc(data["siteId"])
     .collection("rooms");
-  
-  return sites.add(
-    data["room"]);
-  
+
+  return sites.add(data["room"]);
 });
 
-exports.linkInstruments = functions.https.onCall((data, context) => {
+exports.linkInstruments = functions.https.onCall(async (data, context) => {
   const room = admin
-  .firestore()
-  .collection("teams")
-  .doc(data["teamId"])
-  .collection("sites")
-  .doc(data["siteId"])
-  .collection("rooms")
-  .doc(data["roomId"])
-  .collection("assigned");
-
-  const promises = [];
-  const instruments = data["instruments"];
-  instruments.map((instrument) => { 
-    const p = admin
     .firestore()
     .collection("teams")
     .doc(data["teamId"])
-    .collection("instruments")
-    .doc(instrument.instrumentCode)
-    .collection("instances")
-    .doc(instrument.instanceSerial).update({"currentSiteId" : data["siteId"],
-    "currentRoomId" : data["roomId"],});
-    
-    const r = room.add(instrument);
-    promises.push(p);
-    promises.push(r);
+    .collection("sites")
+    .doc(data["siteId"])
+    .collection("rooms")
+    .doc(data["roomId"])
+    .collection("assigned");
 
-    return Promise.all(promises);
-  });
+  try {
+    const promises = [];
+    const instruments = data["instruments"];
+
+    instruments.forEach((instrument) => {
+      const p = admin
+        .firestore()
+        .collection("teams")
+        .doc(data["teamId"])
+        .collection("instruments")
+        .doc(instrument.instrumentCode)
+        .collection("instances")
+        .doc(instrument.instanceSerial)
+        .update({
+          currentSiteId: data["siteId"],
+          currentRoomId: data["roomId"],
+        });
+
+      const r = room.add(instrument);
+      promises.push(p);
+      promises.push(r);
+    });
+    await Promise.all(promises);
+  } catch (e) {
+    console.log("Error relocating instrument :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
 });
 
 //case user exited from
 
-  exports.autoInstanceOnUpdate = functions.firestore
+exports.autoInstanceOnUpdate = functions.firestore
   .document("teams/{teamId}/instruments/{instrumentId}/instances/{instanceId}")
-  
   //remove from old location on update
-  .onUpdate((change,context)=>{
+  .onUpdate((change, context) => {
     var deviceBefore = change.before.data();
     var deviceAfter = change.after.data();
 
-    console.log(deviceBefore['instrumentCode']+" : "+deviceBefore['serial']
-    +" moved from "+deviceBefore['currentSiteId']+", room:"+deviceBefore['currentRoomId']
-    +" to "+deviceAfter['currentSiteId']+", room:"+deviceAfter['currentRoomId']);
+    if (deviceBefore["currentSiteId"] === "Main") return null;
+
+    console.log(
+      deviceBefore["instrumentCode"] +
+        " : " +
+        deviceBefore["serial"] +
+        " moved from " +
+        deviceBefore["currentSiteId"] +
+        ", room:" +
+        deviceBefore["currentRoomId"] +
+        " to " +
+        deviceAfter["currentSiteId"] +
+        ", room:" +
+        deviceAfter["currentRoomId"]
+    );
 
     var assigned = admin
-    .firestore()
-    .collection("teams")
-    .doc(context.params.teamId)
-    .collection("sites")
-    .doc(deviceBefore['currentSiteId'])
-    .collection("rooms")
-    .doc(deviceBefore['currentRoomId'])
-    .collection("assigned");
-    
-    var docs = assigned.get()
-    .then((val)=>{
-      val.docs.forEach((doc)=>{
-      if(doc.data()['instanceSerial'] === deviceBefore['serial'] && doc.data()['instrumentCode'] === deviceBefore['instrumentCode'])  {
-        assigned.doc(doc.id).delete();
-      }
-    });      
-    return null;
-  })
- .catch((e)=>e);
+      .firestore()
+      .collection("teams")
+      .doc(context.params.teamId)
+      .collection("sites")
+      .doc(deviceBefore["currentSiteId"])
+      .collection("rooms")
+      .doc(deviceBefore["currentRoomId"])
+      .collection("assigned");
+
+    var docs = assigned.get().then((val) => {
+      val.docs.forEach((doc) => {
+        if (
+          doc.data()["instanceSerial"] === deviceBefore["serial"] &&
+          doc.data()["instrumentCode"] === deviceBefore["instrumentCode"]
+        ) {
+          assigned.doc(doc.id).delete();
+        }
+      });
+      return { status: "success" };
+    });
+    return { status: "success" };
+  });
+
+exports.addContact = functions.https.onCall(async (data, context) => {
+  const teams = admin.firestore().collection("teams").doc(data["teamId"]); //setting referance
+
+  try {
+    var contact = await teams.collection("contacts").add(data["contact"]);
+    console.log("New Contact ID : "+contact.id);
+    teams
+      .collection("sites")
+      .doc(data["siteId"])
+      .collection("contact")
+      .doc(contact.id)
+      .set({});
+  } catch (e) {
+    console.log('Error adding contact :: '+e);
+    return { status: "failed", messege: e.toString() };
+  }
+  return { status: "success" };
 });
 
-    
+exports.updateContact = functions.https.onCall(async (data, context) => {
+  const teams = admin.firestore().collection("teams").doc(data["teamId"]); //setting referance
+  try {
+    await teams.collection("contacts").update(data["contact"]);
+  } catch (e) {
+    return { status: "failed", messege: e.toString() };
+  }
 
+  return { status: "success" };
+});
 
-  
+// exports.assignContact = functions.https.onCall(async (data, context) => {
+//   return admin.firestore().collection("teams").doc(data["teamId"])
+//   .collection("sites").doc(data["siteId"])
+//   .collection("contact").doc(contactid).set({});  //setting referance
+
+// });

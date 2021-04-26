@@ -37,7 +37,7 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              FutureProvider<List<Room>>(
+                              StreamProvider<List<Room>>(
                                 create: (context) =>
                                     FirebaseFirestoreProvider.getRooms(
                                         _siteList.elementAt(index).id),

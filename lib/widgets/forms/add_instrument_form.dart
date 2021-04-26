@@ -120,93 +120,84 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   @override
   Widget build(BuildContext context) {
-    return _uploading
-        ? Center(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: FittedBox(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          )
-        : SingleChildScrollView(
-            padding: EdgeInsets.only(
-                left: 25,
-                top: 5,
-                right: 25,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-            child: Form(
-              key: _instrumentForm,
-              child: DefaultTabController(
-                initialIndex: 0,
-                length: 2,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    tabbar, //defined in consts
-                    Container(
-                      height: 200,
-                      child: TabBarView(
-                        children: [
-                          Column(
-                            children: <Widget>[
-                              _buildNameField(),
-                              _buildCodeField(),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              _buildManifacturerField(),
-                              _buildModelField(),
-                              _buildPriceField(),
-                            ],
-                          ),
-                        ],
-                      ),
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+          left: 25,
+          top: 5,
+          right: 25,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+      child: Form(
+        key: _instrumentForm,
+        child: DefaultTabController(
+          initialIndex: 0,
+          length: 2,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              tabbar, //defined in consts
+              Container(
+                height: 200,
+                child: TabBarView(
+                  children: [
+                    Column(
+                      children: <Widget>[
+                        _buildNameField(),
+                        _buildCodeField(),
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: TextButton(
-                        child: Text(
-                          'Add New Instrument',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () async {
-                          FormState formState = _instrumentForm.currentState;
-
-                          if (formState != null) {
-                            if (manualValidation()) {
-                              //_instrumentForm.currentState.validate()) {
-                              formState.save();
-                              setState(() {
-                                _uploading = true;
-                              });
-                              //send to server
-                              await _uploadInstrument();
-                            }
-                          }
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith(getColor),
-                        ),
-                      ),
-                    )
+                    Column(
+                      children: <Widget>[
+                        _buildManifacturerField(),
+                        _buildModelField(),
+                        _buildPriceField(),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ),
-          );
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 10),
+                child: _uploading
+                    ? CircularProgressIndicator()
+                    : OutlinedButton(
+                        onPressed: _uploadInstrument,
+                        child: Text(
+                          'Add New Instrument',
+                        ),
+                        style: outlinedButtonStyle,
+                      ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  _uploadInstrument() {
-    try {
-      FirebaseFirestoreCloudFunctions.uploadInstrument(_newInstrument).then(
-        (_) async => await showDialog(
+  _uploadInstrument() async {
+    FormState formState = _instrumentForm.currentState;
+
+    if (formState != null && manualValidation()) {
+      formState.save();
+      setState(() {
+        _uploading = true;
+      });
+      try {
+        await FirebaseFirestoreCloudFunctions.uploadInstrument(_newInstrument)
+            .then((_) async => {
+                  Navigator.of(context).pop(),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Instrument Added Successfully!'),
+                    ),
+                  ),
+                });
+      } catch (error) {
+        showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text('Success!'),
-            content: Text('New Instrument created!\n'),
+            title: Text('Error!'),
+            content: Text('Operation failed\n' + error.toString()),
             actions: <Widget>[
               TextButton(
                 onPressed: Navigator.of(context).pop,
@@ -214,30 +205,14 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
               ),
             ],
           ),
-        ).then(
-          (_) => Navigator.of(context).pop(),
-        ),
-      );
-    } catch (error) {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text('Error!'),
-          content: Text('Operation failed\n' + error.toString()),
-          actions: <Widget>[
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: Text('Ok'),
-            ),
-          ],
-        ),
-      );
-    } finally {
-      setState(
-        () {
-          _uploading = false;
-        },
-      );
+        );
+      } finally {
+        setState(
+          () {
+            _uploading = false;
+          },
+        );
+      }
     }
   }
 

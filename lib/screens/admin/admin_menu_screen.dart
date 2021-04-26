@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/screens/admin/admin_contact_screen.dart';
 import 'package:teamshare/screens/admin/admin_instrument_screen.dart';
 import 'package:teamshare/screens/admin/admin_part_screen.dart';
 import 'package:teamshare/screens/admin/admin_site_screen.dart';
 
 class AdminMenuScreen extends StatelessWidget {
   static const String routeName = '/admin_menu_screen';
+  final String siteId;
+
+  const AdminMenuScreen({this.siteId});
 
   Widget createButton(IconData icon, void Function() click, String title,
       BuildContext context) {
@@ -116,8 +121,20 @@ class AdminMenuScreen extends StatelessWidget {
                   }, 'Parts', context),
                 ),
                 Expanded(
-                    child: createButton(Icons.perm_contact_calendar, null,
-                        'Contacts', context)),
+                    child: createButton(Icons.perm_contact_calendar, () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => StreamProvider<List<Contact>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getContacts(),
+                        initialData: [],
+                        child: AdminContactScreen(
+                          siteId: siteId,
+                        ),
+                      ),
+                    ),
+                  );
+                }, 'Contacts', context)),
               ],
             ),
           ],

@@ -9,6 +9,7 @@ import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 //import 'package:geocoder/geocoder.dart' as geo;
 import 'package:teamshare/models/site.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/screens/map_screen.dart';
 
@@ -107,102 +108,94 @@ class _AddSiteFormState extends State<AddSiteForm> {
 
   @override
   Widget build(BuildContext context) {
-    return _uploading
-        ? Center(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: FittedBox(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          )
-        : SingleChildScrollView(
-            padding: EdgeInsets.only(
-                left: 5,
-                right: 5,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-            child: Form(
-              key: _siteForm,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  SizedBox(
-                    height: 200,
-                    child: Row(
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+          left: 5,
+          right: 5,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+      child: Form(
+        key: _siteForm,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SizedBox(
+              height: 200,
+              child: Row(
+                children: [
+                  Flexible(
+                    flex: 2,
+                    fit: FlexFit.tight,
+                    child: Column(
                       children: [
-                        Flexible(
-                          flex: 2,
-                          fit: FlexFit.tight,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: _previewImageUrl == null
-                                      ? Icon(Icons.location_off_sharp)
-                                      : Image.network(
-                                          _previewImageUrl,
-                                          fit: BoxFit.fill,
-                                        ),
-                                ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.location_on),
-                                    tooltip: 'Current Location',
-                                    onPressed: _getCurrentLocation,
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.map),
-                                    tooltip: 'Select On Map',
-                                    onPressed: _selectOnMap,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          flex: 3,
-                          fit: FlexFit.tight,
+                        Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildNameField(),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(child: _buildAddressField()),
-                                  ],
-                                )
-                              ],
-                            ),
+                            child: _previewImageUrl == null
+                                ? Icon(Icons.location_off_sharp)
+                                : Image.network(
+                                    _previewImageUrl,
+                                    fit: BoxFit.fill,
+                                  ),
                           ),
-                        )
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.location_on),
+                              tooltip: 'Current Location',
+                              onPressed: _getCurrentLocation,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.map),
+                              tooltip: 'Select On Map',
+                              onPressed: _selectOnMap,
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 20),
-                    child: TextButton(
+                  Flexible(
+                    flex: 3,
+                    fit: FlexFit.tight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildNameField(),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(child: _buildAddressField()),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: _uploading
+                  ? CircularProgressIndicator()
+                  : OutlinedButton(
                       onPressed: _addSite,
                       child: Text(
                         'Add New Site',
                       ),
+                      style: outlinedButtonStyle,
                     ),
-                  ),
-                ],
-              ),
             ),
-          );
+          ],
+        ),
+      ),
+    );
   }
 
   void _addSite() async {
@@ -218,18 +211,14 @@ class _AddSiteFormState extends State<AddSiteForm> {
         //send to server
         try {
           await FirebaseFirestoreCloudFunctions.uploadSite(_newSite)
-              .then((_) async => await showDialog(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                        title: Text('Success!'),
-                        content: Text('New Site created!\n'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: Navigator.of(context).pop,
-                            child: Text('Ok'),
-                          ),
-                        ],
-                      )).then((_) => Navigator.of(context).pop()));
+              .then((_) async => {
+                    Navigator.of(context).pop(),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Site Added Successfully!'),
+                      ),
+                    ),
+                  });
         } catch (error) {
           showDialog(
               context: context,

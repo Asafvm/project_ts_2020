@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
@@ -150,6 +151,19 @@ class FirebaseFirestoreCloudFunctions {
           .toList(),
       "siteId": siteId,
       "roomId": roomId,
+    }).then((value) => print(value.data));
+  }
+
+  static Future<HttpsCallableResult> uploadContact(
+      String siteId, Contact newContact) async {
+    return await FirebaseFunctions.instance
+        .httpsCallable("addContact")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "siteId": siteId,
+      "contact": newContact.toJson(),
     });
   }
+
+  static linkContacts(List<Contact> selected, String id, String room) {}
 }

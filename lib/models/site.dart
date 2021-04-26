@@ -33,7 +33,6 @@ class Room {
   String roomNumber;
   String roomTitle;
   String decription;
-  List<String> instruments = [];
 
   Room({
     this.building = "",
@@ -41,17 +40,7 @@ class Room {
     this.roomNumber = "",
     this.roomTitle = "",
     this.decription = "",
-  }) {
-    this.instruments = [];
-  }
-
-  List<String> get getInstruments {
-    return instruments;
-  }
-
-  void addInstrument(String instrumentId) {
-    instruments.add(instrumentId);
-  }
+  });
 
   @override
   String toString() {
@@ -64,9 +53,7 @@ class Room {
         floor = data['floor'],
         roomNumber = data['roomNumber'],
         roomTitle = data['roomTitle'],
-        decription = data['decription'],
-        instruments =
-            List<String>.from(data['instruments']) ?? [] as List<String>;
+        decription = data['decription'];
 
   factory Room.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Room.fromJson(documentSnapshot.data(), documentSnapshot.id);
@@ -79,7 +66,6 @@ class Room {
       'roomNumber': roomNumber,
       'roomTitle': roomTitle,
       'decription': decription,
-      'instruments': instruments ?? []
     };
   }
 }

@@ -61,11 +61,12 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                       icon: Icon(Icons.picture_as_pdf),
                       tooltip: 'Add new form',
                       onPressed: () async {
-                        FilePickerResult result = await FilePicker.platform
-                            .pickFiles(
-                                allowMultiple: false,
-                                type: FileType.custom,
-                                allowedExtensions: ['pdf']);
+                        FilePickerResult result =
+                            await FilePicker.platform.pickFiles(
+                          allowMultiple: false,
+                          type: FileType.custom,
+                          allowedExtensions: ['pdf'],
+                        );
 
                         if (result != null) {
                           Navigator.push(

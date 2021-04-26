@@ -86,3 +86,7 @@ Color getColor(Set<MaterialState> states) {
   }
   return Colors.blue;
 }
+
+var outlinedButtonStyle = OutlinedButton.styleFrom(
+  side: BorderSide(color: Colors.blue),
+);

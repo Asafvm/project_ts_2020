@@ -87,52 +87,41 @@ class _AddRoomFormState extends State<AddRoomForm> {
 
   @override
   Widget build(BuildContext context) {
-    return _uploading
-        ? Center(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: FittedBox(
-                child: CircularProgressIndicator(),
-              ),
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+          left: 15,
+          top: 5,
+          right: 15,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+      child: Form(
+        key: _roomForm,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            _buildTitleField(),
+            Row(
+              children: [
+                Expanded(child: _buildBuildingField()),
+                Expanded(child: _buildfloorField()),
+                Expanded(child: _buildRoomNumberField()),
+              ],
             ),
-          )
-        : SingleChildScrollView(
-            padding: EdgeInsets.only(
-                left: 15,
-                top: 5,
-                right: 15,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 10),
-            child: Form(
-              key: _roomForm,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  _buildTitleField(),
-                  Row(
-                    children: [
-                      Expanded(child: _buildBuildingField()),
-                      Expanded(child: _buildfloorField()),
-                      Expanded(child: _buildRoomNumberField()),
-                    ],
-                  ),
-                  _buildDescriptionField(),
-                  Container(
-                      margin: EdgeInsets.symmetric(vertical: 20),
-                      child: TextButton(
+            _buildDescriptionField(),
+            Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: _uploading
+                    ? CircularProgressIndicator()
+                    : OutlinedButton(
                         onPressed: _uploadRoomDetails,
                         child: Text(
                           'Add Room',
-                          style: TextStyle(color: Colors.white),
                         ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith(getColor),
-                        ),
+                        style: outlinedButtonStyle,
                       ))
-                ],
-              ),
-            ),
-          );
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _uploadRoomDetails() async {
@@ -146,18 +135,14 @@ class _AddRoomFormState extends State<AddRoomForm> {
       try {
         await FirebaseFirestoreCloudFunctions.uploadRoom(
                 widget.siteId, _newRoom)
-            .then((_) async => await showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                      title: Text('Success!'),
-                      content: Text('New Room created!\n'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: Navigator.of(context).pop,
-                          child: Text('Ok'),
-                        ),
-                      ],
-                    )).then((_) => Navigator.of(context).pop()));
+            .then((_) async => {
+                  Navigator.of(context).pop(),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Room Added Successfully!'),
+                    ),
+                  ),
+                });
       } catch (error) {
         showDialog(
             context: context,

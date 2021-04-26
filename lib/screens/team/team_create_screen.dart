@@ -159,16 +159,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                           child: Text("Add From Contacts"),
                         ),
                         TextButton(
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith(getColor),
-                          ), // shape: RoundedRectangleBorder(
-                          //   borderRadius: BorderRadius.all(Radius.circular(25)),
-                          //   side: BorderSide(
-                          //       color: Colors.black,
-                          //       width: 1,
-                          //       style: BorderStyle.solid),
-                          // ),
                           onPressed: () async {
                             String email = await _getMailManually(context);
                             if (email.isNotEmpty) {
@@ -228,14 +218,21 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                       }),
                       members.add(Authentication().userEmail),
                       await FirebaseFirestoreCloudFunctions.addTeam(
-                          _name,
-                          _description,
-                          members.toList(),
-                          __imgPicked ? _picUrl : null),
-                      setState(() {
-                        _loading = false;
-                      }),
-                      Navigator.of(context).pop(),
+                              _name,
+                              _description,
+                              members.toList(),
+                              __imgPicked ? _picUrl : null)
+                          .onError((error, stackTrace) => {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Error adding team!\n${error.toString()}'))),
+                              })
+                          .whenComplete(() => {
+                                setState(() {
+                                  _loading = false;
+                                }),
+                                Navigator.of(context).pop(),
+                              }),
                     }
                   else
                     Applogger.consoleLog(
