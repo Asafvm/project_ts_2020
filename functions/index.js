@@ -38,8 +38,10 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
     await Promise.all(promises);
   } catch (e) {
     console.log("Error adding members ::" + e);
+    return { status: "failed", messege: e.toString() };
   }
-  return teamid.id;
+
+  return { status: "success", 'teamId' : teamid.id };
 });
 
 //add field to team document
@@ -56,11 +58,11 @@ exports.updateTeam = functions.https.onCall(async (data, context) => {
     .update(teamdata)
     .then((val) => {
       console.log("success: updated team info ");
-      return true;
+      return { status: "success"};
     })
-    .catch((err) => {
-      console.log("could not updated team info. error: " + err);
-      return false;
+    .catch((e) => {
+      console.log("could not updated team info. error: " + e);
+      return { status: "failed", messege: e.toString() };
     });
 });
 
@@ -329,9 +331,53 @@ exports.updateContact = functions.https.onCall(async (data, context) => {
   return { status: "success" };
 });
 
-// exports.assignContact = functions.https.onCall(async (data, context) => {
-//   return admin.firestore().collection("teams").doc(data["teamId"])
-//   .collection("sites").doc(data["siteId"])
-//   .collection("contact").doc(contactid).set({});  //setting referance
+exports.linkContacts = functions.https.onCall(async (data, context) => {
+  const contactRef = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"]).collection("contacts");
 
-// });
+  try {
+    const promises = [];
+    const contacts = data["contacts"];
+
+    contacts.forEach((contact) => {
+      const p = contactRef
+        add(contact)
+    });
+
+      promises.push(p);
+  
+    await Promise.all(promises);
+  } catch (e) {
+    console.log("Error assigning contact :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
+});
+
+exports.unlinkContacts = functions.https.onCall(async (data, context) => {
+  const contactRef = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"]).collection("sites").doc(data["siteId"]).collection("contacts");
+
+
+  try {
+    const promises = [];
+    const contacts = data["contacts"];
+
+    contacts.forEach((contact) => {
+      const p = contactRef
+        add(contact)
+    });
+
+      promises.push(p);
+  
+    await Promise.all(promises);
+  } catch (e) {
+    console.log("Error assigning contact :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
+});

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/material.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
@@ -22,7 +23,7 @@ class FirebaseFirestoreCloudFunctions {
   static const String rooms = "rooms";
 //Get from Firebase
 
-  static Future<void> addTeam(String name, String description,
+  static Future<HttpsCallableResult> addTeam(String name, String description,
       [List<String> members = const [], String picUrl]) async {
     //step 1: upload team and get id
     HttpsCallableResult teaminfo = await FirebaseFunctions.instance
@@ -36,23 +37,29 @@ class FirebaseFirestoreCloudFunctions {
       "members": members,
     });
 
-    String teamid = teaminfo.data;
-    Applogger.consoleLog(MessegeType.info,
-        "Team created successfuly without logo. teamid: $teamid\n");
-    //step 2: user team id to upload pic to team folder
-    if (picUrl != null) {
-      String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
-          File(picUrl), '$teamid', 'logoUrl');
+    //check status
+    var response = teaminfo.data;
+    if (response["status"] == "success") {
+      String teamid = response["teamId"];
+      Applogger.consoleLog(MessegeType.info,
+          "Team created successfuly without logo. teamid: $teamid\n");
+      //step 2: user team id to upload pic to team folder
+      if (picUrl != null) {
+        String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
+            File(picUrl), '$teamid', 'logoUrl');
 
-      await FirebaseFunctions.instance
-          .httpsCallable("updateTeam")
-          .call(<String, dynamic>{
-        'teamid': teamid,
-        'data': {
-          'logoUrl': firestoragePicUrl,
-        }
-      }).then((value) => Applogger.consoleLog(
-              MessegeType.info, "Team created successfuly"));
+        return await FirebaseFunctions.instance
+            .httpsCallable("updateTeam")
+            .call(<String, dynamic>{
+          'teamid': teamid,
+          'data': {
+            'logoUrl': firestoragePicUrl,
+          }
+        });
+      }
+      return teaminfo;
+    } else {
+      return teaminfo;
     }
   }
 
@@ -161,7 +168,7 @@ class FirebaseFirestoreCloudFunctions {
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "siteId": siteId,
-      "contact": newContact.toJson(),
+      "contacts": newContact.toJson(),
     });
   }
 

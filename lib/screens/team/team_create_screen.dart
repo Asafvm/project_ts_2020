@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,7 +26,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
   Set<String> members = Set<String>(); //using set to avoid duplicates
   bool __imgPicked = false;
   String _picUrl = 'assets/pics/add_image.png';
-
+  bool _loading = false;
   @override
   void initState() {
     setState(() {
@@ -199,8 +200,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
   }
 
   void _createTeam() {
-    bool _loading = false;
-
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -210,34 +209,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
             content: Text("Create $_name?"),
             actions: [
               TextButton(
-                onPressed: () async => {
-                  if (Authentication().isAuth)
-                    {
-                      setState(() {
-                        _loading = true;
-                      }),
-                      members.add(Authentication().userEmail),
-                      await FirebaseFirestoreCloudFunctions.addTeam(
-                              _name,
-                              _description,
-                              members.toList(),
-                              __imgPicked ? _picUrl : null)
-                          .onError((error, stackTrace) => {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(
-                                        'Error adding team!\n${error.toString()}'))),
-                              })
-                          .whenComplete(() => {
-                                setState(() {
-                                  _loading = false;
-                                }),
-                                Navigator.of(context).pop(),
-                              }),
-                    }
-                  else
-                    Applogger.consoleLog(
-                        MessegeType.error, "User is not connected")
-                },
+                onPressed: _uploadTeam,
                 child: _loading ? CircularProgressIndicator() : Text("Ok"),
               ),
               TextButton(
@@ -328,5 +300,38 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
       },
       context: context,
     );
+  }
+
+  void _uploadTeam() async {
+    if (Authentication().isAuth) {
+      setState(() {
+        _loading = true;
+      });
+      members.add(Authentication().userEmail);
+
+      HttpsCallableResult result =
+          await FirebaseFirestoreCloudFunctions.addTeam(_name, _description,
+              members.toList(), __imgPicked ? _picUrl : null);
+
+      if (result.data["status"] == "success") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Team Added Successfully'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error adding team!\n${result.data["messege"]}'),
+          ),
+        );
+      }
+
+      setState(() {
+        _loading = false;
+      });
+      Navigator.of(context).pop();
+    } else
+      Applogger.consoleLog(MessegeType.error, "User is not connected");
   }
 }
