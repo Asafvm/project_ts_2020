@@ -13,7 +13,6 @@ class ContactSelectionScreen extends StatefulWidget {
 
 class _ContactSelectionScreenState extends State<ContactSelectionScreen> {
   List<Contact> _selectedContacts = [];
-  int _oldContactListLength = 0;
   List<Contact> _contactList;
   List<bool> _selectableList;
   int _oldSelectableListLength = 0;
