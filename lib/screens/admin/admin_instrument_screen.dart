@@ -21,7 +21,7 @@ class _AdminInstrumentScreenState extends State<AdminInstrumentScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
-          Icons.add,
+          Icons.add_to_queue,
           color: Colors.white,
         ),
         onPressed: () => _openAddInstrument(context),

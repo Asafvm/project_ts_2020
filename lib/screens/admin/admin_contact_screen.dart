@@ -19,11 +19,13 @@ class _AdminContactScreenState extends State<AdminContactScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Manage Contacts"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _openAddContactForm(context))
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.person_add_alt_1,
+          color: Colors.white,
+        ),
+        onPressed: () => _openAddContactForm(context),
       ),
       body: contacts.isEmpty
           ? Center(child: Text("No contacts registered for this site"))

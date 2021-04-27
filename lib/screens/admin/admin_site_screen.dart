@@ -21,7 +21,7 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
-          Icons.add,
+          Icons.add_location_alt_rounded,
           color: Colors.white,
         ),
         onPressed: () => _openAddSite(context),
@@ -29,7 +29,7 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: _siteList.isEmpty
-            ? Center(child: Text("You haven't registered any _siteList yet"))
+            ? Center(child: Text("You haven't registered any sites yet"))
             : ListView.builder(
                 key: UniqueKey(), //new Key(Strings.randomString(20)),
                 itemBuilder: (ctx, index) => GestureDetector(
