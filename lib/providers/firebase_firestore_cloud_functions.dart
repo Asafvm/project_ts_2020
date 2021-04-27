@@ -31,7 +31,7 @@ class FirebaseFirestoreCloudFunctions {
       "teamInfo": {
         "name": name,
         "description": description,
-        "creatorEmail": Authentication().userEmail,
+        "creatorEmail": Authentication().userEmail.toLowerCase(),
       },
       "members": members,
     });

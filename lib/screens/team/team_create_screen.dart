@@ -163,7 +163,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                             String email = await _getMailManually(context);
                             if (email.isNotEmpty) {
                               setState(() {
-                                members.add(email);
+                                members.add(email.toLowerCase());
                               });
                             }
                           },
