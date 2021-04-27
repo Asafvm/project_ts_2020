@@ -42,7 +42,7 @@ class FirebaseFirestoreCloudFunctions {
     //step 2: user team id to upload pic to team folder
     if (picUrl != null) {
       String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
-          File(picUrl), '$teams/$teamid', 'logoUrl');
+          File(picUrl), '$teamid', 'logoUrl');
 
       await FirebaseFunctions.instance
           .httpsCallable("updateTeam")

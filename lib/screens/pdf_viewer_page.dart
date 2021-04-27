@@ -250,8 +250,8 @@ class _PDFScreenState extends State<PDFScreen> {
       File file = File(widget.pathPDF);
 
       if (file != null && Authentication().isAuth) {
-        final String instrumentPath = "instruments/" +
-            TeamProvider().getCurrentTeam.getTeamId +
+        final String instrumentPath = TeamProvider().getCurrentTeam.getTeamId +
+            "/instruments/" +
             widget.instrumentID +
             "/";
         if (!widget.onlyFields) {
