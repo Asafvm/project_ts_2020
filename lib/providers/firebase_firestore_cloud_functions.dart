@@ -47,7 +47,7 @@ class FirebaseFirestoreCloudFunctions {
         String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
             File(picUrl), '$teamid', 'logoUrl');
 
-        return await FirebaseFunctions.instance
+        var result = await FirebaseFunctions.instance
             .httpsCallable("updateTeam")
             .call(<String, dynamic>{
           'teamid': teamid,
@@ -55,6 +55,7 @@ class FirebaseFirestoreCloudFunctions {
             'logoUrl': firestoragePicUrl,
           }
         });
+        return result;
       }
       return teaminfo;
     } else {

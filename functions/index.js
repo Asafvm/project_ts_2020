@@ -53,17 +53,18 @@ exports.updateTeam = functions.https.onCall(async (data, context) => {
   console.log(teamid + " Url=" + teamdata);
   console.log("Url2=" + teamdata["logoUrl"]);
   // eslint-disable-next-line promise/no-nesting
-  teams
+  try{
+  await teams
     .doc(teamid)
-    .update(teamdata)
-    .then((val) => {
-      console.log("success: updated team info ");
-      return { status: "success"};
-    })
-    .catch((e) => {
-      console.log("could not updated team info. error: " + e);
-      return { status: "failed", messege: e.toString() };
-    });
+    .update(teamdata);
+    console.log("success: updated team info ");
+    return { status: "success"};
+
+  }catch(e){
+    console.log("could not updated team info. error: " + e);
+    return { status: "failed", messege: e.toString() };
+  }
+    
 });
 
 //register team at user profile automatically
