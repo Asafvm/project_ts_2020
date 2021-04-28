@@ -26,28 +26,6 @@ class _MainScreenState extends State<MainScreen> {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              } else if (snapshot.hasData) {
-                var data = snapshot.data.docs;
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(10),
-                        itemBuilder: (ctx, index) {
-                          return TeamThumbnail(
-                            key: UniqueKey(),
-                            teamDocId: data[index].id,
-                          );
-                        },
-                        itemCount: data.length,
-                        shrinkWrap: true,
-                      ),
-                    ),
-                  ],
-                );
               } else {
                 if (snapshot.error != null) {
                   return Center(
@@ -60,25 +38,50 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("You are not part of a team... yet"),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            createTeam(context);
-                          },
-                          icon: Icon(Icons.create),
-                          label: Text("Create"),
-                        ),
-                      ),
-                      Text("Your team now!"),
-                    ],
-                  ),
-                );
+                if (snapshot.hasData) {
+                  var data = snapshot.data.docs;
+                  return data.length == 0
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("You are not part of a team... yet"),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    createTeam(context);
+                                  },
+                                  icon: Icon(Icons.create),
+                                  label: Text("Create"),
+                                ),
+                              ),
+                              Text("Your team now!"),
+                            ],
+                          ),
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(10),
+                                itemBuilder: (ctx, index) {
+                                  return TeamThumbnail(
+                                    key: UniqueKey(),
+                                    teamDocId: data[index].id,
+                                  );
+                                },
+                                itemCount: data.length,
+                                shrinkWrap: true,
+                              ),
+                            ),
+                          ],
+                        );
+                } else
+                  return Container();
               }
             }),
         floatingActionButton: FloatingActionButton(
