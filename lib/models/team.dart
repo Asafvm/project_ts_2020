@@ -20,6 +20,6 @@ class Team {
   Team.fromJson(Map<String, dynamic> data)
       : name = data['name'].toString().trim(),
         description = data['description'].toString().trim(),
-        logoUrl = data['logoUrl'].toString().trim(),
+        logoUrl = data['logoUrl'],
         creatorEmail = data['creatorEmail'].toString().trim();
 }
