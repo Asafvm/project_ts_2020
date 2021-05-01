@@ -168,9 +168,19 @@ class FirebaseFirestoreCloudFunctions {
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "siteId": siteId,
-      "contacts": newContact.toJson(),
+      "contact": newContact.toJson(),
     });
   }
 
-  static linkContacts(List<Contact> selected, String id, String room) {}
+  static Future<HttpsCallableResult> linkContacts(
+      List<Contact> selected, String siteId, String roomId) async {
+    return await FirebaseFunctions.instance
+        .httpsCallable("linkContacts")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "siteId": siteId,
+      "roomId": roomId,
+      "contacts": selected.map((contact) => {"contactId": contact.id}).toList(),
+    });
+  }
 }

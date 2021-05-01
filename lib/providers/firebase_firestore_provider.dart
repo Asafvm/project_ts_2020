@@ -125,4 +125,17 @@ class FirebaseFirestoreProvider {
               .toList(),
         );
   }
+
+  static Stream<List<String>> getContactsAtSite(String siteId, String roomId) {
+    String contactRef =
+        '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$rooms/$roomId/$contacts';
+
+    return FirebaseFirestore.instance.collection(contactRef).snapshots().map(
+          (query) => query.docs
+              .map(
+                (doc) => doc.id,
+              )
+              .toList(),
+        );
+  }
 }

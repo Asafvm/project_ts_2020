@@ -27,11 +27,7 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
     const promises = [];
     members.forEach((member) => {
       console.log("Adding member " + member);
-      const p = teams
-        .doc(teamid.id)
-        .collection("members")
-        .doc(member)
-        .set({});
+      const p = teams.doc(teamid.id).collection("members").doc(member).set({});
 
       promises.push(p);
     });
@@ -41,7 +37,7 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
     return { status: "failed", messege: e.toString() };
   }
 
-  return { status: "success", 'teamId' : teamid.id };
+  return { status: "success", teamId: teamid.id };
 });
 
 //add field to team document
@@ -53,18 +49,14 @@ exports.updateTeam = functions.https.onCall(async (data, context) => {
   console.log(teamid + " Url=" + teamdata);
   console.log("Url2=" + teamdata["logoUrl"]);
   // eslint-disable-next-line promise/no-nesting
-  try{
-  await teams
-    .doc(teamid)
-    .update(teamdata);
+  try {
+    await teams.doc(teamid).update(teamdata);
     console.log("success: updated team info ");
-    return { status: "success"};
-
-  }catch(e){
+    return { status: "success" };
+  } catch (e) {
     console.log("could not updated team info. error: " + e);
     return { status: "failed", messege: e.toString() };
   }
-    
 });
 
 //register team at user profile automatically
@@ -307,15 +299,19 @@ exports.addContact = functions.https.onCall(async (data, context) => {
 
   try {
     var contact = await teams.collection("contacts").add(data["contact"]);
-    console.log("New Contact ID : "+contact.id);
-    teams
-      .collection("sites")
-      .doc(data["siteId"])
-      .collection("contact")
-      .doc(contact.id)
-      .set({});
+    console.log("New Contact ID : " + contact.id);
+
+    var siteId = data["siteId"];
+    if (siteId !== null) {
+      teams
+        .collection("sites")
+        .doc(data["siteId"])
+        .collection("contact")
+        .doc(contact.id)
+        .set({});
+    }
   } catch (e) {
-    console.log('Error adding contact :: '+e);
+    console.log("Error adding contact :: " + e);
     return { status: "failed", messege: e.toString() };
   }
   return { status: "success" };
@@ -333,22 +329,24 @@ exports.updateContact = functions.https.onCall(async (data, context) => {
 });
 
 exports.linkContacts = functions.https.onCall(async (data, context) => {
+
   const contactRef = admin
     .firestore()
     .collection("teams")
-    .doc(data["teamId"]).collection("contacts");
+    .doc(data["teamId"])
+    .collection("sites")
+    .doc(data["siteId"])
+    .collection("rooms")
+    .doc(data["roomId"])
+    .collection("contacts");
 
   try {
     const promises = [];
     const contacts = data["contacts"];
-
     contacts.forEach((contact) => {
-      const p = contactRef
-        add(contact)
-    });
-
+      const p = contactRef.doc(contact.contactId).set({});
       promises.push(p);
-  
+    });
     await Promise.all(promises);
   } catch (e) {
     console.log("Error assigning contact :: " + e);
@@ -361,20 +359,22 @@ exports.unlinkContacts = functions.https.onCall(async (data, context) => {
   const contactRef = admin
     .firestore()
     .collection("teams")
-    .doc(data["teamId"]).collection("sites").doc(data["siteId"]).collection("contacts");
-
+    .doc(data["teamId"])
+    .collection("sites")
+    .doc(data["siteId"])
+    .collection("rooms")
+    .doc(data["roomId"])
+    .collection("contacts");
 
   try {
     const promises = [];
     const contacts = data["contacts"];
 
     contacts.forEach((contact) => {
-      const p = contactRef
-        add(contact)
+      const p = contactRef.doc(contact.contactId).delete();
+      promises.push(p);
     });
 
-      promises.push(p);
-  
     await Promise.all(promises);
   } catch (e) {
     console.log("Error assigning contact :: " + e);

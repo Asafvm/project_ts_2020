@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:teamshare/models/contact.dart';
+import 'package:teamshare/models/site.dart';
 
 class ContactListTile extends StatelessWidget {
-  final text;
-  ContactListTile(this.text);
+  final Contact contact;
+  final String siteName;
+  final Room room;
+
+  ContactListTile({this.contact, this.siteName, this.room});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        TextField(
-          keyboardType: TextInputType.emailAddress,
-        ),
-        Checkbox(
-          onChanged: (value) {},
-          value: false,
-        ),
-      ],
+    return ListTile(
+      leading: Icon(Icons.person),
+      title: Text(contact.getFullName()),
+      subtitle: Text('$siteName - ${room.toString()}'),
     );
   }
 }

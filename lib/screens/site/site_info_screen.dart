@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/location_helper.dart';
@@ -10,6 +11,7 @@ import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/contact/contact_selection_screen.dart';
 import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';
+import 'package:teamshare/widgets/list_items/contact_list_tile.dart';
 import 'package:teamshare/widgets/list_items/instrument_instance_list_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -54,6 +56,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
 
   @override
   Widget build(BuildContext context) {
+    List<Contact> contactList = Provider.of<List<Contact>>(context);
     List<Room> roomList = Provider.of<List<Room>>(context);
     mediaQuery = MediaQuery.of(context);
 
@@ -242,8 +245,38 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                         )),
                         //Contacts
                         Container(
-                          child: Center(
-                            child: Text("There"),
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              ...roomList.map(
+                                (room) => StreamBuilder<List<String>>(
+                                  stream: FirebaseFirestoreProvider
+                                      .getContactsAtSite(
+                                          widget.site.id, room.id),
+                                  initialData: [],
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      List<Contact> list = contactList
+                                          .where((contact) => snapshot.data
+                                              .contains(contact.id))
+                                          .toList();
+                                      return ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: list.length,
+                                        itemBuilder: (context, index) {
+                                          return ContactListTile(
+                                            contact: list[index],
+                                            siteName: widget.site.name,
+                                            room: room,
+                                          );
+                                        },
+                                      );
+                                    } else
+                                      return Container();
+                                  },
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ],
@@ -344,10 +377,14 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
       },
     ));
 
-    await FirebaseFirestoreCloudFunctions.linkContacts(
-        selected, widget.site.id, room);
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Assigning completed!')));
+    HttpsCallableResult result =
+        await FirebaseFirestoreCloudFunctions.linkContacts(
+            selected, widget.site.id, room);
+    if (result.data["status"] == "success")
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Assigning completed!')));
+    else
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Assigning failed!')));
   }
 }
