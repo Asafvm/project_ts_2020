@@ -4,6 +4,7 @@ import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
+import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/team_provider.dart';
 
 import 'authentication.dart';
@@ -18,12 +19,17 @@ class FirebaseFirestoreProvider {
   static const String sites = "sites";
   static const String rooms = "rooms";
   static const String contacts = "contacts";
+  static const String members = "members";
   static const String parts = "parts";
 //Get from Firebase
 
-  static Stream<QuerySnapshot> getUserTeamList() {
+  static Stream<List<String>> getUserTeamList() {
     String teamsRef = "$users/${Authentication().userEmail}/$teams";
-    return FirebaseFirestore.instance.collection(teamsRef).snapshots();
+    Stream<List<String>> stream =
+        FirebaseFirestore.instance.collection(teamsRef).snapshots().map(
+              (query) => query.docs.map((doc) => doc.id).toList(),
+            );
+    return stream;
   }
 
   static Stream<List<Part>> getParts() {
@@ -79,13 +85,11 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  static Stream<Map<String, dynamic>> getTeamInfo(String teamDocId) {
-    return FirebaseFirestore.instance
+  static Future<Team> getTeamInfo(String teamDocId) async {
+    return Team.fromFirebase(await FirebaseFirestore.instance
         .collection("teams")
         .doc(teamDocId)
-        .get()
-        .then((value) => value.data())
-        .asStream();
+        .get());
   }
 
   static Stream<List<Site>> getSites() {
@@ -131,6 +135,19 @@ class FirebaseFirestoreProvider {
         '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$rooms/$roomId/$contacts';
 
     return FirebaseFirestore.instance.collection(contactRef).snapshots().map(
+          (query) => query.docs
+              .map(
+                (doc) => doc.id,
+              )
+              .toList(),
+        );
+  }
+
+  static Stream<List<String>> getTeamMembers(String getTeamId) {
+    String membersRef =
+        '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$members';
+
+    return FirebaseFirestore.instance.collection(membersRef).snapshots().map(
           (query) => query.docs
               .map(
                 (doc) => doc.id,

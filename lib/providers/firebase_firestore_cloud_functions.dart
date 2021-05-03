@@ -44,23 +44,44 @@ class FirebaseFirestoreCloudFunctions {
           "Team created successfuly without logo. teamid: $teamid\n");
       //step 2: user team id to upload pic to team folder
       if (picUrl != null) {
-        String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
-            File(picUrl), '$teamid', 'logoUrl');
-
-        var result = await FirebaseFunctions.instance
-            .httpsCallable("updateTeam")
-            .call(<String, dynamic>{
-          'teamid': teamid,
-          'data': {
-            'logoUrl': firestoragePicUrl,
-          }
-        });
-        return result;
+        return updateTeamLogo(url: picUrl, teamid: teamid);
       }
       return teaminfo;
     } else {
       return teaminfo;
     }
+  }
+
+  static Future<HttpsCallableResult> addTeamMember(
+      String teamid, List<String> members) async {
+    //step 1: upload team and get id
+    return await FirebaseFunctions.instance
+        .httpsCallable("addTeamMember")
+        .call(<String, dynamic>{
+      'teamId': teamid,
+      "members": members,
+    });
+  }
+
+  static Future<HttpsCallableResult> updateTeamLogo(
+      {String url, String teamid}) async {
+    String firestoragePicUrl = await FirebaseStorageProvider.uploadFile(
+        File(url), '$teamid', 'logoUrl');
+    return await updateTeam(
+        teamid: teamid, data: {'logoUrl': firestoragePicUrl});
+  }
+
+  static Future<HttpsCallableResult> updateTeam(
+      {String teamid, Map<String, dynamic> data}) async {
+    return await FirebaseFunctions.instance
+        .httpsCallable("updateTeam")
+        .call(<String, dynamic>{
+      'teamid': teamid,
+      'data': data,
+      // {
+      //   data,
+      // }
+    });
   }
 
   static Future<void> uploadPart(Part _newPart) async {

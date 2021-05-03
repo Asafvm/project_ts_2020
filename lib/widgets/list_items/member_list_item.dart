@@ -24,18 +24,20 @@ class MemberListItem extends StatelessWidget {
                 textAlign: TextAlign.start,
               ),
             ),
-            Switch(
-              activeColor: Theme.of(context).primaryColor,
-              onChanged: (bool value) {},
-              value: false,
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.remove_circle,
-                color: Colors.red,
+            if (removeFunction != null)
+              Switch(
+                activeColor: Theme.of(context).primaryColor,
+                onChanged: (bool value) {},
+                value: false,
               ),
-              onPressed: () => removeFunction(name),
-            ),
+            if (removeFunction != null)
+              IconButton(
+                icon: Icon(
+                  Icons.remove_circle,
+                  color: Colors.red,
+                ),
+                onPressed: () => removeFunction(name),
+              ),
           ],
         ),
       ),

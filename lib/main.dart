@@ -52,9 +52,13 @@ class TeamShare extends StatelessWidget {
               ChangeNotifierProvider.value(
                 value: Authentication(),
               ),
-              ChangeNotifierProvider.value(
-                value: TeamProvider(),
-              ),
+              // ChangeNotifierProvider.value(
+              //   value: TeamProvider(),
+              // ),
+              StreamProvider<List<String>>(
+                  create: (context) =>
+                      FirebaseFirestoreProvider.getUserTeamList(),
+                  initialData: []),
             ],
             child: Consumer<Authentication>(
               builder: (ctx, auth, _) {
@@ -83,23 +87,25 @@ class TeamShare extends StatelessWidget {
                   routes: {
                     MainScreen.routeName: (ctx) => MainScreen(),
                     AdminMenuScreen.routeName: (ctx) =>
-                        MultiProvider(providers: [
-                          StreamProvider<List<Instrument>>(
-                            create: (context) =>
-                                FirebaseFirestoreProvider.getInstruments(),
-                            initialData: [],
-                          ),
-                          StreamProvider<List<Part>>(
-                            create: (context) =>
-                                FirebaseFirestoreProvider.getParts(),
-                            initialData: [],
-                          ),
-                          StreamProvider<List<Site>>(
-                            create: (context) =>
-                                FirebaseFirestoreProvider.getSites(),
-                            initialData: [],
-                          )
-                        ], child: AdminMenuScreen()),
+                        // MultiProvider(providers: [
+                        //   StreamProvider<List<Instrument>>(
+                        //     create: (context) =>
+                        //         FirebaseFirestoreProvider.getInstruments(),
+                        //     initialData: [],
+                        //   ),
+                        //   StreamProvider<List<Part>>(
+                        //     create: (context) =>
+                        //         FirebaseFirestoreProvider.getParts(),
+                        //     initialData: [],
+                        //   ),
+                        //   StreamProvider<List<Site>>(
+                        //     create: (context) =>
+                        //         FirebaseFirestoreProvider.getSites(),
+                        //     initialData: [],
+                        //   )
+                        // ], child:
+                        AdminMenuScreen()
+                    // ),
                   },
                 );
               },

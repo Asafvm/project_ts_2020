@@ -5,10 +5,12 @@ import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/admin/admin_contact_screen.dart';
 import 'package:teamshare/screens/admin/admin_instrument_screen.dart';
 import 'package:teamshare/screens/admin/admin_part_screen.dart';
 import 'package:teamshare/screens/admin/admin_site_screen.dart';
+import 'package:teamshare/screens/admin/admin_team_managment_screen.dart';
 
 class AdminMenuScreen extends StatelessWidget {
   static const String routeName = '/admin_menu_screen';
@@ -68,8 +70,19 @@ class AdminMenuScreen extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: createButton(
-                      Icons.group, null, 'Team Managment', context),
+                  child: createButton(Icons.group, () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => StreamProvider<List<String>>(
+                          initialData: [],
+                          create: (context) =>
+                              FirebaseFirestoreProvider.getTeamMembers(
+                                  TeamProvider().getCurrentTeam.getTeamId),
+                          child: AdminTeamManagmentScreen(),
+                        ),
+                      ),
+                    );
+                  }, 'Team Managment', context),
                 ),
               ],
             ),

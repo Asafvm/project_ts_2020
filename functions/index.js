@@ -26,7 +26,6 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
 
     const promises = [];
     members.forEach((member) => {
-      console.log("Adding member " + member);
       const p = teams.doc(teamid.id).collection("members").doc(member).set({});
 
       promises.push(p);
@@ -40,14 +39,34 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
   return { status: "success", teamId: teamid.id };
 });
 
+//add team member
+exports.addTeamMember = functions.https.onCall(async (data, context) => {
+  const teams = admin.firestore().collection("teams").doc(data["teamId"]).collection("members"); //setting referance
+
+  try {
+    const members = data["members"];
+
+    const promises = [];
+    members.forEach((member) => {
+      const p = teams.doc(member).set({});
+
+      promises.push(p);
+    });
+    await Promise.all(promises);
+  } catch (e) {
+    console.log("Error adding members ::" + e);
+    return { status: "failed", messege: e.toString() };
+  }
+
+  return { status: "success" };
+});
+
 //add field to team document
 exports.updateTeam = functions.https.onCall(async (data, context) => {
   const teams = admin.firestore().collection("teams");
   const teamid = data["teamid"];
   const teamdata = data["data"];
 
-  console.log(teamid + " Url=" + teamdata);
-  console.log("Url2=" + teamdata["logoUrl"]);
   // eslint-disable-next-line promise/no-nesting
   try {
     await teams.doc(teamid).update(teamdata);
