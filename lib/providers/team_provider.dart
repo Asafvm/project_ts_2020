@@ -18,10 +18,12 @@ class TeamProvider with ChangeNotifier {
 
   void setCurrentTeam(Team team) {
     _currentTeam = team;
+    notifyListeners();
   }
 
   void clearCurrentTeam() {
     _currentTeam = null;
+    notifyListeners();
   }
 
   Team get getCurrentTeam => _currentTeam;

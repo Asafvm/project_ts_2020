@@ -78,9 +78,6 @@ class FirebaseFirestoreCloudFunctions {
         .call(<String, dynamic>{
       'teamid': teamid,
       'data': data,
-      // {
-      //   data,
-      // }
     });
   }
 

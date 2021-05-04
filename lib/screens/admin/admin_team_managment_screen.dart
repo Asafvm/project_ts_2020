@@ -20,6 +20,10 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
   List<String> members = [];
   final scaffoldState = GlobalKey<ScaffoldState>();
 
+  bool _isExpanded = false;
+
+  int _maxLines = 2;
+
   @override
   Widget build(BuildContext context) {
     members = Provider.of<List<String>>(context);
@@ -75,9 +79,17 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
           ),
           Expanded(
             flex: 1,
-            child: Text(
-              currentTeam.description,
-              textAlign: TextAlign.left,
+            child: Container(
+              color: Colors.black12,
+              padding: const EdgeInsets.all(15),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  currentTeam.description,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: _isExpanded ? null : _maxLines,
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -280,6 +292,7 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
               controller: descText,
               decoration: InputDecoration(hintText: "Description"),
               maxLength: 200,
+              maxLines: null,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -291,7 +304,7 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
                           data: {
                             'name': teamText.text,
                             'description': descText.text
-                          });
+                          }).whenComplete(() => Navigator.of(context).pop());
                     },
                     child: Text("Save")),
                 TextButton(
