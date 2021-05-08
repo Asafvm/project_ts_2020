@@ -1,76 +1,82 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Instrument {
-  String _manifacturer = "";
-  String _reference = "";
-  String _codeName = "";
-  String _model = "";
-  double _price = 0.0;
+  String id = "";
+  String manifacturer = "";
+  String reference = "";
+  String codeName = "";
+  String model = "";
+  double price = 0.0;
+  String imgUrl;
 
   Instrument() {
-    _manifacturer = "";
-    _reference = "";
-    _codeName = "";
-    _model = "";
-    _price = 0.0;
+    id = "";
+    manifacturer = "";
+    reference = "";
+    codeName = "";
+    model = "";
+    price = 0.0;
   }
 
   String getManifacturer() {
-    return this._manifacturer;
+    return this.manifacturer;
   }
 
   void setManifacturer(String manifacturer) {
-    this._manifacturer = manifacturer == null ? "Unknown" : manifacturer;
+    this.manifacturer = manifacturer == null ? "Unknown" : manifacturer;
   }
 
   String getReference() {
-    return this._reference;
+    return this.reference;
   }
 
   void setReference(String reference) {
-    this._reference = reference;
+    this.reference = reference;
   }
 
   String getCodeName() {
-    return this._codeName;
+    return this.codeName;
   }
 
   void setCodeName(String codeName) {
-    this._codeName = codeName;
+    this.codeName = codeName;
   }
 
   String getModel() {
-    return this._model;
+    return this.model;
   }
 
   void setModel(String model) {
-    this._model = model;
+    this.model = model;
   }
 
   double getPrice() {
-    return this._price;
+    return this.price;
   }
 
   void setPrice(double price) {
-    this._price = price;
+    this.price = price;
   }
 
   Map<String, dynamic> toJson() => {
-        'manifacturer': _manifacturer,
-        'reference': _reference,
-        'codeName': _codeName,
-        'model': _model,
-        'price': _price.toDouble(),
+        'manifacturer': manifacturer,
+        'reference': reference,
+        'codeName': codeName,
+        'model': model,
+        'price': price.toDouble(),
+        'imgUrl': imgUrl,
       };
 
-  Instrument.fromJson(Map<String, dynamic> data)
-      : _manifacturer = data['manifacturer'].toString().trim(),
-        _reference = data['reference'].toString().trim(),
-        _codeName = data['codeName'].toString().trim(),
-        _model = data['model'].toString().trim(),
-        _price = double.parse(data['price'].toString()); //stupid, but works
+  Instrument.fromJson(Map<String, dynamic> data, String id)
+      : id = id,
+        manifacturer = data['manifacturer'].toString().trim(),
+        reference = data['reference'].toString().trim(),
+        codeName = data['codeName'].toString().trim(),
+        model = data['model'].toString().trim(),
+        price = double.parse(data['price'].toString()), //stupid, but works
+        imgUrl = data['imgUrl'].toString().trim() ?? null;
 
   factory Instrument.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Instrument.fromJson(documentSnapshot.data());
+    return Instrument.fromJson(documentSnapshot.data(), documentSnapshot.id);
   }
 }

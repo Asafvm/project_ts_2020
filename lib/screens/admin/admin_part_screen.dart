@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/widgets/forms/add_part_form.dart';
 import 'package:teamshare/widgets/list_items/part_list_item.dart';
 
@@ -44,7 +46,11 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
     showModalBottomSheet(
         context: context,
         builder: (_) {
-          return AddPartForm();
+          return StreamProvider<List<Instrument>>(
+            create: (context) => FirebaseFirestoreProvider.getInstruments(),
+            initialData: [],
+            child: AddPartForm(),
+          );
         });
   }
 }

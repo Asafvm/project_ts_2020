@@ -9,9 +9,10 @@ class AddInstrumentForm extends StatefulWidget {
   _AddInstrumentFormState createState() => _AddInstrumentFormState();
 }
 
-class _AddInstrumentFormState extends State<AddInstrumentForm> {
+class _AddInstrumentFormState extends State<AddInstrumentForm>
+    with AutomaticKeepAliveClientMixin<AddInstrumentForm> {
   bool _uploading = false;
-  Instrument _newInstrument;
+  Instrument _newInstrument = Instrument();
   final _instrumentForm = GlobalKey<FormState>();
 
   Widget _buildNameField() {
@@ -113,13 +114,8 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
   }
 
   @override
-  void initState() {
-    _newInstrument = Instrument();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SingleChildScrollView(
       padding: EdgeInsets.only(
           left: 25,
@@ -229,4 +225,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
       return true;
     }
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

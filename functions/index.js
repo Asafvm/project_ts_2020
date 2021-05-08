@@ -41,7 +41,11 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
 
 //add team member
 exports.addTeamMember = functions.https.onCall(async (data, context) => {
-  const teams = admin.firestore().collection("teams").doc(data["teamId"]).collection("members"); //setting referance
+  const teams = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("members"); //setting referance
 
   try {
     const members = data["members"];
@@ -170,20 +174,62 @@ exports.addInstrumentInstance = functions.https.onCall(
 
 //add part to team's inventory
 exports.addPart = functions.https.onCall(async (data, context) => {
-  const teamid = data["teamID"];
+  const teamid = data["teamId"];
   const partdata = data["part"];
-
-  console.log("Team: " + teamid);
-  console.log("Part: " + partdata);
 
   const parts = admin
     .firestore()
     .collection("teams")
     .doc(teamid)
     .collection("parts");
-
-  await parts.add(partdata);
+  try {
+    await parts.add(partdata);
+  } catch (e) {
+    console.log("Error Adding Part :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
 });
+//update part info
+exports.updatePart = functions.https.onCall(async (data, context) => {
+  const teamid = data["teamId"];
+  const partdata = data["part"];
+
+  const parts = admin
+    .firestore()
+    .collection("teams")
+    .doc(teamid)
+    .collection("parts").doc(data["partId"]);
+  try {
+    await parts.update(partdata);
+  } catch (e) {
+    console.log("Error Adding Part :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
+});
+exports.addPartSerial = functions.https.onCall(async (data, context) => {
+  const teamid = data["teamId"];
+  const partId = data["partId"];
+  const partSerial = data["partId"];
+
+  const part = admin
+    .firestore()
+    .collection("teams")
+    .doc(teamid)
+    .collection("parts")
+    .doc(partId)
+    .collection("serial");
+  try {
+    await part.add(partSerial);
+  } catch (e) {
+    console.log("Error Adding Part Serial :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
+});
+
+
 
 //add report's fields to instrument ducoment
 exports.addInstrumentReport = functions.https.onCall((data, context) => {
@@ -348,7 +394,6 @@ exports.updateContact = functions.https.onCall(async (data, context) => {
 });
 
 exports.linkContacts = functions.https.onCall(async (data, context) => {
-
   const contactRef = admin
     .firestore()
     .collection("teams")

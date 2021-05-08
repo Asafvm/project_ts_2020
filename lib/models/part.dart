@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Part {
+  String id = "";
   String manifacturer;
   String reference;
   String altreference;
@@ -9,9 +10,10 @@ class Part {
   double price;
   int mainStockMin;
   int personalStockMin;
-  String instrumentId;
+  List<String> instrumentId;
   bool serialTracking;
   bool active;
+  String imgUrl;
 
   String getManifacturer() {
     return this.manifacturer;
@@ -77,11 +79,11 @@ class Part {
     this.personalStockMin = personalStockMin;
   }
 
-  String getInstrumentId() {
+  List<String> getInstrumentId() {
     return this.instrumentId;
   }
 
-  void setInstrumentId(String instrumentId) {
+  void setInstrumentId(List<String> instrumentId) {
     this.instrumentId = instrumentId;
   }
 
@@ -112,13 +114,14 @@ class Part {
       this.mainStockMin = 0,
       this.personalStockMin = 0,
       this.serialTracking = false,
-      this.active = true});
+      this.active = true,
+      this.imgUrl = ""});
 
   Map<String, dynamic> toJson() => {
         'manifacturer': manifacturer ?? '',
         'reference': reference,
         'altreference': altreference,
-        'InstrumentId': instrumentId ?? '',
+        'instrumentId': instrumentId ?? [],
         'model': model ?? '',
         'description': description,
         'price': price ?? 0.0,
@@ -126,22 +129,26 @@ class Part {
         'personalStockMin': personalStockMin ?? 0,
         'serialTracking': serialTracking ?? false,
         'active': active ?? true,
+        'imgUrl': imgUrl,
       };
 
-  Part.fromJson(Map<String, dynamic> data)
-      : manifacturer = data['manifacturer'].toString(),
+  Part.fromJson(Map<String, dynamic> data, String id)
+      : id = id,
+        manifacturer = data['manifacturer'].toString(),
         reference = data['reference'].toString(),
         altreference = data['altreference'].toString() ?? "",
-        instrumentId = data['instrumentId'].toString(),
+        instrumentId =
+            List<String>.from(data['instrumentId']) ?? List<String>.empty(),
         model = data['model'].toString() ?? "",
         description = data['description'].toString(),
         price = double.tryParse(data['price'].toString()) ?? 0.0,
         mainStockMin = data['mainStockMin'] ?? 0,
         personalStockMin = data['personalStockMin'] ?? 0,
         serialTracking = data['serialTracking'] ?? false,
-        active = data['active'] ?? true;
+        active = data['active'] ?? true,
+        imgUrl = data['imgUrl'] ?? null;
 
   factory Part.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Part.fromJson(documentSnapshot.data());
+    return Part.fromJson(documentSnapshot.data(), documentSnapshot.id);
   }
 }

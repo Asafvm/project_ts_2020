@@ -85,8 +85,18 @@ class FirebaseFirestoreCloudFunctions {
     await FirebaseFunctions.instance
         .httpsCallable("addPart")
         .call(<String, dynamic>{
-      "teamID": TeamProvider().getCurrentTeam.getTeamId,
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "part": _newPart.toJson()
+    });
+  }
+
+  static Future<void> updatePart(Part part) async {
+    await FirebaseFunctions.instance
+        .httpsCallable("updatePart")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "part": part.toJson(),
+      "partId": part.id,
     });
   }
 

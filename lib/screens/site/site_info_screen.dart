@@ -342,12 +342,15 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
         );
       },
     ));
+    if (selected != null && selected.isNotEmpty) {
+      await FirebaseFirestoreCloudFunctions.linkInstruments(
+          selected, widget.site.id, room);
 
-    await FirebaseFirestoreCloudFunctions.linkInstruments(
-        selected, widget.site.id, room);
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Relocation completed!')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Relocation completed!')));
+    } else
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Relocation canceled!')));
   }
 
   void _openAddRoomForm(BuildContext context) {
