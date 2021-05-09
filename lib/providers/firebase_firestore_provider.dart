@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamshare/models/contact.dart';
+import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/team_provider.dart';
 
 import 'authentication.dart';
@@ -12,15 +14,6 @@ import 'authentication.dart';
 ///*** class changed to static ***///
 
 class FirebaseFirestoreProvider {
-  static const String instruments = "instruments";
-  static const String instances = "instances";
-  static const String users = "users";
-  static const String teams = "teams";
-  static const String sites = "sites";
-  static const String rooms = "rooms";
-  static const String contacts = "contacts";
-  static const String members = "members";
-  static const String parts = "parts";
 //Get from Firebase
 
   static Stream<List<String>> getUserTeamList() {
@@ -151,6 +144,21 @@ class FirebaseFirestoreProvider {
           (query) => query.docs
               .map(
                 (doc) => doc.id,
+              )
+              .toList(),
+        );
+  }
+
+  static Stream<List<Entry>> getEntries(InstrumentInstance instance) {
+    String instanceRef =
+        "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments/${instance.instrumentCode}/$instances/${instance.serial}/$entries";
+    return FirebaseFirestore.instance
+        .collection("$instanceRef")
+        .snapshots()
+        .map(
+          (query) => query.docs
+              .map(
+                (doc) => Entry.fromFirestore(doc),
               )
               .toList(),
         );

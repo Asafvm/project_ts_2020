@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ENTRY_TYPE { INFO, WARNING }
 
 class Entry {
@@ -29,4 +31,8 @@ class Entry {
       : timestamp = data['timestamp'],
         type = data['type'],
         details = data['details'];
+
+  factory Entry.fromFirestore(DocumentSnapshot documentSnapshot) {
+    return Entry.fromJson(documentSnapshot.data());
+  }
 }

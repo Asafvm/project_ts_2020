@@ -5,12 +5,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
   final Map<String, dynamic> fields;
-  const GenericFormScreen({this.fields, this.pdfPath});
+  final InstrumentInstance instance;
+  const GenericFormScreen({this.fields, this.pdfPath, this.instance});
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
 }
@@ -47,7 +50,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 ),
                 TextButton.icon(
                   icon: Icon(Icons.send),
-                  onPressed: () {},
+                  onPressed: _submit,
                   label: Text("Submit"),
                 )
               ],
@@ -142,5 +145,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       Navigator.of(context).pop(false); //formFilled = false
 
     }
+  }
+
+  void _submit() {
+    FirebaseFirestoreCloudFunctions.uploadInstanceReport(
+        fields, widget.instance.instrumentCode, widget.instance.serial);
   }
 }

@@ -18,19 +18,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   List<Room> _roomList;
 
+  String _selectedSite;
+  String _selectedRoom;
+  String _selectedInstrument;
+
+  String _statistics = "Matches found";
+  List<InstrumentInstance> instances;
+  List<InstrumentInstance> filteredInstances = [];
+
+  @override
+  void initState() {
+    _siteFilter = '';
+    _roomFilter = '';
+    _instrumentFilter = '';
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Site> sites = Provider.of<List<Site>>(context);
     List<Instrument> instruments = Provider.of<List<Instrument>>(context);
-    List<InstrumentInstance> instances =
-        Provider.of<List<InstrumentInstance>>(context);
-
+    instances = Provider.of<List<InstrumentInstance>>(context);
+    _filterInstanceList();
     return Scaffold(
       appBar: AppBar(
         title: Text("Reports"),
       ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Flexible(
               flex: 1,
@@ -38,7 +54,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 children: [
                   Expanded(
                     child: DropdownButton(
-                      hint: Text("Site"),
+                      hint: Text(_selectedSite ?? "Site"),
                       items: sites
                           .map((e) => DropdownMenuItem<String>(
                                 value: e.id,
@@ -47,6 +63,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           .toList(),
                       onChanged: (value) => {
                         setState(() {
+                          _selectedSite = sites
+                              .where((element) => element.id == value)
+                              .first
+                              .name;
                           _siteFilter = value;
                           _roomFilter = '';
                         })
@@ -62,7 +82,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             _roomList = snapshot.data;
 
                             return DropdownButton(
-                              hint: Text("Room"),
+                              hint: Text(_selectedRoom ?? "Room"),
                               items: snapshot.data
                                   .map((room) => DropdownMenuItem<String>(
                                         value: room.id,
@@ -71,7 +91,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   .toList(),
                               onChanged: (value) => {
                                 setState(() {
+                                  _selectedRoom = _roomList
+                                      .where((element) => element.id == value)
+                                      .first
+                                      .roomTitle;
                                   _roomFilter = value;
+                                  _instrumentFilter = '';
                                 })
                               },
                             );
@@ -83,7 +108,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   if (_siteFilter != '' && _roomFilter != '')
                     Expanded(
                       child: DropdownButton(
-                        hint: Text("Instrument"),
+                        hint: Text(_selectedInstrument ?? "Instrument"),
                         items: instruments
                             .map((e) => DropdownMenuItem<String>(
                                   value: e.getCodeName(),
@@ -91,6 +116,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 ))
                             .toList(),
                         onChanged: (value) {
+                          _selectedInstrument = instruments
+                              .where((element) => element.id == value)
+                              .first
+                              .codeName;
                           _instrumentFilter = value;
                         },
                       ),
@@ -119,20 +148,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ],
               ),
             ),
-            Expanded(
+            Flexible(flex: 1, child: Text(_statistics)),
+            Flexible(
+              flex: 8,
               child: ListView.builder(
-                itemCount: instances
-                    .where((element) =>
-                        element.currentSiteId == _siteFilter &&
-                        element.currentRoomId == _roomFilter &&
-                        element.instrumentCode == _instrumentFilter)
-                    .length,
+                itemCount: filteredInstances.length,
                 itemBuilder: (context, index) {
                   return InstrumentInstanceListItem(
-                    instance: instances[index],
+                    instance: filteredInstances[index],
                     instrument: instruments
                         .where((element) =>
-                            element.codeName == instances[index].instrumentCode)
+                            element.codeName ==
+                            filteredInstances[index].instrumentCode)
                         .first,
                   );
                 },
@@ -142,5 +169,25 @@ class _ReportsScreenState extends State<ReportsScreen> {
         ),
       ),
     );
+  }
+
+  void _filterInstanceList() {
+    filteredInstances = instances;
+    if (_siteFilter != '') {
+      filteredInstances = filteredInstances
+          .where((element) => element.currentSiteId.contains(_siteFilter))
+          .toList();
+    }
+    if (_roomFilter != '') {
+      filteredInstances = filteredInstances
+          .where((element) => element.currentRoomId == _roomFilter)
+          .toList();
+    }
+    if (_instrumentFilter != '') {
+      filteredInstances = filteredInstances
+          .where((element) => element.instrumentCode == _instrumentFilter)
+          .toList();
+    }
+    _statistics = '${filteredInstances.length} Matches Found';
   }
 }

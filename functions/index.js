@@ -158,17 +158,12 @@ exports.addInstrumentInstance = functions.https.onCall(
       .collection("instances")
       .doc(data["instrument"]["serial"]);
 
-    // const snapshot = await instruments.get();
-    // if (snapshot.exists)
-    //   //throw error message if found
-    //   throw new functions.https.HttpsError('already-exists', 'Instrument already exists', 'Duplicate serial');
-
     await instruments.create(data["instrument"]);
-    await instruments.update(
-      {
-        entries: Object.assign({}, data["entries"]),
-      } //map every list item to index number
-    );
+    await instruments.collection("entries").add({
+      type: 0,
+      timestamp: Date.now(),
+      details: "New Instrument Created",
+    });
   }
 );
 
@@ -199,7 +194,8 @@ exports.updatePart = functions.https.onCall(async (data, context) => {
     .firestore()
     .collection("teams")
     .doc(teamid)
-    .collection("parts").doc(data["partId"]);
+    .collection("parts")
+    .doc(data["partId"]);
   try {
     await parts.update(partdata);
   } catch (e) {
@@ -229,10 +225,8 @@ exports.addPartSerial = functions.https.onCall(async (data, context) => {
   return { status: "success" };
 });
 
-
-
 //add report's fields to instrument ducoment
-exports.addInstrumentReport = functions.https.onCall((data, context) => {
+exports.addInstrumentReport = functions.https.onCall(async (data, context) => {
   const instrumentreports = admin
     .firestore()
     .collection("teams")
@@ -241,10 +235,48 @@ exports.addInstrumentReport = functions.https.onCall((data, context) => {
     .doc(data["instrument_id"])
     .collection("reports")
     .doc(data["file"]);
+  try {
+    await instrumentreports.set(Object.assign({}, data["fields"]));
+  } catch (e) {
+    console.log("Error Creating Report :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
+});
 
-  return instrumentreports.set(
-    Object.assign({}, data["fields"]) //map every list item to index number
-  );
+exports.addInstanceReport = functions.https.onCall(async (data, context) => {
+  const instanceRef = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("instruments")
+    .doc(data["instrumentId"])
+    .collection("instances")
+    .doc(data["instanceId"]);
+
+  const promises = [];
+  try {
+    const fields = instanceRef
+      .collection("reports").doc("test")
+      .set(Object.assign({}, data["fields"]));
+
+    const log = instanceRef
+      .collection("entries")
+      .add({ type: 2, timestamp: Date.now(), details: "New Report Created" });
+
+    promises.push(fields);
+    promises.push(log);
+
+    await Promise.all(promises);
+  } catch (e) {
+    console.log("Error Creating Report :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
+
+  // return instrumentreports.set(
+  //   Object.assign({}, data["fields"]) //map every list item to index number
+  // );
 });
 
 exports.addSite = functions.https.onCall((data, context) => {
@@ -285,22 +317,27 @@ exports.linkInstruments = functions.https.onCall(async (data, context) => {
     const instruments = data["instruments"];
 
     instruments.forEach((instrument) => {
-      const p = admin
+      const instanceRef = admin
         .firestore()
         .collection("teams")
         .doc(data["teamId"])
         .collection("instruments")
         .doc(instrument.instrumentCode)
         .collection("instances")
-        .doc(instrument.instanceSerial)
-        .update({
-          currentSiteId: data["siteId"],
-          currentRoomId: data["roomId"],
-        });
+        .doc(instrument.instanceSerial);
 
-      const r = room.add(instrument);
-      promises.push(p);
-      promises.push(r);
+      const update = instanceRef.update({
+        currentSiteId: data["siteId"],
+        currentRoomId: data["roomId"],
+      });
+      const insert = room.add(instrument);
+
+      const log = instanceRef
+        .collection("entries")
+        .add({ type: 1, timestamp: Date.now(), details: "Instrument Moved" });
+      promises.push(update);
+      promises.push(insert);
+      promises.push(log);
     });
     await Promise.all(promises);
   } catch (e) {

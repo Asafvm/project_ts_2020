@@ -4,6 +4,8 @@ import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/generic_form_screen.dart';
@@ -17,10 +19,8 @@ class InstrumentInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String instrumentPath = "instruments/" +
-        TeamProvider().getCurrentTeam.getTeamId +
-        instrument.getCodeName() +
-        "/";
+    final String instrumentPath =
+        '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${instrument.getCodeName()}/';
     var textStyleTitle = TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold);
     var textStyleContent = TextStyle(fontSize: 20.0);
     return Scaffold(
@@ -106,11 +106,18 @@ class InstrumentInfoScreen extends StatelessWidget {
                         children: [
                           Container(
                             //log
-                            child: ListView.builder(
-                              itemCount: instance.entries.length,
-                              itemBuilder: (context, index) {
-                                return EntryListItem(
-                                    instance.entries.elementAt(index));
+                            child: StreamBuilder<List<Entry>>(
+                              stream: FirebaseFirestoreProvider.getEntries(
+                                  instance),
+                              initialData: [],
+                              builder: (context, snapshot) {
+                                return ListView.builder(
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (context, index) {
+                                    return EntryListItem(
+                                        snapshot.data.elementAt(index));
+                                  },
+                                );
                               },
                             ),
                           ),
@@ -152,17 +159,20 @@ class InstrumentInfoScreen extends StatelessWidget {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           GenericFormScreen(
-                                                        fields: snapshot
-                                                            .data[index]
-                                                            .data(),
-                                                        pdfPath:
-                                                            downloadedPdfPath,
-                                                      ),
+                                                              fields: snapshot
+                                                                  .data[index]
+                                                                  .data(),
+                                                              pdfPath:
+                                                                  downloadedPdfPath,
+                                                              instance:
+                                                                  instance),
                                                     ),
                                                   )
                                                   .then((formFilled) => {
-                                                        if (formFilled = true)
-                                                          instance.addEntry(
+                                                        if (formFilled == true)
+                                                          FirebaseFirestoreCloudFunctions
+                                                              .addInstanceEntry(
+                                                            // instance.addEntry(
                                                             Entry(
                                                                 type: ENTRY_TYPE
                                                                     .INFO.index,

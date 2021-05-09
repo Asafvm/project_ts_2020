@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:teamshare/models/contact.dart';
+import 'package:teamshare/models/entry.dart';
+import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
@@ -108,7 +110,7 @@ class FirebaseFirestoreCloudFunctions {
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
       "instrumentID": _newInstrument.instrumentCode,
       "instrument": _newInstrument.toJson(),
-      "entries": _newInstrument.entries.map((e) => e.toJson()).toList()
+      //"entries": _newInstrument.entries.map((e) => e.toJson()).toList()
     });
   }
 
@@ -132,17 +134,31 @@ class FirebaseFirestoreCloudFunctions {
 
   //Cloud Storage
 
-  static Future<void> uploadFields(List<Map<String, dynamic>> fields,
-      String fileName, String instrumentId) async {
+  static Future<void> uploadFields(
+      List<Field> fields, String fileName, String instrumentId) async {
     String teamId = TeamProvider().getCurrentTeam.getTeamId;
 
     await FirebaseFunctions.instance
         .httpsCallable("addInstrumentReport")
         .call(<String, dynamic>{
-      "team_id": teamId,
-      "instrument_id": instrumentId,
+      "teamId": teamId,
+      "instrumentId": instrumentId,
       "file": fileName,
-      "fields": fields,
+      "fields": fields.map((field) => field.toJson()).toList(),
+    });
+  }
+
+  static Future<void> uploadInstanceReport(
+      List<Field> fields, String instrumentId, String instanceId) async {
+    String teamId = TeamProvider().getCurrentTeam.getTeamId;
+
+    await FirebaseFunctions.instance
+        .httpsCallable("addInstanceReport")
+        .call(<String, dynamic>{
+      "teamId": teamId,
+      "instrumentId": instrumentId,
+      "instanceId": instanceId,
+      "fields": fields.map((field) => field.toJson()).toList(),
     });
   }
 
@@ -211,4 +227,6 @@ class FirebaseFirestoreCloudFunctions {
       "contacts": selected.map((contact) => {"contactId": contact.id}).toList(),
     });
   }
+
+  static addInstanceEntry(Entry entry) {}
 }

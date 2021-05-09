@@ -245,8 +245,8 @@ class _PDFScreenState extends State<PDFScreen> {
       setState(() {
         _uploading = true;
       });
-      List<Map<String, dynamic>> fields = [];
-      _fields.forEach((f) => fields.add(f.toJson()));
+      List<Field> fields = [];
+      _fields.forEach((f) => fields.add(f));
       File file = File(widget.pathPDF);
 
       if (file != null && Authentication().isAuth) {

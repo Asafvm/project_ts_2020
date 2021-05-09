@@ -90,3 +90,15 @@ Color getColor(Set<MaterialState> states) {
 var outlinedButtonStyle = OutlinedButton.styleFrom(
   side: BorderSide(color: Colors.blue),
 );
+
+//Firestore consts
+const String instruments = "instruments";
+const String instances = "instances";
+const String users = "users";
+const String teams = "teams";
+const String sites = "sites";
+const String rooms = "rooms";
+const String contacts = "contacts";
+const String members = "members";
+const String parts = "parts";
+const String entries = "entries";
