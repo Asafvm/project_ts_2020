@@ -91,28 +91,13 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
           } else {
             return ListView.builder(
               itemCount: snapshot.data.length,
-              itemBuilder: (ctx, index) => GestureDetector(
-                onTap: () => _switchToInstrumentView(snapshot.data[index]),
-                child: InstrumentInstanceListItem(
-                  Icons.computer,
-                  ctx,
-                  snapshot.data[index].serial,
-                ),
+              itemBuilder: (ctx, index) => InstrumentInstanceListItem(
+                instance: snapshot.data[index],
+                instrument: widget.instrument,
               ),
             );
           }
         },
-      ),
-    );
-  }
-
-  _switchToInstrumentView(InstrumentInstance instance) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) => InstrumentInfoScreen(
-          instrument: widget.instrument,
-          instance: instance,
-        ),
       ),
     );
   }

@@ -58,6 +58,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
   Widget build(BuildContext context) {
     List<Contact> contactList = Provider.of<List<Contact>>(context);
     List<Room> roomList = Provider.of<List<Room>>(context);
+    List<Instrument> instrumentList = Provider.of<List<Instrument>>(context);
     mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
@@ -234,9 +235,13 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                 itemCount: list.length,
                                 itemBuilder: (context, index) {
                                   return InstrumentInstanceListItem(
-                                      Icons.computer,
-                                      context,
-                                      list[index].serial);
+                                    instance: list[index],
+                                    instrument: instrumentList
+                                        .where((element) =>
+                                            element.codeName ==
+                                            list[index].instrumentCode)
+                                        .first,
+                                  );
                                 },
                               );
                             } else

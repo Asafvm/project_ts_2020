@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/contact.dart';
+import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/site/site_info_screen.dart';
@@ -48,6 +49,11 @@ class _AdminSiteScreenState extends State<AdminSiteScreen> {
                             StreamProvider<List<Contact>>(
                               create: (context) =>
                                   FirebaseFirestoreProvider.getContacts(),
+                              initialData: [],
+                            ),
+                            StreamProvider<List<Instrument>>(
+                              create: (context) =>
+                                  FirebaseFirestoreProvider.getInstruments(),
                               initialData: [],
                             ),
                           ],
