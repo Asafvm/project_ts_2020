@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
@@ -147,8 +148,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     }
   }
 
-  void _submit() {
-    FirebaseFirestoreCloudFunctions.uploadInstanceReport(
+  Future<void> _submit() async {
+    var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
         fields, widget.instance.instrumentCode, widget.instance.serial);
+    print(result.data);
+    if (result.data["status"] == "success") Navigator.of(context).pop();
   }
 }

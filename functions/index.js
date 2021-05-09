@@ -256,13 +256,16 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
 
   const promises = [];
   try {
+    var reportid =  ((await instanceRef.collection("reports").get()).docs.length+1).toString();
+    while (reportid.length < 6) reportid = "0" + reportid;  //6-digit report id
+    console.log('id='+reportid);
     const fields = instanceRef
-      .collection("reports").doc("test")
+      .collection("reports").doc(reportid)
       .set(Object.assign({}, data["fields"]));
 
     const log = instanceRef
       .collection("entries")
-      .add({ type: 2, timestamp: Date.now(), details: "New Report Created" });
+      .add({ type: 2, timestamp: Date.now(), details: "Report "+reportid+" Created"});
 
     promises.push(fields);
     promises.push(log);
@@ -272,7 +275,7 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     console.log("Error Creating Report :: " + e);
     return { status: "failed", messege: e };
   }
-  return { status: "success" };
+  return { status: "success", 'reportId' : reportid };
 
   // return instrumentreports.set(
   //   Object.assign({}, data["fields"]) //map every list item to index number
