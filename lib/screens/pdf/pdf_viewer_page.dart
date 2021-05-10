@@ -20,7 +20,7 @@ class PDFScreen extends StatefulWidget {
   final List<Field> fields;
   final String pathPDF;
   final String instrumentID;
-  final bool onlyFields;
+  final bool onlyFields; // upload field data only (update exisiting report)
   PDFScreen(
       {this.pathPDF,
       this.instrumentID,

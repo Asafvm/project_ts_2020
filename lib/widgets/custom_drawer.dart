@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/screens/admin/admin_menu_screen.dart';
-import 'package:teamshare/screens/reports_screen.dart';
+import 'package:teamshare/screens/drawer_screens/FileExplorer.dart';
+import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
+import 'package:teamshare/screens/drawer_screens/reports_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   @override
@@ -52,7 +54,15 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.library_books),
             title: Text('Files'),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => FileExplorer(
+                    path: getTemporaryDirectory(),
+                  ),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.map),

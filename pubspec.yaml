@@ -23,6 +23,7 @@ dependencies:
   #firebase
   firebase: ^9.0.0
   firebase_core: ^1.0.0
+  firebase_core_web: ^1.0.2
   firebase_auth: ^1.0.0
   cloud_firestore: ^1.0.0
   cloud_functions: ^1.0.0
@@ -35,9 +36,10 @@ dependencies:
   json_annotation:
   #http requests
   http: ^0.13.0
-  geocode: 1.0.1
+  geocode: ^1.0.1
   location: ^4.0.2
   google_maps_flutter: ^2.0.1
+  google_maps_webservice: ^0.0.20-nullsafety.5
   sqflite: ^2.0.0+2
   #pdf related
   native_pdf_renderer: ^3.0.0 #test this

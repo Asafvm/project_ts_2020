@@ -11,7 +11,7 @@ import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
-import 'package:teamshare/screens/map_screen.dart';
+import 'package:teamshare/screens/drawer_screens/map_screen.dart';
 
 class AddSiteForm extends StatefulWidget {
   @override

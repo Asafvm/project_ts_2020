@@ -4,11 +4,10 @@ import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
-import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/screens/generic_form_screen.dart';
+import 'package:teamshare/screens/pdf/generic_form_screen.dart';
 import 'package:teamshare/widgets/list_items/entry_list_item.dart';
 
 class InstrumentInfoScreen extends StatelessWidget {
@@ -169,19 +168,19 @@ class InstrumentInfoScreen extends StatelessWidget {
                                                     ),
                                                   )
                                                   .then((formFilled) => {
-                                                        if (formFilled == true)
-                                                          FirebaseFirestoreCloudFunctions
-                                                              .addInstanceEntry(
-                                                            // instance.addEntry(
-                                                            Entry(
-                                                                type: ENTRY_TYPE
-                                                                    .INFO.index,
-                                                                details:
-                                                                    "Uploaded new ${snapshot.data[index].id} form",
-                                                                timestamp: Timestamp
-                                                                        .now()
-                                                                    .millisecondsSinceEpoch),
-                                                          ),
+                                                        // if (formFilled == true)
+                                                        // FirebaseFirestoreCloudFunctions
+                                                        //     .addInstanceEntry(
+                                                        //   // instance.addEntry(
+                                                        //   Entry(
+                                                        //       type: ENTRY_TYPE
+                                                        //           .INFO.index,
+                                                        //       details:
+                                                        //           "Uploaded new ${snapshot.data[index].id} form",
+                                                        //       timestamp: Timestamp
+                                                        //               .now()
+                                                        //           .millisecondsSinceEpoch),
+                                                        // ),
                                                       });
                                             },
                                             child: Text(

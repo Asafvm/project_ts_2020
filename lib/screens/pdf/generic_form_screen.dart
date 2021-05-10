@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
@@ -9,6 +8,7 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
@@ -139,8 +139,18 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
       result.copy(dest + '/test.pdf');
       Applogger.consoleLog(MessegeType.info, "Saved to: $dest");
+      Navigator.of(context)
+          .push(MaterialPageRoute(
+            builder: (context) => PDFScreen(
+              fields: fields,
+              pathPDF: result.path,
+              onlyFields: true,
+              instrumentID: widget.instance.instrumentCode,
+            ),
+          ))
+          .then(
+              (value) => Navigator.of(context).pop(true)); //formFilled = true);
 
-      Navigator.of(context).pop(true); //formFilled = true
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
       Navigator.of(context).pop(false); //formFilled = false

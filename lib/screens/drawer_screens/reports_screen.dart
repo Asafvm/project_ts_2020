@@ -151,19 +151,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
             Flexible(flex: 1, child: Text(_statistics)),
             Flexible(
               flex: 8,
-              child: ListView.builder(
-                itemCount: filteredInstances.length,
-                itemBuilder: (context, index) {
-                  return InstrumentInstanceListItem(
-                    instance: filteredInstances[index],
-                    instrument: instruments
-                        .where((element) =>
-                            element.codeName ==
-                            filteredInstances[index].instrumentCode)
-                        .first,
-                  );
-                },
-              ),
+              child: Container(
+                  child: instruments.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: filteredInstances.length,
+                          itemBuilder: (context, index) {
+                            return InstrumentInstanceListItem(
+                              instance: filteredInstances[index],
+                              instrument: instruments
+                                  .where((element) =>
+                                      element.codeName ==
+                                      filteredInstances[index].instrumentCode)
+                                  .first,
+                            );
+                          },
+                        )
+                      : Container()),
             )
           ],
         ),

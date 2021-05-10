@@ -7,7 +7,7 @@ import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_list_screen.dart';
-import 'package:teamshare/screens/pdf_viewer_page.dart';
+import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 class InstrumentListItem extends StatefulWidget {
   final IconData icon;
@@ -159,10 +159,8 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
   }
 
   _openPDF(String pdf, List<Field> fields) async {
-    final String instrumentPath = "instruments/" +
-        TeamProvider().getCurrentTeam.getTeamId +
-        widget.instrument.getCodeName() +
-        "/";
+    final String instrumentPath =
+        '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrument.getCodeName()}/';
     String path =
         await FirebaseStorageProvider.downloadFile('$instrumentPath/$pdf');
     Navigator.push(

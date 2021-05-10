@@ -52,7 +52,10 @@ class _MapScreenState extends State<MapScreen> {
     if (widget.isSelecting) {
       setState(() {
         _pickedLocation = position;
-        _addMarker(Marker(markerId: MarkerId('1'), position: position));
+        _addMarker(Marker(
+            markerId: MarkerId('1'),
+            position: position,
+            infoWindow: InfoWindow()));
       });
     }
   }
