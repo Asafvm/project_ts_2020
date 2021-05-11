@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 //TODO: add sharing and browsing functionality
 class FileExplorer extends StatefulWidget {
@@ -17,7 +18,14 @@ class _FileExplorerState extends State<FileExplorer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        //TODO: add action[] on multiselect
+
+        actions: [
+          if (_multiSelect)
+            IconButton(icon: Icon(Icons.share), onPressed: () {})
+        ],
+      ),
       body: FutureBuilder<Directory>(
         future: widget.path,
         builder: (context, snapshot) {
@@ -30,9 +38,10 @@ class _FileExplorerState extends State<FileExplorer> {
                 .type
                 .toString()
                 .compareTo(b.statSync().type.toString()));
+
             return Column(
               children: [
-                Text(snapshot.data.path), //path as string
+                Text(snapshot.data.path), //TODO: change to filter text
                 Expanded(
                   child: ListView.builder(
                     itemCount: files.length,
@@ -71,6 +80,20 @@ class _FileExplorerState extends State<FileExplorer> {
                                       true; //mark first selected
                                 });
                               },
+                              onTap: () {
+                                //open if has pdf extension
+                                if (files[index].path.endsWith(".pdf"))
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => PDFScreen(
+                                        fields: [],
+                                        instrumentID: "",
+                                        onlyFields: true,
+                                        pathPDF: files[index].path),
+                                  ));
+
+                                //TODO: else if folder call FileExplorer(currect path + folder name])
+                              },
+
                               leading: Icon(fileStats.type.toString() == "file"
                                   ? Icons.file_copy
                                   : Icons.folder), //set icon

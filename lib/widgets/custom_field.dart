@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CustomField extends StatefulWidget {
   final Field field;
@@ -20,29 +21,30 @@ class _CustomFieldState extends State<CustomField> {
 
   @override
   Widget build(BuildContext context) {
-    Size rectSize = widget.field.size * widget.scale;
+    Size rectSize = widget.field.size; // * widget.scale;
 
-    Widget _createRect(Color color, double w, Size size) {
-      Size _size = size;
-      return SizedBox.fromSize(
-        size: _size,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(width: w, color: color),
-          ),
-          child: Text(
-            "(" + widget.field.index.toString() + ") " + widget.field.hint,
-            style: TextStyle(fontSize: 16), //TODO: fix style while dragging
-          ),
+    Widget _createRect(Color color, double width, Size size) {
+      return Container(
+        height: size.height,
+        width: size.width,
+        decoration: BoxDecoration(
+          border: Border.all(width: width, color: color),
+        ),
+        child: AutoSizeText(
+          '(${widget.field.index.toString()})' + widget.field.defaultValue,
+          minFontSize: 0,
+          stepGranularity: 0.1,
         ),
       );
     }
 
     return Positioned(
-      top:
-          widget.field.offset.dy * widget.pdfSizeOnScreen.height / widget.scale,
-      left:
-          widget.field.offset.dx * widget.pdfSizeOnScreen.width / widget.scale,
+      height: rectSize.height,
+      width: rectSize.width,
+      top: widget.field.offset.dy *
+          widget.pdfSizeOnScreen.height, // / widget.scale,
+      left: widget.field.offset.dx *
+          widget.pdfSizeOnScreen.width, // / widget.scale,
       child: GestureDetector(
         onTap: () => setState(() {
           _selected = !_selected;
@@ -77,7 +79,7 @@ class _CustomFieldState extends State<CustomField> {
         widget.mqd.viewPadding.topLeft.dy / widget.pdfSizeOnScreen.height);
 
     Offset factor =
-        Offset(0, 60 / widget.pdfSizeOnScreen.height); //TODO: figure this out
+        Offset(0, 57 / widget.pdfSizeOnScreen.height); //TODO: figure this out
 
     setState(() {
       widget.field.offset = offset - viewRatio - factor;

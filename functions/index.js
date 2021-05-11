@@ -225,14 +225,14 @@ exports.addPartSerial = functions.https.onCall(async (data, context) => {
   return { status: "success" };
 });
 
-//add report's fields to instrument ducoment
+//add template report fields to instrument document
 exports.addInstrumentReport = functions.https.onCall(async (data, context) => {
   const instrumentreports = admin
     .firestore()
     .collection("teams")
-    .doc(data["team_id"])
+    .doc(data["teamId"])
     .collection("instruments")
-    .doc(data["instrument_id"])
+    .doc(data["instrumentId"])
     .collection("reports")
     .doc(data["file"]);
   try {

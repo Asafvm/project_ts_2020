@@ -19,7 +19,7 @@ class InstrumentInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String instrumentPath =
-        '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${instrument.getCodeName()}/';
+        '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${instrument.getCodeName()}';
     var textStyleTitle = TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold);
     var textStyleContent = TextStyle(fontSize: 20.0);
     return Scaffold(
@@ -141,55 +141,45 @@ class InstrumentInfoScreen extends StatelessWidget {
                                       itemBuilder: (ctx, index) => ListTile(
                                         leading: Icon(Icons.picture_as_pdf),
                                         title: Text(snapshot.data[index].id),
-                                        trailing: FittedBox(
-                                          child: TextButton(
-                                            style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith(getColor),
-                                            ),
-                                            onPressed: () async {
-                                              String downloadedPdfPath =
-                                                  await FirebaseStorageProvider
-                                                      .downloadFile(
-                                                          '$instrumentPath/${snapshot.data[index].id}');
-                                              Navigator.of(context)
-                                                  .push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          GenericFormScreen(
-                                                              fields: snapshot
-                                                                  .data[index]
-                                                                  .data(),
-                                                              pdfPath:
-                                                                  downloadedPdfPath,
-                                                              instance:
-                                                                  instance),
-                                                    ),
-                                                  )
-                                                  .then((formFilled) => {
-                                                        // if (formFilled == true)
-                                                        // FirebaseFirestoreCloudFunctions
-                                                        //     .addInstanceEntry(
-                                                        //   // instance.addEntry(
-                                                        //   Entry(
-                                                        //       type: ENTRY_TYPE
-                                                        //           .INFO.index,
-                                                        //       details:
-                                                        //           "Uploaded new ${snapshot.data[index].id} form",
-                                                        //       timestamp: Timestamp
-                                                        //               .now()
-                                                        //           .millisecondsSinceEpoch),
-                                                        // ),
-                                                      });
-                                            },
-                                            child: Text(
-                                              "Create",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
+                                        trailing: OutlinedButton(
+                                          child: Text(
+                                            "Create",
                                           ),
+                                          style: outlinedButtonStyle,
+                                          onPressed: () async {
+                                            String downloadedPdfPath =
+                                                await FirebaseStorageProvider
+                                                    .downloadFile(
+                                                        '$instrumentPath/${snapshot.data[index].id}');
+                                            Navigator.of(context)
+                                                .push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        GenericFormScreen(
+                                                            fields: snapshot
+                                                                .data[index]
+                                                                .data(),
+                                                            pdfPath:
+                                                                downloadedPdfPath,
+                                                            instance: instance),
+                                                  ),
+                                                )
+                                                .then((formFilled) => {
+                                                      // if (formFilled == true)
+                                                      // FirebaseFirestoreCloudFunctions
+                                                      //     .addInstanceEntry(
+                                                      //   // instance.addEntry(
+                                                      //   Entry(
+                                                      //       type: ENTRY_TYPE
+                                                      //           .INFO.index,
+                                                      //       details:
+                                                      //           "Uploaded new ${snapshot.data[index].id} form",
+                                                      //       timestamp: Timestamp
+                                                      //               .now()
+                                                      //           .millisecondsSinceEpoch),
+                                                      // ),
+                                                    });
+                                          },
                                         ),
                                       ),
                                       itemCount: items,

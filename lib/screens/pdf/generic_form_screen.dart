@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
@@ -46,12 +47,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
               children: [
                 TextButton.icon(
                   icon: Icon(Icons.preview),
-                  onPressed: _preview,
+                  onPressed: () => _preview(context),
                   label: Text("Preview"),
                 ),
                 TextButton.icon(
                   icon: Icon(Icons.send),
-                  onPressed: _submit,
+                  onPressed: () => _submit(context),
                   label: Text("Submit"),
                 )
               ],
@@ -109,41 +110,49 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     );
   }
 
-  Future<void> _preview() async {
+  Future<void> _preview(BuildContext context) async {
     try {
       PdfMutableDocument doc = await PdfMutableDocument.path(widget.pdfPath);
 
       // PdfMutableDocument doc =
       //     await PdfMutableDocument.asset("assets/pdf/blank.pdf");
 
+      //add field to pages
       for (Field field in fields) {
         var page = doc.getPage(field.page);
         page.add(
           item: pdfWidgets.Positioned(
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
-            child: pdfWidgets.Text(
-              field.defaultValue ?? '!!!',
-              // style:
-              //     pdfWidgets.TextStyle(fontSize: 32, color: pdf.PdfColors.red),
-            ),
+            child:
+
+                //     AutoSizeText(
+                //   '(${widget.field.index.toString()})' + widget.field.defaultValue,
+                //   minFontSize: 0,
+                //   stepGranularity: 0.1,
+                // ),
+
+                pdfWidgets.Text(field.defaultValue ?? '!!!',
+                    style: pdfWidgets.TextStyle(fontSize: 26)),
+            // style:
+            //     pdfWidgets.TextStyle(fontSize: 32, color: pdf.PdfColors.red),
           ),
         );
       }
+      String dest = (await getTemporaryDirectory()).path;
 
-      File result =
-          await doc.save(filename: '${DateTime.now().toIso8601String()}.pdf');
+      File result = await doc
+          .save(filename: '${DateTime.now().toIso8601String()}.pdf')
+          .then((value) => value.copy('$dest/${basename(value.path)}'));
       Applogger.consoleLog(MessegeType.info, "PDF Editing Done");
 
-      String dest = (await getApplicationDocumentsDirectory()).path;
+      //result = await result.copy();
 
-      result.copy(dest + '/test.pdf');
-      Applogger.consoleLog(MessegeType.info, "Saved to: $dest");
       Navigator.of(context)
           .push(MaterialPageRoute(
             builder: (context) => PDFScreen(
               fields: fields,
-              pathPDF: result.path,
+              pathPDF: result.uri.toString(),
               onlyFields: true,
               instrumentID: widget.instance.instrumentCode,
             ),
@@ -158,7 +167,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     }
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit(BuildContext context) async {
     var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
         fields, widget.instance.instrumentCode, widget.instance.serial);
     print(result.data);

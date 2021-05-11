@@ -245,15 +245,11 @@ class _PDFScreenState extends State<PDFScreen> {
       setState(() {
         _uploading = true;
       });
-      List<Field> fields = [];
-      _fields.forEach((f) => fields.add(f));
       File file = File(widget.pathPDF);
 
       if (file != null && Authentication().isAuth) {
-        final String instrumentPath = TeamProvider().getCurrentTeam.getTeamId +
-            "/instruments/" +
-            widget.instrumentID +
-            "/";
+        final String instrumentPath =
+            '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrumentID}';
         if (!widget.onlyFields) {
           Applogger.consoleLog(MessegeType.info, "Saving File");
           await FirebaseStorageProvider.uploadFile(file, instrumentPath)
@@ -262,11 +258,9 @@ class _PDFScreenState extends State<PDFScreen> {
 
         _updateProgress(50);
         Applogger.consoleLog(MessegeType.info, "Saving Fields");
-        await FirebaseFirestoreCloudFunctions.uploadFields(fields,
-                path.basenameWithoutExtension(file.path), widget.instrumentID)
-            .catchError((_) => {
-                  _showDialog("Failed to upload fields"),
-                });
+        var result = await FirebaseFirestoreCloudFunctions.uploadFields(_fields,
+            path.basenameWithoutExtension(widget.pathPDF), widget.instrumentID);
+
         _updateProgress(100);
         Applogger.consoleLog(MessegeType.info, "Saving Operation Finished");
 

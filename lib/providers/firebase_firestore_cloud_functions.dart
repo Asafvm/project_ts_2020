@@ -134,11 +134,11 @@ class FirebaseFirestoreCloudFunctions {
 
   //Cloud Storage
 
-  static Future<void> uploadFields(
+  static Future<HttpsCallableResult> uploadFields(
       List<Field> fields, String fileName, String instrumentId) async {
     String teamId = TeamProvider().getCurrentTeam.getTeamId;
 
-    await FirebaseFunctions.instance
+    return await FirebaseFunctions.instance
         .httpsCallable("addInstrumentReport")
         .call(<String, dynamic>{
       "teamId": teamId,

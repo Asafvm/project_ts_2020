@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/providers/applogger.dart';
 
 class FirebaseStorageProvider {
@@ -36,21 +37,15 @@ class FirebaseStorageProvider {
 
   static Future<String> downloadFile(String path) async {
     Reference ref = FirebaseStorage.instance.ref().child(path);
-    // String url = await ref.getDownloadURL();
-    // final http.Response downloadData = await http.get(url);
-    final Directory systemTempDir = Directory.systemTemp;
-    final File tempFile =
-        File('${systemTempDir.path}/${basenameWithoutExtension(path)}.pdf');
+    final Directory systemTempDir = await getTemporaryDirectory();
+    final File tempFile = await File(
+            '${systemTempDir.path}/${basenameWithoutExtension(path)}.pdf')
+        .create();
+
     if (tempFile.existsSync()) {
-      await tempFile.delete();
+      final DownloadTask task = ref.writeToFile(tempFile);
+      TaskSnapshot result = await task.whenComplete(() => null);
+      return tempFile.path;
     }
-    await tempFile.create();
-    final DownloadTask task = ref.writeToFile(tempFile);
-    await task.whenComplete(() => null);
-    return tempFile.path;
-    // final int byteCount = task.snapshot.totalBytes;
-    // var bodyBytes = downloadData.bodyBytes;
-    // final String name = await ref.getName();
-    //final String path = await ref.getPath();
   }
 }
