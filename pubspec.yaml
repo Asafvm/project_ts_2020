@@ -42,12 +42,12 @@ dependencies:
   google_maps_webservice: ^0.0.20-nullsafety.5
   sqflite: ^2.0.0+2
   #pdf related
-  native_pdf_renderer: ^3.0.0 #test this
   path_provider: ^2.0.1 
   path: ^1.7.0
   file_picker: ^3.0.0
-  flutter_pdfview: ^1.1.0
-  pdf: ^3.0.1  #for creating pdf
+  native_pdf_renderer: ^3.0.0 #test this
+  native_pdf_view: ^4.0.1
+  pdf: ^3.3.0  #for creating pdf
   # CupertinoIcons
   cupertino_icons: ^1.0.2
   #misc
