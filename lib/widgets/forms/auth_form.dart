@@ -63,10 +63,18 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
     InputDecoration _getInputDecoration(
         IconData icon, String label, String hint) {
       final inputDecoration = InputDecoration(
-          icon: Icon(icon, color: Colors.white),
-          hintStyle: textStyleWhite.copyWith(color: Colors.grey[500]),
-          labelText: label,
-          labelStyle: textStyleWhite);
+        icon: Icon(icon, color: Colors.white),
+        hintStyle: textStyleWhite.copyWith(color: Colors.grey[500]),
+        labelText: label,
+        labelStyle: textStyleWhite,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+              color: Theme.of(context).primaryColor,
+              width: 1,
+              style: BorderStyle.solid),
+        ),
+      );
       return inputDecoration;
     }
 
@@ -85,8 +93,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
               child: Form(
                 key: _loginKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     TextFormField(
                       style: textStyleWhite,

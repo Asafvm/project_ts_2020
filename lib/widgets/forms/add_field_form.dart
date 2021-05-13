@@ -57,9 +57,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     },
                   ),
                 ),
-                Spacer(
-                  flex: 1,
-                ),
+                Spacer(),
                 Flexible(
                   flex: 3,
                   child: TextFormField(
@@ -85,9 +83,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     },
                   ),
                 ),
-                Spacer(
-                  flex: 1,
-                ),
+                Spacer(),
                 Flexible(
                   flex: 3,
                   child: TextFormField(
@@ -126,9 +122,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     }).toList(),
                   ),
                 ),
-                Spacer(
-                  flex: 1,
-                ),
+                Spacer(),
                 Flexible(
                   flex: 3,
                   child: DropdownButtonFormField(

@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
-import 'package:teamshare/providers/firebase_storage_provider.dart';
-import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/widgets/image_upload_button.dart';
 
 class AddInstrumentForm extends StatefulWidget {
   @override
   _AddInstrumentFormState createState() => _AddInstrumentFormState();
 }
 
-class _AddInstrumentFormState extends State<AddInstrumentForm> {
+class _AddInstrumentFormState extends State<AddInstrumentForm>
+    with AutomaticKeepAliveClientMixin<AddInstrumentForm> {
   bool _uploading = false;
   Instrument _newInstrument = Instrument();
   final _instrumentForm = GlobalKey<FormState>();
 
   Widget _buildNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Instrument Name'),
+      decoration: DecorationLibrary.inputDecoration("Instrument Name", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newInstrument.setCodeName(value),
       onSaved: (val) {
@@ -40,7 +38,8 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   Widget _buildCodeField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Reference Number"),
+      decoration:
+          DecorationLibrary.inputDecoration("Reference Number", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newInstrument.setReference(value),
       onSaved: (val) {
@@ -59,10 +58,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   Widget _buildManifacturerField() {
     return TextFormField(
-      decoration: InputDecoration(
-          labelText: "Manifacturer",
-          hintText: "Default: Unknown",
-          hintStyle: TextStyle(color: Colors.grey)),
+      decoration: DecorationLibrary.inputDecoration("Manifacturer", context),
       keyboardType: TextInputType.text,
       onChanged: (val) {
         _newInstrument.setManifacturer(val);
@@ -78,10 +74,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   Widget _buildModelField() {
     return TextFormField(
-      decoration: InputDecoration(
-          labelText: "Model",
-          hintText: "Default: 1",
-          hintStyle: TextStyle(color: Colors.grey)),
+      decoration: DecorationLibrary.inputDecoration("Model", context),
       keyboardType: TextInputType.text,
       onChanged: (val) {
         _newInstrument.setModel(val);
@@ -96,10 +89,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   Widget _buildPriceField() {
     return TextFormField(
-      decoration: InputDecoration(
-          labelText: "Price",
-          hintText: "Default: 0",
-          hintStyle: TextStyle(color: Colors.grey)),
+      decoration: DecorationLibrary.inputDecoration("Price", context),
       keyboardType:
           TextInputType.numberWithOptions(decimal: true, signed: false),
       onChanged: (val) {
@@ -118,6 +108,8 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return SingleChildScrollView(
       padding: EdgeInsets.only(
           left: 25,
@@ -137,30 +129,15 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
                 height: 200,
                 child: TabBarView(
                   children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 1,
-                          fit: FlexFit.tight,
-                          child: IconButton(
-                            icon: Icon(Icons.add_a_photo),
-                            iconSize: 50,
-                            onPressed: () => _takePicture(context),
-                          ),
-                        ),
-                        Flexible(
-                          flex: 3,
-                          fit: FlexFit.tight,
-                          child: Column(
-                            children: <Widget>[
-                              _buildNameField(),
-                              _buildCodeField(),
-                            ],
-                          ),
-                        )
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        _buildNameField(),
+                        _buildCodeField(),
                       ],
                     ),
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         _buildManifacturerField(),
                         _buildModelField(),
@@ -245,54 +222,6 @@ class _AddInstrumentFormState extends State<AddInstrumentForm> {
     }
   }
 
-  void _takePicture(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  top: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                      style: BorderStyle.solid))),
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.photo), onPressed: _pickFromGallery),
-              ),
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.camera_alt_rounded),
-                    onPressed: _pickFromCamera),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future _pickFromGallery() async {
-    final imageFile = await ImagePicker().getImage(
-      source: ImageSource.gallery,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-
-    // await FirebaseStorageProvider.uploadFile(imageFile.path,
-    //        )
-    //     .then((_) => currentTeam.logoUrl = imageFile.path);
-  }
-
-  Future _pickFromCamera() async {
-    final imageFile = await ImagePicker().getImage(
-      source: ImageSource.camera,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-  }
+  @override
+  bool get wantKeepAlive => true;
 }

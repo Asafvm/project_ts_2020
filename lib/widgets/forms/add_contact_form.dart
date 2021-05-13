@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
@@ -26,7 +27,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildFirstNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "First Name"),
+      decoration: DecorationLibrary.inputDecoration("First Name", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newContact.firstName = val;
@@ -37,7 +38,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildLastNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Last Name"),
+      decoration: DecorationLibrary.inputDecoration("Last Name", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newContact.lastName = val;
@@ -48,7 +49,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildPhoneNumberField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Phone Number"),
+      decoration: DecorationLibrary.inputDecoration("Phone Number", context),
       keyboardType: TextInputType.phone,
       onSaved: (val) {
         _newContact.phone = val;
@@ -59,7 +60,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildEmailField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Email"),
+      decoration: DecorationLibrary.inputDecoration("Email", context),
       keyboardType: TextInputType.emailAddress,
       onSaved: (val) {
         _newContact.email = val;
@@ -83,8 +84,9 @@ class _AddContactFormState extends State<AddContactForm> {
           children: <Widget>[
             Row(
               children: [
-                Expanded(child: _buildFirstNameField()),
-                Expanded(child: _buildLastNameField()),
+                Expanded(flex: 4, child: _buildFirstNameField()),
+                Spacer(),
+                Expanded(flex: 4, child: _buildLastNameField()),
               ],
             ),
             _buildPhoneNumberField(),
