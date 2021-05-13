@@ -47,5 +47,6 @@ class FirebaseStorageProvider {
       TaskSnapshot result = await task.whenComplete(() => null);
       return tempFile.path;
     }
+    return null;
   }
 }

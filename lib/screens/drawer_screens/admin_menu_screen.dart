@@ -76,8 +76,7 @@ class AdminMenuScreen extends StatelessWidget {
                         builder: (_) => StreamProvider<List<String>>(
                           initialData: [],
                           create: (context) =>
-                              FirebaseFirestoreProvider.getTeamMembers(
-                                  TeamProvider().getCurrentTeam.getTeamId),
+                              FirebaseFirestoreProvider.getTeamMembers(),
                           child: AdminTeamManagmentScreen(),
                         ),
                       ),

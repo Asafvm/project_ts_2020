@@ -102,3 +102,6 @@ const String contacts = "contacts";
 const String members = "members";
 const String parts = "parts";
 const String entries = "entries";
+const String reports = "reports";
+const String report_templates = "report_templates";
+const String images = "images";

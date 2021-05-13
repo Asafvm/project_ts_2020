@@ -1,20 +1,17 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
-// import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/forms/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
-//import 'package:after_layout/after_layout.dart';
 
 class PDFScreen extends StatefulWidget {
   final List<Field> fields;
@@ -42,9 +39,6 @@ class _PDFScreenState extends State<PDFScreen> {
   GlobalKey _keyPDF = GlobalKey();
   RenderBox pdfBox;
   Size pdfSize;
-  double _scale = 1.0;
-  double _previousScale = 1.0;
-  Offset _focalPoint = Offset(0, 0);
   PdfController _pdfController;
   static final int _initialPage = 1;
   int _actualPageNumber = _initialPage;
@@ -207,12 +201,12 @@ class _PDFScreenState extends State<PDFScreen> {
       File file = File(widget.pathPDF);
 
       if (file != null && Authentication().isAuth) {
-        final String instrumentPath =
-            '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrumentID}';
         if (!widget.onlyFields) {
           Applogger.consoleLog(MessegeType.info, "Saving File");
-          await FirebaseStorageProvider.uploadFile(file, instrumentPath)
-              .catchError((e) => e.toString());
+          await FirebaseStorageProvider.uploadFile(
+            file,
+            FirebasePaths.instrumentReportTemplatePath(widget.instrumentID),
+          ).catchError((e) => e.toString());
         }
 
         _updateProgress(50);

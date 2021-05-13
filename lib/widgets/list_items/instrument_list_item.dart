@@ -48,9 +48,9 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
             ),
             color: _bgDefaultColor,
             child: ListTile(
-              leading: CircleAvatar(
-                child: Icon(widget.icon),
-              ),
+              leading: widget.instrument.imgUrl == null
+                  ? CircleAvatar(child: Icon(widget.icon))
+                  : Image.network(widget.instrument.imgUrl),
               title: Text(widget.instrument.getCodeName()),
               subtitle: Text(widget.instrument.getReference()),
               trailing: FittedBox(
