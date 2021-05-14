@@ -6,6 +6,7 @@ class Site {
   String name;
   Address address;
   List<Contact> contacts = [];
+  String imgUrl;
 
   Site({this.name, this.address});
 
@@ -13,13 +14,15 @@ class Site {
     return {
       'name': name,
       'address': address.toJson(),
+      'imgUrl': imgUrl,
     };
   }
 
   Site.fromJson(Map<String, dynamic> data, String id)
       : id = id,
         name = data['name'].toString().trim(),
-        address = Address.fromJson(data['address']);
+        address = Address.fromJson(data['address']),
+        imgUrl = data['imgUrl'];
 
   factory Site.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Site.fromJson(documentSnapshot.data(), documentSnapshot.id);

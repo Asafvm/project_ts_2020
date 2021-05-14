@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
@@ -43,9 +45,25 @@ class InstrumentInfoScreen extends StatelessWidget {
                   Flexible(
                     fit: FlexFit.tight,
                     flex: 2,
-                    child: IconButton(
-                      icon: Icon(Icons.add_a_photo),
-                      onPressed: () {},
+                    child: InkWell(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: instance.imgUrl == null
+                                  ? AssetImage('assets/pics/unknown.jpg')
+                                  : NetworkImage(instance.imgUrl),
+                              fit: BoxFit.fitHeight),
+                        ),
+                      ),
+                      onTap: () async => {
+                        instance.imgUrl = await ImageHelper.takePicture(
+                            context: context,
+                            uploadPath: FirebasePaths.instanceImagePath(
+                                instance.instrumentCode, instance.serial),
+                            fileName: 'instrumentImg'),
+                        FirebaseFirestoreCloudFunctions
+                            .uploadInstrumentInstance(instance)
+                      },
                     ),
                   ),
                   Flexible(

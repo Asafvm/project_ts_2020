@@ -207,7 +207,8 @@ class _AddSiteFormState extends State<AddSiteForm> {
         });
         //send to server
         try {
-          await FirebaseFirestoreCloudFunctions.uploadSite(_newSite)
+          await FirebaseFirestoreCloudFunctions.uploadSite(
+                  _newSite, Operation.CREATE)
               .then((_) async => {
                     Navigator.of(context).pop(),
                     ScaffoldMessenger.of(context).showSnackBar(

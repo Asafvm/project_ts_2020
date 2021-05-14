@@ -34,6 +34,12 @@ class FirebasePaths {
   static String instanceReportImagePath(
           String instrumentId, String instanceId) =>
       '${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentId/$instanceId/$reports/$images';
-  static String instrumentImagePath(String instrumentId, String instanceId) =>
+  static String instrumentImagePath(String instrumentId) =>
       '${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentId/$images';
+  static String instanceImagePath(String instrumentId, String instanceId) =>
+      '${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentId/$instanceId/$images';
+  static String partImagePath(String partId) =>
+      '${TeamProvider().getCurrentTeam.getTeamId}/$parts/$partId/$images';
+  static String siteImagePath(String siteId) =>
+      '${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$images';
 }

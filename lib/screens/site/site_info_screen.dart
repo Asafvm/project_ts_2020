@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
@@ -8,6 +9,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/screens/contact/contact_selection_screen.dart';
 import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';
@@ -76,59 +78,117 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Stack(
+              Row(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 1,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    child: Image.network(
-                      _previewImageUrl,
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 20,
-                    right: 20,
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.black),
-                          borderRadius: BorderRadius.circular(15),
-                          color: Colors.white),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            IconButton(
-                                splashColor: Theme.of(context).accentColor,
-                                splashRadius: 20,
-                                iconSize: 35,
-                                color: Theme.of(context).primaryColor,
-                                icon:
-                                    Image.asset('assets/icons/googlemaps.png'),
-                                tooltip: 'Directions',
-                                onPressed: () => launchGoogleMaps(
-                                    widget.site.address.lat,
-                                    widget.site.address.lng)),
-                            IconButton(
-                                splashColor: Theme.of(context).accentColor,
-                                splashRadius: 20,
-                                iconSize: 35,
-                                color: Theme.of(context).primaryColor,
-                                icon: Image.asset('assets/icons/waze.png'),
-                                tooltip: 'Directions',
-                                onPressed: () => launchWaze(
-                                    widget.site.address.lat,
-                                    widget.site.address.lng)),
-                          ],
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          child: Image.network(
+                            _previewImageUrl,
+                            fit: BoxFit.fill,
+                          ),
                         ),
-                      ),
+                        if (widget.site.imgUrl == null)
+                          Positioned(
+                            top: 20,
+                            right: 20,
+                            child: IconButton(
+                              splashColor: Theme.of(context).accentColor,
+                              splashRadius: 20,
+                              iconSize: 35,
+                              color: Theme.of(context).primaryColor,
+                              icon: Icon(Icons.camera_alt_rounded),
+                              tooltip: 'Take a picture',
+                              onPressed: () async => {
+                                widget.site.imgUrl =
+                                    await ImageHelper.takePicture(
+                                        context: context,
+                                        uploadPath: FirebasePaths.siteImagePath(
+                                            widget.site.id),
+                                        fileName: 'siteImg'),
+                                await FirebaseFirestoreCloudFunctions
+                                        .uploadSite(
+                                            widget.site, Operation.UPDATE)
+                                    .then((value) => print(value.data))
+                              },
+                            ),
+                          ),
+                        Positioned(
+                          bottom: 20,
+                          right: 20,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 1, color: Colors.black),
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.white),
+                            child: Material(
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                      splashColor:
+                                          Theme.of(context).accentColor,
+                                      splashRadius: 20,
+                                      iconSize: 35,
+                                      color: Theme.of(context).primaryColor,
+                                      icon: Image.asset(
+                                          'assets/icons/googlemaps.png'),
+                                      tooltip: 'Directions',
+                                      onPressed: () => launchGoogleMaps(
+                                          widget.site.address.lat,
+                                          widget.site.address.lng)),
+                                  IconButton(
+                                      splashColor:
+                                          Theme.of(context).accentColor,
+                                      splashRadius: 20,
+                                      iconSize: 35,
+                                      color: Theme.of(context).primaryColor,
+                                      icon:
+                                          Image.asset('assets/icons/waze.png'),
+                                      tooltip: 'Directions',
+                                      onPressed: () => launchWaze(
+                                          widget.site.address.lat,
+                                          widget.site.address.lng)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  if (widget.site.imgUrl != null)
+                    Expanded(
+                      child: InkWell(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: widget.site.imgUrl == null
+                                    ? AssetImage('assets/pics/unknown.jpg')
+                                    : NetworkImage(widget.site.imgUrl),
+                                fit: BoxFit.fitHeight),
+                          ),
+                        ),
+                        onTap: () async => {
+                          widget.site.imgUrl = await ImageHelper.takePicture(
+                              context: context,
+                              uploadPath:
+                                  FirebasePaths.siteImagePath(widget.site.id),
+                              fileName: 'siteImg'),
+                          FirebaseFirestoreCloudFunctions.uploadSite(
+                              widget.site, Operation.UPDATE)
+                        },
+                      ),
+                    ),
                 ],
               ),
               Padding(
