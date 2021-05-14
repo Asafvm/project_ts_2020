@@ -10,6 +10,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 class GenericFormScreen extends StatefulWidget {
@@ -132,7 +133,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           ),
         );
       }
-      String dest = (await getTemporaryDirectory()).path;
+      String dest =
+          '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}';
 
       File result = await doc
           .save(filename: '${DateTime.now().toIso8601String()}.pdf')

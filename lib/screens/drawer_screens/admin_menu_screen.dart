@@ -5,7 +5,6 @@ import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/admin/admin_contact_screen.dart';
 import 'package:teamshare/screens/admin/admin_instrument_screen.dart';
 import 'package:teamshare/screens/admin/admin_part_screen.dart';
