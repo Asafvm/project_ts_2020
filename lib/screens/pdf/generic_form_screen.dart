@@ -118,12 +118,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     try {
       PdfMutableDocument doc = await PdfMutableDocument.path(widget.pdfPath);
 
-      // PdfMutableDocument doc =
-      //     await PdfMutableDocument.asset("assets/pdf/blank.pdf");
-
       //add field to pages
+
       for (Field field in fields) {
-        var page = doc.getPage(field.page);
+        var page = doc.getPage(field.page - 1);
         page.add(
           item: pdfWidgets.Positioned(
             left: field.offset.dx * page.size.width,
@@ -141,20 +139,14 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           .then((value) => value.copy('$dest/${basename(value.path)}'));
       Applogger.consoleLog(MessegeType.info, "PDF Editing Done");
 
-      //result = await result.copy();
-
-      Navigator.of(context)
-          .push(MaterialPageRoute(
-            builder: (context) => PDFScreen(
-              fields: [],
-              pathPDF: result.path,
-              onlyFields: true,
-              instrumentID: widget.instance.instrumentCode,
-            ),
-          ))
-          .then(
-              (value) => Navigator.of(context).pop(true)); //formFilled = true);
-
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => PDFScreen(
+          fields: [],
+          pathPDF: result.path,
+          onlyFields: true,
+          instrumentID: widget.instance.instrumentCode,
+        ),
+      ));
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
       Navigator.of(context).pop(false); //formFilled = false

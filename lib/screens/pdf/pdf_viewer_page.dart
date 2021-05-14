@@ -120,7 +120,7 @@ class _PDFScreenState extends State<PDFScreen> {
                         setState(() {
                           _actualPageNumber = page;
                         });
-                        _updateLists(page, page);
+                        _updateLists(_actualPageNumber, _actualPageNumber);
                       },
                     ),
                     if (pdfBox != null)
@@ -143,7 +143,7 @@ class _PDFScreenState extends State<PDFScreen> {
   Future<void> _addField(Offset pos) async {
     final Field f = Field.basic(
       index: _fieldIndex,
-      page: _pageIndex,
+      page: _actualPageNumber,
       initialPos: Offset(pos.dx / pdfBox.size.width,
           pos.dy / pdfBox.size.height), //save offset as ratio
     );
@@ -211,7 +211,7 @@ class _PDFScreenState extends State<PDFScreen> {
 
         _updateProgress(50);
         Applogger.consoleLog(MessegeType.info, "Saving Fields");
-        var result = await FirebaseFirestoreCloudFunctions.uploadFields(_fields,
+        await FirebaseFirestoreCloudFunctions.uploadFields(_fields,
             path.basenameWithoutExtension(widget.pathPDF), widget.instrumentID);
 
         _updateProgress(100);

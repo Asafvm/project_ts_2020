@@ -117,15 +117,14 @@ class _CustomFieldState extends State<CustomField> {
             : Draggable(
                 data: widget.field.index,
                 onDragEnd: (details) {
-                  Offset newPos = Offset(
+                  //subtract the height of the status bar and appbar
+                  widget.field.offset = Offset(
                       (details.offset.dx - widget.mqd.viewPadding.topLeft.dx) /
                           widget.pdfSizeOnScreen.width,
                       (details.offset.dy -
                               widget.mqd.padding.top -
-                              widget
-                                  .appbarHeight) / //75 =  empty space due to centered widget
+                              widget.appbarHeight) /
                           widget.pdfSizeOnScreen.height);
-                  _relocate(newPos);
                 },
                 feedback: Card(elevation: 5, child: field),
                 child: field,
@@ -133,21 +132,6 @@ class _CustomFieldState extends State<CustomField> {
               ),
       ),
     );
-  }
-
-  void _relocate(Offset offset) {
-    // Offset viewRatio = Offset(
-    //     widget.mqd.viewPadding.topLeft.dx / widget.pdfSizeOnScreen.width,
-    //     widget.mqd.viewPadding.topLeft.dy / widget.pdfSizeOnScreen.height);
-
-    // Offset factor =
-    //     Offset(0, 50 / widget.pdfSizeOnScreen.height); //TODO: figure this out
-
-    setState(() {
-      widget.field.offset = offset;
-      // -viewRatio;
-      // -factor;
-    });
   }
 
   void _resize(Offset offset) {

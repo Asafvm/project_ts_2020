@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/instrument.dart';

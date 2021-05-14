@@ -48,7 +48,7 @@ class FirebaseStorageProvider {
 
     if (tempFile.existsSync()) {
       final DownloadTask task = ref.writeToFile(tempFile);
-      TaskSnapshot result = await task.whenComplete(() => null);
+      await task.whenComplete(() => null);
       return tempFile.path;
     }
     return null;

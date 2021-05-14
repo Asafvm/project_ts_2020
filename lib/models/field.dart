@@ -4,7 +4,7 @@ class Field {
   final double _minWidth = 10;
   final double _minHeight = 10;
   final double _defWidth = 40;
-  final double _defHeight = 20;
+  final double _defHeight = 15;
 
   String defaultValue;
   final int index;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_list_screen.dart';
@@ -108,7 +109,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
             //list of files related to instrument
             stream: FirebaseFirestore.instance
                 .collection(
-                    "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrument.getCodeName()}/reports")
+                    FirebasePaths.instanceReportRef(widget.instrument.id))
                 .snapshots()
                 .map((list) => list.docs),
             builder: (context, snapshot) {
@@ -123,14 +124,13 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                     shrinkWrap: true,
                     itemBuilder: (ctx, index) => ListTile(
                       leading: Icon(Icons.picture_as_pdf),
-                      title: Text(snapshot.data[index].id),
+                      title: Text(
+                        snapshot.data[index].id,
+                        maxLines: 2,
+                      ),
                       trailing: FittedBox(
                         child: Row(
                           children: <Widget>[
-                            // IconButton(
-                            //     icon: Icon(Icons.file_upload),
-                            //     onPressed:
-                            //         () {}), //TODO: replace file at storage
                             IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () => _openPDF(
@@ -159,10 +159,8 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
   }
 
   _openPDF(String pdf, List<Field> fields) async {
-    final String instrumentPath =
-        '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${widget.instrument.getCodeName()}/';
-    String path =
-        await FirebaseStorageProvider.downloadFile('$instrumentPath/$pdf');
+    String path = await FirebaseStorageProvider.downloadFile(
+        '${FirebasePaths.instrumentReportTemplatePath(widget.instrument.id)}/$pdf');
     Navigator.push(
         context,
         MaterialPageRoute(
