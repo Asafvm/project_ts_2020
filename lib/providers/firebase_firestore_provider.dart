@@ -14,7 +14,6 @@ class FirebaseFirestoreProvider {
 //Get from Firebase
 
   static Stream<List<String>> getUserTeamList() {
-    // String teamsRef = "$users/${Authentication().userEmail}/$teams";
     Stream<List<String>> stream = FirebaseFirestore.instance
         .collection(FirebasePaths.teamsRef)
         .snapshots()
@@ -25,8 +24,6 @@ class FirebaseFirestoreProvider {
   }
 
   static Stream<List<Part>> getParts() {
-    // String partsRef =
-    //     "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$parts";
     return FirebaseFirestore.instance
         .collection(FirebasePaths.partsRef)
         .snapshots()
