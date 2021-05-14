@@ -8,6 +8,7 @@ import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/drawer_screens/FileExplorer.dart';
 import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
+import 'package:teamshare/screens/drawer_screens/map_screen.dart';
 import 'package:teamshare/screens/drawer_screens/reports_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -67,7 +68,12 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.map),
             title: Text('Map'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MapScreen()),
+              );
+            },
           ),
           Divider(),
           ListTile(

@@ -61,6 +61,9 @@ dependencies:
   plugin_platform_interface: ^2.0.0
   ffi: ^1.0.0
   url_launcher: ^6.0.3 #for navigation
+  custom_info_window: ^1.0.1
+  clippy_flutter: ^1.1.1
+  google_maps_cluster_manager: ^1.0.0
 
 dev_dependencies:
   flutter_test:

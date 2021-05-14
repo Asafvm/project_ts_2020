@@ -23,7 +23,8 @@ class _FileExplorerState extends State<FileExplorer> {
 
         actions: [
           if (_multiSelect)
-            IconButton(icon: Icon(Icons.share), onPressed: () {})
+            IconButton(icon: Icon(Icons.share), onPressed: () {}),
+          IconButton(icon: Icon(Icons.delete), onPressed: () {})
         ],
       ),
       body: FutureBuilder<Directory>(
@@ -92,6 +93,10 @@ class _FileExplorerState extends State<FileExplorer> {
                                   ));
 
                                 //TODO: else if folder call FileExplorer(currect path + folder name])
+
+                                else if(files[index].path.endsWith(".")){
+                                  
+                                }
                               },
 
                               leading: Icon(fileStats.type.toString() == "file"
