@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/consts.dart';
@@ -38,7 +39,7 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildDescFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Description"),
+      decoration: DecorationLibrary.inputDecoration("Description", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newPart.description = value,
       initialValue: (_newPart != null) ? _newPart.description : "",
@@ -54,7 +55,8 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildMinStorageFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Main Storage Min"),
+      decoration:
+          DecorationLibrary.inputDecoration("Main Storage Min", context),
       keyboardType: TextInputType.number,
       onChanged: (value) => _newPart.mainStockMin = int.tryParse(value) ?? 0,
       initialValue: (_newPart != null) ? _newPart.mainStockMin.toString() : "",
@@ -74,7 +76,8 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildPerStorageFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Personal Storage Min'),
+      decoration:
+          DecorationLibrary.inputDecoration("Personal Storage Min", context),
       keyboardType: TextInputType.number,
       onChanged: (value) =>
           _newPart.personalStockMin = int.tryParse(value) ?? 0,
@@ -96,7 +99,7 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildRefFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Reference'),
+      decoration: DecorationLibrary.inputDecoration("Reference", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newPart.reference = value,
       initialValue: (_newPart != null) ? _newPart.reference : "",
@@ -112,7 +115,7 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildAltRefFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Alt. Reference'),
+      decoration: DecorationLibrary.inputDecoration("Alt. Reference", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newPart.altreference = value,
       initialValue: (_newPart != null) ? _newPart.altreference : "",
@@ -124,7 +127,7 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildManFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Manifacturer'),
+      decoration: DecorationLibrary.inputDecoration("Manifacturer", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newPart.manifacturer = value,
       initialValue: (_newPart != null) ? _newPart.manifacturer : "",
@@ -136,7 +139,7 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildModelFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Model'),
+      decoration: DecorationLibrary.inputDecoration("Model", context),
       keyboardType: TextInputType.text,
       onChanged: (value) => _newPart.model = value,
       initialValue: (_newPart != null) ? _newPart.model : "",
@@ -148,7 +151,7 @@ class _AddPartFormState extends State<AddPartForm>
 
   Widget _buildPriceFormField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Price'),
+      decoration: DecorationLibrary.inputDecoration("Price", context),
       keyboardType: TextInputType.numberWithOptions(decimal: true),
       onChanged: (value) => _newPart.price = double.tryParse(value) ?? 0,
       initialValue: (_newPart != null) ? _newPart.price.toString() : "",
@@ -183,52 +186,45 @@ class _AddPartFormState extends State<AddPartForm>
 
     var reqTab = Column(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Row(
-          children: [
-            Flexible(
-              flex: 1,
-              fit: FlexFit.tight,
-              child: IconButton(
-                icon: Icon(Icons.add_a_photo),
-                iconSize: 50,
-                onPressed: () {},
-              ),
-            ),
-            Flexible(
-              flex: 3,
-              fit: FlexFit.tight,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildDescFormField(),
-                  _buildRefFormField(),
-                ],
-              ),
-            )
-          ],
+        Flexible(
+          flex: 3,
+          fit: FlexFit.tight,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDescFormField(),
+              _buildRefFormField(),
+            ],
+          ),
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Expanded(child: _buildMinStorageFormField()),
-            Expanded(child: _buildPerStorageFormField()),
+            Expanded(flex: 2, child: _buildMinStorageFormField()),
+            Spacer(),
+            Expanded(flex: 2, child: _buildPerStorageFormField()),
           ],
         ),
       ],
     );
     var optTab = Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: <Widget>[
-            Expanded(child: _buildManFormField()),
-            Expanded(child: _buildModelFormField()),
+            Expanded(flex: 3, child: _buildManFormField()),
+            Spacer(),
+            Expanded(flex: 2, child: _buildModelFormField()),
           ],
         ),
         Row(
           children: <Widget>[
-            Expanded(child: _buildAltRefFormField()),
-            Expanded(child: _buildPriceFormField())
+            Expanded(flex: 3, child: _buildAltRefFormField()),
+            Spacer(),
+            Expanded(flex: 2, child: _buildPriceFormField())
           ],
         ),
         Row(
@@ -256,8 +252,7 @@ class _AddPartFormState extends State<AddPartForm>
             ),
           ],
         ),
-        Expanded(
-          flex: 3,
+        Flexible(
           child: instrumentList.isEmpty
               ? Text(
                   "No Instruments listed",

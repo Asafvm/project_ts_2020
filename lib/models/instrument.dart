@@ -74,7 +74,7 @@ class Instrument {
         codeName = data['codeName'].toString().trim(),
         model = data['model'].toString().trim(),
         price = double.parse(data['price'].toString()), //stupid, but works
-        imgUrl = data['imgUrl'].toString().trim() ?? null;
+        imgUrl = data['imgUrl'] ?? null;
 
   factory Instrument.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Instrument.fromJson(documentSnapshot.data(), documentSnapshot.id);

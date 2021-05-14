@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:geocode/geocode.dart' as geo;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 //import 'package:geocoder/geocoder.dart' as geo;
@@ -81,7 +82,7 @@ class _AddSiteFormState extends State<AddSiteForm> {
 
   Widget _buildNameField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Site Name"),
+      decoration: DecorationLibrary.inputDecoration("Site Name", context),
       keyboardType: TextInputType.text,
       validator: (value) => (value.trim().isEmpty) ? "Not a valid name" : null,
       onSaved: (val) {
@@ -92,9 +93,9 @@ class _AddSiteFormState extends State<AddSiteForm> {
 
   Widget _buildAddressField() {
     return TextField(
+      decoration:
+          DecorationLibrary.inputDecoration("Selected Address", context),
       controller: _controllerAddressText,
-      decoration: InputDecoration(
-          labelText: "Selected Address", hintText: "Please select location"),
       enabled: false,
       maxLines: 2,
     );
@@ -164,15 +165,11 @@ class _AddSiteFormState extends State<AddSiteForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildNameField(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(child: _buildAddressField()),
-                            ],
-                          )
+                          Expanded(flex: 2, child: _buildNameField()),
+                          Spacer(),
+                          Expanded(flex: 3, child: _buildAddressField())
                         ],
                       ),
                     ),
@@ -210,7 +207,8 @@ class _AddSiteFormState extends State<AddSiteForm> {
         });
         //send to server
         try {
-          await FirebaseFirestoreCloudFunctions.uploadSite(_newSite)
+          await FirebaseFirestoreCloudFunctions.uploadSite(
+                  _newSite, Operation.CREATE)
               .then((_) async => {
                     Navigator.of(context).pop(),
                     ScaffoldMessenger.of(context).showSnackBar(

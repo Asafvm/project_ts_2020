@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/forms/add_instrument_instance_form.dart';
 import 'package:teamshare/widgets/list_items/instrument_instance_list_item.dart';
@@ -17,6 +20,8 @@ class InstrumentListScreen extends StatefulWidget {
 
 class _InstrumentListScreenState extends State<InstrumentListScreen> {
   Team curTeam;
+  final scaffoldState = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     curTeam = TeamProvider().getCurrentTeam;
@@ -26,13 +31,13 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldState,
       appBar: AppBar(
         title: Text(widget.instrument.getCodeName()),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _openAddInstrumentInstance(context))
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openAddInstrumentInstance(context),
+        child: Icon(Icons.add),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -40,7 +45,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             _buildInstanceList(),
           ],
         ),
@@ -56,7 +61,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
         }).whenComplete(() => setState(() {}));
   }
 
-  _buildHeader() {
+  _buildHeader(BuildContext context) {
     return Expanded(
       flex: 1,
       child: Card(
@@ -64,7 +69,26 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Icon(Icons.computer),
+            InkWell(
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: widget.instrument.imgUrl == null
+                          ? AssetImage('assets/pics/unknown.jpg')
+                          : NetworkImage(widget.instrument.imgUrl),
+                      fit: BoxFit.fitHeight),
+                ),
+              ),
+              onTap: () async => {
+                widget.instrument.imgUrl = await ImageHelper.takePicture(
+                    context: context,
+                    uploadPath:
+                        FirebasePaths.instrumentImagePath(widget.instrument.id),
+                    fileName: 'instrumentImg'),
+                FirebaseFirestoreCloudFunctions.uploadInstrument(
+                    widget.instrument)
+              },
+            ),
             Positioned(
                 top: 10,
                 left: 10,

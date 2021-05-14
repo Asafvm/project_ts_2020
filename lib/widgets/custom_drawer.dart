@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +8,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/drawer_screens/FileExplorer.dart';
 import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/drawer_screens/map_screen.dart';
@@ -55,11 +58,14 @@ class CustomDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.library_books),
             title: Text('Files'),
-            onTap: () {
+            onTap: () async {
+              Future<Directory> dir = Directory(
+                      '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}')
+                  .create(recursive: true);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => FileExplorer(
-                    path: getTemporaryDirectory(),
+                    path: dir,
                   ),
                 ),
               );

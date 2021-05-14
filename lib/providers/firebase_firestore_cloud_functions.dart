@@ -15,13 +15,14 @@ import 'package:teamshare/providers/team_provider.dart';
 
 import 'authentication.dart';
 
-///*** class changed to static ***///
+enum Operation { CREATE, UPDATE, DELETE }
 
 class FirebaseFirestoreCloudFunctions {
   static const String instruments = "instruments";
   static const String teams = "teams";
   static const String sites = "sites";
   static const String rooms = "rooms";
+
 //Get from Firebase
 
   static Future<HttpsCallableResult> addTeam(String name, String description,
@@ -83,8 +84,8 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<void> uploadPart(Part _newPart) async {
-    await FirebaseFunctions.instance
+  static Future<HttpsCallableResult> uploadPart(Part _newPart) async {
+    return await FirebaseFunctions.instance
         .httpsCallable("addPart")
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
@@ -92,8 +93,8 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<void> updatePart(Part part) async {
-    await FirebaseFunctions.instance
+  static Future<HttpsCallableResult> updatePart(Part part) async {
+    return await FirebaseFunctions.instance
         .httpsCallable("updatePart")
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
@@ -102,9 +103,9 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<void> uploadInstrumentInstance(
+  static Future<HttpsCallableResult> uploadInstrumentInstance(
       InstrumentInstance _newInstrument) async {
-    await FirebaseFunctions.instance
+    return await FirebaseFunctions.instance
         .httpsCallable("addInstrumentInstance")
         .call(<String, dynamic>{
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
@@ -114,22 +115,26 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<void> uploadInstrument(Instrument _newInstrument) async {
-    await FirebaseFunctions.instance
-        .httpsCallable("addInstrument")
-        .call(
-          <String, dynamic>{
-            "instrument": _newInstrument.toJson(),
-            "teamId": TeamProvider().getCurrentTeam.getTeamId
-          },
-        )
-        .then(
-          (value) => print("Upload Finished: ${value.data}"),
-        )
-        .catchError(
-          (e) =>
-              throw new Exception("Error uploading: ${e.details["message"]}"),
-        );
+  static Future<HttpsCallableResult> updateInstrumentInstance(
+      InstrumentInstance _newInstrument) async {
+    return await FirebaseFunctions.instance
+        .httpsCallable("updateInstrumentInstance")
+        .call(<String, dynamic>{
+      "teamID": TeamProvider().getCurrentTeam.getTeamId,
+      "instrumentID": _newInstrument.instrumentCode,
+      "instrument": _newInstrument.toJson(),
+      //"entries": _newInstrument.entries.map((e) => e.toJson()).toList()
+    });
+  }
+
+  static Future<HttpsCallableResult> uploadInstrument(
+      Instrument _newInstrument) async {
+    return await FirebaseFunctions.instance.httpsCallable("addInstrument").call(
+      <String, dynamic>{
+        "instrument": _newInstrument.toJson(),
+        "teamId": TeamProvider().getCurrentTeam.getTeamId
+      },
+    );
   }
 
   //Cloud Storage
@@ -162,8 +167,8 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static removeTeam(String teamDocId) {
-    FirebaseFirestore.instance
+  static Future<HttpsCallableResult> removeTeam(String teamDocId) {
+    return FirebaseFirestore.instance
         .collection("users")
         .doc(Authentication().userEmail)
         .collection("teams")
@@ -171,17 +176,22 @@ class FirebaseFirestoreCloudFunctions {
         .delete();
   }
 
-  static uploadSite(Site newSite) async {
-    await FirebaseFunctions.instance
+  static Future<HttpsCallableResult> uploadSite(
+      Site newSite, Operation operation) async {
+    print("OPERATION:::" + operation.index.toString());
+    return await FirebaseFunctions.instance
         .httpsCallable("addSite")
         .call(<String, dynamic>{
+      "operation": operation.index,
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "site": newSite.toJson(),
+      "siteId": newSite.id,
     });
   }
 
-  static uploadRoom(String siteId, Room newRoom) async {
-    await FirebaseFunctions.instance
+  static Future<HttpsCallableResult> uploadRoom(
+      String siteId, Room newRoom) async {
+    return await FirebaseFunctions.instance
         .httpsCallable("addRoom")
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
@@ -190,9 +200,9 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<void> linkInstruments(
+  static Future<HttpsCallableResult> linkInstruments(
       List<InstrumentInstance> selected, String siteId, String roomId) async {
-    await FirebaseFunctions.instance
+    return await FirebaseFunctions.instance
         .httpsCallable("linkInstruments")
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
@@ -202,7 +212,7 @@ class FirebaseFirestoreCloudFunctions {
           .toList(),
       "siteId": siteId,
       "roomId": roomId,
-    }).then((value) => print(value.data));
+    });
   }
 
   static Future<HttpsCallableResult> uploadContact(
@@ -227,6 +237,4 @@ class FirebaseFirestoreCloudFunctions {
       "contacts": selected.map((contact) => {"contactId": contact.id}).toList(),
     });
   }
-
-  static addInstanceEntry(Entry entry) {}
 }

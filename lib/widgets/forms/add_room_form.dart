@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
@@ -25,7 +26,7 @@ class _AddRoomFormState extends State<AddRoomForm> {
 
   Widget _buildBuildingField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Building"),
+      decoration: DecorationLibrary.inputDecoration("Building", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newRoom.building = val;
@@ -35,7 +36,7 @@ class _AddRoomFormState extends State<AddRoomForm> {
 
   Widget _buildfloorField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Floor"),
+      decoration: DecorationLibrary.inputDecoration("Floor", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newRoom.floor = val;
@@ -49,7 +50,7 @@ class _AddRoomFormState extends State<AddRoomForm> {
 
   Widget _buildRoomNumberField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Room Number"),
+      decoration: DecorationLibrary.inputDecoration("Room", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newRoom.roomNumber = val;
@@ -63,7 +64,7 @@ class _AddRoomFormState extends State<AddRoomForm> {
 
   Widget _buildTitleField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Title"),
+      decoration: DecorationLibrary.inputDecoration("Title", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newRoom.roomTitle = val;
@@ -77,7 +78,7 @@ class _AddRoomFormState extends State<AddRoomForm> {
 
   Widget _buildDescriptionField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Decription"),
+      decoration: DecorationLibrary.inputDecoration("Decription", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newRoom.decription = val;
@@ -96,14 +97,16 @@ class _AddRoomFormState extends State<AddRoomForm> {
       child: Form(
         key: _roomForm,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             _buildTitleField(),
             Row(
               children: [
-                Expanded(child: _buildBuildingField()),
-                Expanded(child: _buildfloorField()),
-                Expanded(child: _buildRoomNumberField()),
+                Expanded(flex: 3, child: _buildBuildingField()),
+                Spacer(),
+                Expanded(flex: 2, child: _buildfloorField()),
+                Spacer(),
+                Expanded(flex: 2, child: _buildRoomNumberField()),
               ],
             ),
             _buildDescriptionField(),

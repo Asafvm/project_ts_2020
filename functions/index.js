@@ -130,20 +130,33 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
     .collection("teams")
     .doc(data["teamId"])
     .collection("instruments");
-
-  var snapshot = await instruments.get();
-  snapshot.forEach((doc) => {
-    //check for duplicates
-    if (doc.id === data["instrument"]["codeName"])
-      //throw error message if found
-      throw new functions.https.HttpsError(
-        "already-exists",
-        "Instrument already exists",
-        "Duplicate code name"
-      );
-  });
-  //upload new instrument
-  await instruments.doc(data["instrument"]["codeName"]).set(data["instrument"]);
+  try {
+    if (data["instrument"]["codeName"] === null) {
+      var snapshot = await instruments.get();
+      snapshot.forEach((doc) => {
+        //check for duplicates
+        if (doc.id === data["instrument"]["codeName"])
+          //throw error message if found
+          throw new functions.https.HttpsError(
+            "already-exists",
+            "Instrument already exists",
+            "Duplicate code name"
+          );
+      });
+      //upload new instrument
+      await instruments
+        .doc(data["instrument"]["codeName"])
+        .set(data["instrument"]);
+    } else {
+      await instruments
+        .doc(data["instrument"]["codeName"])
+        .update(data["instrument"]);
+    }
+  } catch (e) {
+    console.log("Error Adding instrument :: " + e);
+    return { status: "failed", messege: e };
+  }
+  return { status: "success" };
 });
 
 //add instrument instance to team's inventory
@@ -158,12 +171,38 @@ exports.addInstrumentInstance = functions.https.onCall(
       .collection("instances")
       .doc(data["instrument"]["serial"]);
 
-    await instruments.create(data["instrument"]);
-    await instruments.collection("entries").add({
-      type: 0,
-      timestamp: Date.now(),
-      details: "New Instrument Created",
-    });
+    try {
+      await instruments.create(data["instrument"]);
+      await instruments.collection("entries").add({
+        type: 0,
+        timestamp: Date.now(),
+        details: "New Instrument Created",
+      });
+    } catch (e) {
+      console.log("Error Adding instrument :: " + e);
+      return { status: "failed", messege: e };
+    }
+    return { status: "success" };
+  }
+);
+
+exports.addInstrumentInstance = functions.https.onCall(
+  async (data, context) => {
+    const instruments = admin
+      .firestore()
+      .collection("teams")
+      .doc(data["teamID"])
+      .collection("instruments")
+      .doc(data["instrumentID"])
+      .collection("instances")
+      .doc(data["instrument"]["serial"]);
+    try {
+      await instruments.update(data["instrument"]);
+    } catch (e) {
+      console.log("Error Adding instrument :: " + e);
+      return { status: "failed", messege: e };
+    }
+    return { status: "success" };
   }
 );
 
@@ -178,7 +217,8 @@ exports.addPart = functions.https.onCall(async (data, context) => {
     .doc(teamid)
     .collection("parts");
   try {
-    await parts.add(partdata);
+    if (partdata[id] === null) await parts.add(partdata);
+    else await parts.update(partdata);
   } catch (e) {
     console.log("Error Adding Part :: " + e);
     return { status: "failed", messege: e };
@@ -256,16 +296,21 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
 
   const promises = [];
   try {
-    var reportid =  ((await instanceRef.collection("reports").get()).docs.length+1).toString();
-    while (reportid.length < 6) reportid = "0" + reportid;  //6-digit report id
-    console.log('id='+reportid);
+    var reportid = (
+      (await instanceRef.collection("reports").get()).docs.length + 1
+    ).toString();
+    while (reportid.length < 6) reportid = "0" + reportid; //6-digit report id
+    console.log("id=" + reportid);
     const fields = instanceRef
-      .collection("reports").doc(reportid)
+      .collection("reports")
+      .doc(reportid)
       .set(Object.assign({}, data["fields"]));
 
-    const log = instanceRef
-      .collection("entries")
-      .add({ type: 2, timestamp: Date.now(), details: "Report "+reportid+" Created"});
+    const log = instanceRef.collection("entries").add({
+      type: 2,
+      timestamp: Date.now(),
+      details: "Report " + reportid + " Created",
+    });
 
     promises.push(fields);
     promises.push(log);
@@ -275,21 +320,43 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     console.log("Error Creating Report :: " + e);
     return { status: "failed", messege: e };
   }
-  return { status: "success", 'reportId' : reportid };
+  return { status: "success", reportId: reportid };
 
   // return instrumentreports.set(
   //   Object.assign({}, data["fields"]) //map every list item to index number
   // );
 });
 
-exports.addSite = functions.https.onCall((data, context) => {
+exports.addSite = functions.https.onCall(async (data, context) => {
   const sites = admin
     .firestore()
     .collection("teams")
     .doc(data["teamId"])
     .collection("sites");
+  try {
+    switch(data["operation"]){
+      case 0:   //create
+      await sites.add(data["site"]);
+      break;
 
-  return sites.add(data["site"]);
+      case 1:   //update
+      if(data["siteId"]!==null)
+      sites.doc(data["siteId"]).update(data["site"]);
+      break;
+
+      case 2:   //delete
+
+      break;
+
+
+    }
+    // 
+    //await sites.update(data["site"]);
+  } catch (e) {
+    
+    return { status: "failed", messege: e.toString() };
+  }
+  return { status: "success" };
 });
 
 exports.addRoom = functions.https.onCall((data, context) => {

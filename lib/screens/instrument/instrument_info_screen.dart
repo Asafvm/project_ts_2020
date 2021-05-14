@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/pdf/generic_form_screen.dart';
 import 'package:teamshare/widgets/list_items/entry_list_item.dart';
 
@@ -18,8 +20,8 @@ class InstrumentInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String instrumentPath =
-        '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${instrument.getCodeName()}';
+    // final String instrumentPath =
+    //     '${TeamProvider().getCurrentTeam.getTeamId}/instruments/${instrument.getCodeName()}';
     var textStyleTitle = TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold);
     var textStyleContent = TextStyle(fontSize: 20.0);
     return Scaffold(
@@ -43,9 +45,25 @@ class InstrumentInfoScreen extends StatelessWidget {
                   Flexible(
                     fit: FlexFit.tight,
                     flex: 2,
-                    child: IconButton(
-                      icon: Icon(Icons.add_a_photo),
-                      onPressed: () {},
+                    child: InkWell(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: instance.imgUrl == null
+                                  ? AssetImage('assets/pics/unknown.jpg')
+                                  : NetworkImage(instance.imgUrl),
+                              fit: BoxFit.fitHeight),
+                        ),
+                      ),
+                      onTap: () async => {
+                        instance.imgUrl = await ImageHelper.takePicture(
+                            context: context,
+                            uploadPath: FirebasePaths.instanceImagePath(
+                                instance.instrumentCode, instance.serial),
+                            fileName: 'instrumentImg'),
+                        FirebaseFirestoreCloudFunctions
+                            .uploadInstrumentInstance(instance)
+                      },
                     ),
                   ),
                   Flexible(
@@ -123,69 +141,47 @@ class InstrumentInfoScreen extends StatelessWidget {
                           Container(
                             //forms
                             child: StreamBuilder<List<DocumentSnapshot>>(
-                              stream: FirebaseFirestore.instance
-                                  .collection(
-                                      "teams/${TeamProvider().getCurrentTeam.getTeamId}/instruments/${instrument.getCodeName()}/reports")
-                                  .snapshots()
-                                  .map((list) => list.docs),
+                              stream: FirebaseFirestoreProvider
+                                  .getInstrumentReports(instrument.id),
                               builder: (context, snapshot) {
-                                if (snapshot == null || snapshot.data == null) {
-                                  return Container();
-                                } else {
-                                  int items = snapshot
-                                      .data.length; //for height calculation
-                                  return AnimatedContainer(
-                                    height: 50.0,
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      itemBuilder: (ctx, index) => ListTile(
-                                        leading: Icon(Icons.picture_as_pdf),
-                                        title: Text(snapshot.data[index].id),
-                                        trailing: OutlinedButton(
-                                          child: Text(
-                                            "Create",
-                                          ),
-                                          style: outlinedButtonStyle,
-                                          onPressed: () async {
-                                            String downloadedPdfPath =
-                                                await FirebaseStorageProvider
-                                                    .downloadFile(
-                                                        '$instrumentPath/${snapshot.data[index].id}');
-                                            Navigator.of(context)
-                                                .push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        GenericFormScreen(
-                                                            fields: snapshot
-                                                                .data[index]
-                                                                .data(),
-                                                            pdfPath:
-                                                                downloadedPdfPath,
-                                                            instance: instance),
-                                                  ),
-                                                )
-                                                .then((formFilled) => {
-                                                      // if (formFilled == true)
-                                                      // FirebaseFirestoreCloudFunctions
-                                                      //     .addInstanceEntry(
-                                                      //   // instance.addEntry(
-                                                      //   Entry(
-                                                      //       type: ENTRY_TYPE
-                                                      //           .INFO.index,
-                                                      //       details:
-                                                      //           "Uploaded new ${snapshot.data[index].id} form",
-                                                      //       timestamp: Timestamp
-                                                      //               .now()
-                                                      //           .millisecondsSinceEpoch),
-                                                      // ),
-                                                    });
-                                          },
+                                if (snapshot.hasData) {
+                                  List<DocumentSnapshot> docList =
+                                      snapshot.data;
+
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemBuilder: (ctx, index) => ListTile(
+                                      leading: Icon(Icons.picture_as_pdf),
+                                      title: Text(docList[index].id),
+                                      trailing: OutlinedButton(
+                                        child: Text(
+                                          "Create",
                                         ),
+                                        style: outlinedButtonStyle,
+                                        onPressed: () async {
+                                          String downloadedPdfPath =
+                                              await FirebaseStorageProvider
+                                                  .downloadFile(
+                                                      '${FirebasePaths.instrumentReportTemplatePath(instrument.id)}/${docList[index].id}');
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  GenericFormScreen(
+                                                      fields: snapshot
+                                                          .data[index]
+                                                          .data(),
+                                                      pdfPath:
+                                                          downloadedPdfPath,
+                                                      instance: instance),
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      itemCount: items,
                                     ),
-                                    duration: Duration(milliseconds: 300),
+                                    itemCount: docList.length,
                                   );
+                                } else {
+                                  return Container();
                                 }
                               },
                             ),

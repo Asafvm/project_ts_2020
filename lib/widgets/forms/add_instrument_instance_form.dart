@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
@@ -20,7 +21,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
 
   Widget _buildSerialField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: "Serial"),
+      decoration: DecorationLibrary.inputDecoration("Serial", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newInstInstrument = InstrumentInstance.newInstrument(

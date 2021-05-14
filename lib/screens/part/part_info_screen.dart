@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/firebase_paths.dart';
 import 'package:teamshare/widgets/forms/add_part_form.dart';
 
 class PartInfoScreen extends StatefulWidget {
@@ -36,17 +39,22 @@ class _PartInfoScreenState extends State<PartInfoScreen>
             child: Stack(
               children: [
                 InkWell(
-                  onTap: () => _takePicture(context),
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: widget.part.imgUrl == null ||
-                                  widget.part.imgUrl.isEmpty
+                          image: widget.part.imgUrl == null
                               ? AssetImage('assets/pics/unknown.jpg')
                               : NetworkImage(widget.part.imgUrl),
                           fit: BoxFit.fitHeight),
                     ),
                   ),
+                  onTap: () async => {
+                    widget.part.imgUrl = await ImageHelper.takePicture(
+                        context: context,
+                        uploadPath: FirebasePaths.partImagePath(widget.part.id),
+                        fileName: 'partImg'),
+                    FirebaseFirestoreCloudFunctions.updatePart(widget.part)
+                  },
                 ),
                 Positioned(
                   bottom: 10,
@@ -174,60 +182,6 @@ class _PartInfoScreenState extends State<PartInfoScreen>
         ],
       ),
     );
-  }
-
-  void _takePicture(BuildContext context) {
-    scaffoldState.currentState.showBottomSheet(
-      (context) {
-        return Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  top: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                      style: BorderStyle.solid))),
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.photo), onPressed: _pickFromGallery),
-              ),
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.camera_alt_rounded),
-                    onPressed: _pickFromCamera),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future _pickFromGallery() async {
-    final imageFile = await ImagePicker().getImage(
-      source: ImageSource.gallery,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-
-    // await FirebaseFirestoreCloudFunctions.updateTeamLogo(
-    //         teamid: currentTeam.id, url: imageFile.path)
-    //     .then((_) => currentTeam.logoUrl = imageFile.path);
-  }
-
-  Future _pickFromCamera() async {
-    final imageFile = await ImagePicker().getImage(
-      source: ImageSource.camera,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-
-    // await FirebaseFirestoreCloudFunctions.updateTeamLogo(
-    //         teamid: currentTeam.id, url: imageFile.path)
-    //     .then((_) => currentTeam.logoUrl = imageFile.path);
   }
 
   _editPart(BuildContext context) {

@@ -8,7 +8,9 @@ import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 class GenericFormScreen extends StatefulWidget {
@@ -36,28 +38,30 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         appBar: AppBar(
           title: Text("Insert Form Name here"),
         ),
-        body: Column(
-          children: [
-            for (Field field in fields) _buildGenericField(field),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton.icon(
-                  icon: Icon(Icons.preview),
-                  onPressed: () => _preview(context),
-                  label: Text("Preview"),
-                ),
-                TextButton.icon(
-                  icon: Icon(Icons.send),
-                  onPressed: () => _submit(context),
-                  label: Text("Submit"),
-                )
-              ],
-            ),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              for (Field field in fields) _buildGenericField(field),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton.icon(
+                    icon: Icon(Icons.preview),
+                    onPressed: () => _preview(context),
+                    label: Text("Preview"),
+                  ),
+                  TextButton.icon(
+                    icon: Icon(Icons.send),
+                    onPressed: () => _submit(context),
+                    label: Text("Submit"),
+                  )
+                ],
+              ),
+            ],
+          ),
         ));
   }
 
@@ -124,22 +128,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           item: pdfWidgets.Positioned(
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
-            child:
-
-                //     AutoSizeText(
-                //   '(${widget.field.index.toString()})' + widget.field.defaultValue,
-                //   minFontSize: 0,
-                //   stepGranularity: 0.1,
-                // ),
-
-                pdfWidgets.Text(field.defaultValue ?? '!!!',
-                    style: pdfWidgets.TextStyle(fontSize: 26)),
-            // style:
-            //     pdfWidgets.TextStyle(fontSize: 32, color: pdf.PdfColors.red),
+            child: pdfWidgets.Text(field.defaultValue ?? '!!!',
+                style: pdfWidgets.TextStyle(fontSize: field.size.height)),
           ),
         );
       }
-      String dest = (await getTemporaryDirectory()).path;
+      String dest =
+          '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}';
 
       File result = await doc
           .save(filename: '${DateTime.now().toIso8601String()}.pdf')
@@ -151,8 +146,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       Navigator.of(context)
           .push(MaterialPageRoute(
             builder: (context) => PDFScreen(
-              fields: fields,
-              pathPDF: result.uri.toString(),
+              fields: [],
+              pathPDF: result.path,
               onlyFields: true,
               instrumentID: widget.instance.instrumentCode,
             ),

@@ -5,6 +5,7 @@ class InstrumentInstance {
   final String serial;
   String currentSiteId = 'Main';
   String currentRoomId = '';
+  String imgUrl;
 
   InstrumentInstance({this.instrumentCode, this.serial});
 
@@ -15,13 +16,15 @@ class InstrumentInstance {
         'currentSiteId': currentSiteId,
         'currentRoomId': currentRoomId,
         'serial': serial,
+        'imgUrl': imgUrl,
       };
 
   InstrumentInstance.fromJson(Map<String, dynamic> data)
       : instrumentCode = data['instrumentCode'],
         currentSiteId = data['currentSiteId'],
         currentRoomId = data['currentRoomId'],
-        serial = data['serial'];
+        serial = data['serial'],
+        imgUrl = data['imgUrl'];
 
   factory InstrumentInstance.fromFirestore(DocumentSnapshot documentSnapshot) {
     return InstrumentInstance.fromJson(documentSnapshot.data());
