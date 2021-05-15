@@ -358,7 +358,8 @@ class _AddPartFormState extends State<AddPartForm>
         // send to server
         try {
           if (widget.part == null)
-            await FirebaseFirestoreCloudFunctions.uploadPart(_newPart)
+            await FirebaseFirestoreCloudFunctions.uploadPart(
+                    _newPart, Operation.CREATE)
                 .then((_) async => {
                       Navigator.of(context).pop(),
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -368,7 +369,8 @@ class _AddPartFormState extends State<AddPartForm>
                       ),
                     });
           else
-            await FirebaseFirestoreCloudFunctions.updatePart(_newPart)
+            await FirebaseFirestoreCloudFunctions.uploadPart(
+                    _newPart, Operation.UPDATE)
                 .then((_) async => {
                       Navigator.of(context).pop(),
                       ScaffoldMessenger.of(context).showSnackBar(

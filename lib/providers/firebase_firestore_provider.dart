@@ -23,14 +23,40 @@ class FirebaseFirestoreProvider {
     return stream;
   }
 
-  static Stream<List<Part>> getParts() {
+  static Stream<List<Part>> getStorageParts() {
     return FirebaseFirestore.instance
-        .collection(FirebasePaths.partsRef)
+        .collection(FirebasePaths.partsStorageRef)
         .snapshots()
         .map(
           (query) => query.docs
               .map(
                 (doc) => Part.fromFirestore(doc),
+              )
+              .toList(),
+        );
+  }
+
+  static Stream<List<String>> getPersonalParts() {
+    return FirebaseFirestore.instance
+        .collection(FirebasePaths.partsPersonalRef)
+        .snapshots()
+        .map(
+          (query) => query.docs
+              .map(
+                (doc) => doc.id,
+              )
+              .toList(),
+        );
+  }
+
+  static Stream<List<String>> getMemberParts(String memberId) {
+    return FirebaseFirestore.instance
+        .collection(FirebasePaths.partsMemberRef(memberId))
+        .snapshots()
+        .map(
+          (query) => query.docs
+              .map(
+                (doc) => doc.id,
               )
               .toList(),
         );

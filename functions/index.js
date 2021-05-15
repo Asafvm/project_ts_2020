@@ -208,42 +208,59 @@ exports.addInstrumentInstance = functions.https.onCall(
 
 //add part to team's inventory
 exports.addPart = functions.https.onCall(async (data, context) => {
-  const teamid = data["teamId"];
+  const teamId = data["teamId"];
   const partdata = data["part"];
 
   const parts = admin
     .firestore()
     .collection("teams")
-    .doc(teamid)
+    .doc(teamId)
     .collection("parts");
   try {
-    if (partdata[id] === null) await parts.add(partdata);
-    else await parts.update(partdata);
+    switch (data["operation"]) {
+      case 0: //create
+        await parts.add(partdata);
+        break;
+
+      case 1: //update
+        if (data["partId"] !== null)
+          await parts.doc(data["partId"]).update(partdata);
+        break;
+
+      case 2: //delete
+        break;
+    }
+
+    //else
   } catch (e) {
     console.log("Error Adding Part :: " + e);
     return { status: "failed", messege: e };
   }
   return { status: "success" };
 });
-//update part info
-exports.updatePart = functions.https.onCall(async (data, context) => {
-  const teamid = data["teamId"];
-  const partdata = data["part"];
+
+exports.addUserInventory = functions.https.onCall(async (data, context) => {
+  const teamId = data["teamId"];
+  const userId = data["userId"];
+  const partId = data["partId"];
 
   const parts = admin
     .firestore()
     .collection("teams")
-    .doc(teamid)
-    .collection("parts")
-    .doc(data["partId"]);
+    .doc(teamId)
+    .collection("members")
+    .doc(userId)
+    .collection("inventory")
+    .doc(partId);
   try {
-    await parts.update(partdata);
+    await parts.set({ "count": data["count"] });
   } catch (e) {
     console.log("Error Adding Part :: " + e);
     return { status: "failed", messege: e };
   }
   return { status: "success" };
 });
+
 exports.addPartSerial = functions.https.onCall(async (data, context) => {
   const teamid = data["teamId"];
   const partId = data["partId"];
@@ -334,26 +351,22 @@ exports.addSite = functions.https.onCall(async (data, context) => {
     .doc(data["teamId"])
     .collection("sites");
   try {
-    switch(data["operation"]){
-      case 0:   //create
-      await sites.add(data["site"]);
-      break;
+    switch (data["operation"]) {
+      case 0: //create
+        await sites.add(data["site"]);
+        break;
 
-      case 1:   //update
-      if(data["siteId"]!==null)
-      sites.doc(data["siteId"]).update(data["site"]);
-      break;
+      case 1: //update
+        if (data["siteId"] !== null)
+          sites.doc(data["siteId"]).update(data["site"]);
+        break;
 
-      case 2:   //delete
-
-      break;
-
-
+      case 2: //delete
+        break;
     }
-    // 
+    //
     //await sites.update(data["site"]);
   } catch (e) {
-    
     return { status: "failed", messege: e.toString() };
   }
   return { status: "success" };

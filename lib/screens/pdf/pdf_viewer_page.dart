@@ -42,7 +42,6 @@ class _PDFScreenState extends State<PDFScreen> {
   PdfController _pdfController;
   static final int _initialPage = 1;
   int _actualPageNumber = _initialPage;
-  int _allPagesCount = 0;
 
   final appbar = AppBar(
     title: Text('Creating Form'),
@@ -111,11 +110,7 @@ class _PDFScreenState extends State<PDFScreen> {
                           Center(child: CircularProgressIndicator()),
                       pageLoader: Center(child: CircularProgressIndicator()),
                       controller: _pdfController,
-                      onDocumentLoaded: (document) {
-                        setState(() {
-                          _allPagesCount = document.pagesCount;
-                        });
-                      },
+                      onDocumentLoaded: (document) {},
                       onPageChanged: (page) {
                         setState(() {
                           _actualPageNumber = page;

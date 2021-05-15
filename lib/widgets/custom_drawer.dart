@@ -60,12 +60,18 @@ class CustomDrawer extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => MultiProvider(providers: [
                     StreamProvider<List<Part>>(
-                      create: (context) => FirebaseFirestoreProvider.getParts(),
+                      create: (context) =>
+                          FirebaseFirestoreProvider.getStorageParts(),
                       initialData: [],
                     ),
                     StreamProvider<List<Instrument>>(
                       create: (context) =>
                           FirebaseFirestoreProvider.getInstruments(),
+                      initialData: [],
+                    ),
+                    StreamProvider<List<String>>(
+                      create: (context) =>
+                          FirebaseFirestoreProvider.getTeamMembers(),
                       initialData: [],
                     ),
                   ], child: InventoryScreen()),

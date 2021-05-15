@@ -83,22 +83,27 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<HttpsCallableResult> uploadPart(Part _newPart) async {
+  static Future<HttpsCallableResult> uploadPart(
+      Part _newPart, Operation operation) async {
     return await FirebaseFunctions.instance
         .httpsCallable("addPart")
         .call(<String, dynamic>{
+      "operation": operation.index,
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
-      "part": _newPart.toJson()
+      "part": _newPart.toJson(),
+      "partId": _newPart.id,
     });
   }
 
-  static Future<HttpsCallableResult> updatePart(Part part) async {
+  static Future<HttpsCallableResult> addUserInventory(
+      Part part, int partCount) async {
     return await FirebaseFunctions.instance
-        .httpsCallable("updatePart")
+        .httpsCallable("addUserInventory")
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
-      "part": part.toJson(),
+      "userId": Authentication().userEmail,
       "partId": part.id,
+      "count": partCount,
     });
   }
 

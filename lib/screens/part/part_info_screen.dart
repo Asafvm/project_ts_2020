@@ -52,7 +52,8 @@ class _PartInfoScreenState extends State<PartInfoScreen>
                         context: context,
                         uploadPath: FirebasePaths.partImagePath(widget.part.id),
                         fileName: 'partImg'),
-                    FirebaseFirestoreCloudFunctions.updatePart(widget.part)
+                    FirebaseFirestoreCloudFunctions.uploadPart(
+                        widget.part, Operation.UPDATE)
                   },
                 ),
                 Positioned(
