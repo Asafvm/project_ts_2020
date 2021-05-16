@@ -51,21 +51,6 @@ class _PdfFileHandler {
                 ),
               ));
       await page.close();
-      //TODO: find fix for multipage
-      // await file.openPage(pageIndex: i);
-      // var rawImage = await file.renderPage(
-      //   background: Colors.transparent,
-      //   x: 0,
-      //   y: 0,
-      //   width: page.width,
-      //   height: page.height,
-      //   scale: 1.0,
-      //   pageIndex: i,
-      // );
-      // images.add(PdfRawImage(
-      //   data: rawImage,
-      //   size: Size(size.width.toDouble(), size.height.toDouble()),
-      // ));
     }
 
     return images;

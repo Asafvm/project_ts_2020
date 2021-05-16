@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
@@ -62,21 +63,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             _searchMode = false;
                         });
                       },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Quick search by description or referance',
-                        hintStyle: TextStyle(fontWeight: FontWeight.bold),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                              color: Theme.of(context).primaryColor,
-                              width: 1,
-                              style: BorderStyle.solid),
-                        ),
-                      ),
-                      // controller: _searchText,
+                      decoration: DecorationLibrary.searchDecoration(
+                          context: context,
+                          hint: 'Quick search by description or referance'),
                     ),
                   ),
                 )
