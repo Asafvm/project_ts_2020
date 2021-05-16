@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/widgets/list_items/part_list_item.dart';
 
 class InventoryScreen extends StatefulWidget {

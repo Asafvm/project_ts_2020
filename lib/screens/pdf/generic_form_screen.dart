@@ -8,7 +8,6 @@ import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
-import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';

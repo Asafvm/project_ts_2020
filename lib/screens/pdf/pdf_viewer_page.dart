@@ -33,7 +33,6 @@ class _PDFScreenState extends State<PDFScreen> {
   double _progressValue = 0.0;
   AlwaysStoppedAnimation<Color> _progressColor;
   int _fieldIndex = 0;
-  int _pageIndex = 0;
   List<Field> _fields = [];
   List<Field> _fieldsInPage = [];
   GlobalKey _keyPDF = GlobalKey();
@@ -168,7 +167,6 @@ class _PDFScreenState extends State<PDFScreen> {
   void _updateLists(int page, _) {
     // update view when switching pages
     setState(() {
-      _pageIndex = page;
       _fieldsInPage.clear();
       _fieldsInPage.addAll(_fields.where((f) => f.page == page));
     });

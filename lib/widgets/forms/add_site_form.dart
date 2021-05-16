@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocode/geocode.dart' as geo;
@@ -10,12 +9,10 @@ import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/instrument.dart';
-//import 'package:geocoder/geocoder.dart' as geo;
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/drawer_screens/map_screen.dart';
 
 class AddSiteForm extends StatefulWidget {
