@@ -110,6 +110,7 @@ class _PDFScreenState extends State<PDFScreen> {
                           Center(child: CircularProgressIndicator()),
                       pageLoader: Center(child: CircularProgressIndicator()),
                       controller: _pdfController,
+                      scrollDirection: Axis.horizontal,
                       onDocumentLoaded: (document) {},
                       onPageChanged: (page) {
                         setState(() {

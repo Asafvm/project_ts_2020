@@ -100,9 +100,14 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Map'),
             onTap: () {
               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MapScreen()),
-              );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StreamProvider<List<Site>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getSites(),
+                        initialData: [],
+                        child: MapScreen()),
+                  ));
             },
           ),
           Divider(),

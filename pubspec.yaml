@@ -36,10 +36,12 @@ dependencies:
   json_annotation:
   #http requests
   http: ^0.13.0
+  #google map
   geocode: ^1.0.1
   location: ^4.0.2
   google_maps_flutter: ^2.0.1
   google_maps_webservice: ^0.0.20-nullsafety.5
+  google_maps_cluster_manager: ^1.0.0
   #pdf related
   path_provider: ^2.0.1 
   path: ^1.7.0
@@ -47,6 +49,7 @@ dependencies:
   native_pdf_renderer: ^3.0.0 #test this
   native_pdf_view: ^4.0.1
   pdf: ^3.3.0  #for creating pdf
+  
   # CupertinoIcons
   cupertino_icons: ^1.0.2
   #misc
@@ -62,7 +65,6 @@ dependencies:
   url_launcher: ^6.0.3 #for navigation
   custom_info_window: ^1.0.1
   clippy_flutter: ^1.1.1
-  google_maps_cluster_manager: ^1.0.0
 
 dev_dependencies:
   flutter_test:

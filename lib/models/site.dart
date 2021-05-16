@@ -83,11 +83,7 @@ class Address {
   final String houseNumber;
 
   Address(this.latitude, this.longtitude,
-      {this.country = '',
-      this.area = '',
-      this.city = '',
-      this.street = '',
-      this.houseNumber = ''});
+      {this.country, this.area, this.city, this.street, this.houseNumber});
 
   double get lat {
     return latitude;
@@ -99,7 +95,7 @@ class Address {
 
   @override
   String toString() {
-    return '$street $houseNumber, $city, $country';
+    return '${street ?? ''} ${houseNumber ?? ''}, ${city ?? ''}, ${country ?? ''}';
   }
 
   Map<String, dynamic> toJson() {
