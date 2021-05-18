@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
@@ -83,9 +84,9 @@ class CustomDrawer extends StatelessWidget {
             leading: Icon(Icons.library_books),
             title: Text('Files'),
             onTap: () async {
-              Future<Directory> dir = Directory(
-                      '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}')
-                  .create(recursive: true);
+              Future<Directory> dir =
+                  Directory('${await FirebasePaths.rootTeamFolder()}')
+                      .create(recursive: true);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => FileExplorer(

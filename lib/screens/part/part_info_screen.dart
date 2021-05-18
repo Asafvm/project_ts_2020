@@ -4,7 +4,7 @@ import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
-import 'package:teamshare/providers/firebase_paths.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/widgets/forms/add_part_form.dart';
 
 class PartInfoScreen extends StatefulWidget {

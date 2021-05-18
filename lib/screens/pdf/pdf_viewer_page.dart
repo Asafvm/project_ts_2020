@@ -7,7 +7,7 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
-import 'package:teamshare/providers/firebase_paths.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/widgets/forms/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
@@ -46,6 +46,8 @@ class _PDFScreenState extends State<PDFScreen> {
     title: Text('Creating Form'),
   );
 
+  final _transformationController = TransformationController();
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +62,7 @@ class _PDFScreenState extends State<PDFScreen> {
         _fieldIndex = _fields.length;
       }
     });
-    _updateLists(0, 0);
+    _updateLists(_initialPage);
 
     //set function to run once after first frame
     WidgetsBinding.instance
@@ -96,38 +98,49 @@ class _PDFScreenState extends State<PDFScreen> {
             )
           : AspectRatio(
               aspectRatio: pdfSize.aspectRatio,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onDoubleTap: () {},
-                onLongPressStart: (deatils) => _addField(deatils.localPosition),
+              child: InteractiveViewer(
                 child: Stack(
                   clipBehavior: Clip.hardEdge,
                   children: <Widget>[
-                    PdfView(
-                      key: _keyPDF,
-                      documentLoader:
-                          Center(child: CircularProgressIndicator()),
-                      pageLoader: Center(child: CircularProgressIndicator()),
-                      controller: _pdfController,
-                      scrollDirection: Axis.horizontal,
-                      onDocumentLoaded: (document) {},
-                      onPageChanged: (page) {
-                        setState(() {
-                          _actualPageNumber = page;
-                        });
-                        _updateLists(_actualPageNumber, _actualPageNumber);
-                      },
+                    GestureDetector(
+                      onDoubleTap: () {},
+                      onDoubleTapCancel: () {},
+                      onDoubleTapDown: (details) {},
+                      child: PdfView(
+                        key: _keyPDF,
+                        documentLoader:
+                            Center(child: CircularProgressIndicator()),
+                        pageSnapping: false,
+                        pageLoader: Center(child: CircularProgressIndicator()),
+                        controller: _pdfController,
+                        scrollDirection: Axis.horizontal,
+                        onDocumentLoaded: (document) {},
+                        onPageChanged: (page) {
+                          setState(() {
+                            _actualPageNumber = page;
+                          });
+                          _updateLists(_actualPageNumber);
+                        },
+                      ),
                     ),
                     if (pdfBox != null)
-                      for (Field field
-                          in _fieldsInPage) //put each field in a customfield wrapper
-                        CustomField(
-                          field: field,
-                          mqd: MediaQuery.of(context),
-                          editFunction: _editField,
-                          pdfSizeOnScreen: pdfBox.size,
-                          appbarHeight: appbar.preferredSize.height,
+                      InteractiveViewer(
+                        scaleEnabled: false,
+                        panEnabled: false,
+                        child: Stack(
+                          children: [
+                            for (Field field
+                                in _fieldsInPage) //put each field in a customfield wrapper
+                              CustomField(
+                                field: field,
+                                mqd: MediaQuery.of(context),
+                                editFunction: _editField,
+                                pdfSizeOnScreen: pdfBox.size,
+                                appbarHeight: appbar.preferredSize.height,
+                              ),
+                          ],
                         ),
+                      )
                   ],
                 ),
               ),
@@ -164,7 +177,7 @@ class _PDFScreenState extends State<PDFScreen> {
       });
   }
 
-  void _updateLists(int page, _) {
+  void _updateLists(int page) {
     // update view when switching pages
     setState(() {
       _fieldsInPage.clear();
@@ -238,5 +251,9 @@ class _PDFScreenState extends State<PDFScreen> {
     await showDialog(
             context: context, builder: (_) => _buildAlertDialog(messege))
         .then((value) => Navigator.of(context).pop());
+  }
+
+  void _value() {
+    print("Changed");
   }
 }

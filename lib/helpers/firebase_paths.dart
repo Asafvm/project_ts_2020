@@ -1,3 +1,4 @@
+import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/team_provider.dart';
@@ -46,4 +47,7 @@ class FirebasePaths {
       '${TeamProvider().getCurrentTeam.getTeamId}/$parts/$partId/$images';
   static String siteImagePath(String siteId) =>
       '${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$images';
+
+  static Future<String> rootTeamFolder() async =>
+      '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}';
 }

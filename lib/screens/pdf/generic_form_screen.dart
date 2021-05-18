@@ -2,21 +2,23 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
   final Map<String, dynamic> fields;
   final InstrumentInstance instance;
-  const GenericFormScreen({this.fields, this.pdfPath, this.instance});
+  final String siteName;
+  const GenericFormScreen(
+      {this.fields, this.pdfPath, this.instance, this.siteName});
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
 }
@@ -24,11 +26,14 @@ class GenericFormScreen extends StatefulWidget {
 class _GenericFormScreenState extends State<GenericFormScreen> {
   Uint8List image;
   List<Field> fields = [];
+  var controllersArray = List<TextEditingController>.empty();
   @override
   void initState() {
     super.initState();
 
     fields = widget.fields.values.map((e) => Field.fromJson(e)).toList();
+    controllersArray = List<TextEditingController>.generate(
+        fields.length, (index) => TextEditingController());
   }
 
   @override
@@ -82,11 +87,15 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             flex: 2,
             fit: FlexFit.tight,
             child: TextFormField(
+              controller: controllersArray[fields.indexOf(field)],
+              maxLength: (field.size.width / (field.size.height / 2.50))
+                  .round(), //width of field / width of character
               decoration: InputDecoration(
                 hintStyle: TextStyle(color: Colors.grey),
                 hintText: field.defaultValue,
                 labelText: field.hint,
                 labelStyle: TextStyle(color: Colors.black),
+
                 // validator: (value) {
                 //   if (value.isEmpty) return 'Password cannot be empty';
                 //   return null;
@@ -121,21 +130,35 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
       for (Field field in fields) {
         var page = doc.getPage(field.page - 1);
+
         page.add(
           item: pdfWidgets.Positioned(
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
-            child: pdfWidgets.Text(field.defaultValue ?? '!!!',
-                style: pdfWidgets.TextStyle(fontSize: field.size.height)),
+            child: pdfWidgets.Padding(
+              padding: const pdfWidgets.EdgeInsets.all(5),
+              child: pdfWidgets.Text(
+                controllersArray[fields.indexOf(field)].text.isNotEmpty
+                    ? controllersArray[fields.indexOf(field)].text
+                    : field.defaultValue,
+                style: pdfWidgets.TextStyle(
+                  fontSize: field.size.height,
+                ),
+              ),
+            ),
           ),
         );
       }
-      String dest =
-          '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}';
+      String dest = await FirebasePaths.rootTeamFolder();
 
-      File result = await doc
-          .save(filename: '${DateTime.now().toIso8601String()}.pdf')
-          .then((value) => value.copy('$dest/${basename(value.path)}'));
+      File result = await doc.save(
+          filename:
+              '${DateTime.now().toLocal()}_${widget.instance.instrumentCode}_${widget.instance.serial}.pdf');
+
+      Directory dir =
+          await Directory('$dest/${widget.siteName}').create(recursive: true);
+      result.copy('${dir.path}/${basename(result.path)}');
+
       Applogger.consoleLog(MessegeType.info, "PDF Editing Done");
 
       Navigator.of(context).push(MaterialPageRoute(

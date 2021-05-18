@@ -118,15 +118,18 @@ class _CustomFieldState extends State<CustomField> {
                 data: widget.field.index,
                 onDragEnd: (details) {
                   //subtract the height of the status bar and appbar
-                  widget.field.offset = Offset(
-                      (details.offset.dx - widget.mqd.viewPadding.topLeft.dx) /
-                          widget.pdfSizeOnScreen.width,
-                      (details.offset.dy -
-                              widget.mqd.padding.top -
-                              widget.appbarHeight) /
-                          widget.pdfSizeOnScreen.height);
+                  setState(() {
+                    widget.field.offset = Offset(
+                        (details.offset.dx -
+                                widget.mqd.viewPadding.topLeft.dx) /
+                            widget.pdfSizeOnScreen.width,
+                        (details.offset.dy -
+                                widget.mqd.padding.top -
+                                widget.appbarHeight) /
+                            widget.pdfSizeOnScreen.height);
+                  });
                 },
-                feedback: Card(elevation: 5, child: field),
+                feedback: field,
                 child: field,
                 childWhenDragging: Container(),
               ),

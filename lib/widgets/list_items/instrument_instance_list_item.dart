@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
+import 'package:teamshare/models/site.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_info_screen.dart';
 
 class InstrumentInstanceListItem extends StatelessWidget {
@@ -14,9 +17,13 @@ class InstrumentInstanceListItem extends StatelessWidget {
       onTap: () => {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (BuildContext context) => InstrumentInfoScreen(
-              instrument: instrument,
-              instance: instance,
+            builder: (BuildContext context) => StreamProvider<List<Site>>(
+              create: (context) => FirebaseFirestoreProvider.getSites(),
+              initialData: [],
+              child: InstrumentInfoScreen(
+                instrument: instrument,
+                instance: instance,
+              ),
             ),
           ),
         )

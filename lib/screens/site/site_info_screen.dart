@@ -9,7 +9,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/providers/firebase_paths.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/screens/contact/contact_selection_screen.dart';
 import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';

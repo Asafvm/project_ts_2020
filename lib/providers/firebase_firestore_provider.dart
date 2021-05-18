@@ -6,7 +6,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
-import 'firebase_paths.dart';
+import '../helpers/firebase_paths.dart';
 
 ///*** class changed to static ***///
 

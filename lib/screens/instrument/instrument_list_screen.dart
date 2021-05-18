@@ -5,7 +5,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/providers/firebase_paths.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/forms/add_instrument_instance_form.dart';
 import 'package:teamshare/widgets/list_items/instrument_instance_list_item.dart';

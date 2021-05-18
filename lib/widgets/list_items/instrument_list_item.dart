@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/authentication.dart';
-import 'package:teamshare/providers/firebase_paths.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_list_screen.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
