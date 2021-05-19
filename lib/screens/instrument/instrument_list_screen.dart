@@ -86,7 +86,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
                         FirebasePaths.instrumentImagePath(widget.instrument.id),
                     fileName: 'instrumentImg'),
                 FirebaseFirestoreCloudFunctions.uploadInstrument(
-                    widget.instrument)
+                    widget.instrument, Operation.UPDATE)
               },
             ),
             Positioned(

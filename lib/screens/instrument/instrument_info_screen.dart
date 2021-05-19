@@ -64,7 +64,8 @@ class InstrumentInfoScreen extends StatelessWidget {
                                 instance.instrumentCode, instance.serial),
                             fileName: 'instrumentImg'),
                         FirebaseFirestoreCloudFunctions
-                            .uploadInstrumentInstance(instance)
+                            .uploadInstrumentInstance(
+                                instance, Operation.CREATE)
                       },
                     ),
                   ),

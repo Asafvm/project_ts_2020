@@ -130,27 +130,39 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
     .collection("teams")
     .doc(data["teamId"])
     .collection("instruments");
+
+    console.log(data["instrument"]);
   try {
-    if (data["instrument"]["codeName"] === null) {
-      var snapshot = await instruments.get();
-      snapshot.forEach((doc) => {
-        //check for duplicates
-        if (doc.id === data["instrument"]["codeName"])
-          //throw error message if found
-          throw new functions.https.HttpsError(
-            "already-exists",
-            "Instrument already exists",
-            "Duplicate code name"
-          );
-      });
-      //upload new instrument
-      await instruments
-        .doc(data["instrument"]["codeName"])
-        .set(data["instrument"]);
-    } else {
-      await instruments
-        .doc(data["instrument"]["codeName"])
-        .update(data["instrument"]);
+    switch (data["operation"]) {
+      case 0: //create
+        var snapshot = await instruments.get();
+        snapshot.forEach((doc) => {
+          //check for duplicates
+          if (doc.id === data["instrument"]["codeName"])
+            //throw error message if found
+            throw new functions.https.HttpsError(
+              "already-exists",
+              "Instrument already exists",
+              "Duplicate code name"
+            );
+        });
+        console.log(data["No duplicate found"]);
+
+        await instruments
+          .doc(data["instrument"]["codeName"])
+          .set(data["instrument"]);
+
+        break;
+
+      case 1: //update
+        if (data["instrumentId"] !== null)
+          await instruments
+            .doc(data["instrumentId"])
+            .update(data["instrument"]);
+        break;
+
+      case 2: //delete
+        break;
     }
   } catch (e) {
     console.log("Error Adding instrument :: " + e);
@@ -165,39 +177,31 @@ exports.addInstrumentInstance = functions.https.onCall(
     const instruments = admin
       .firestore()
       .collection("teams")
-      .doc(data["teamID"])
+      .doc(data["teamId"])
       .collection("instruments")
-      .doc(data["instrumentID"])
+      .doc(data["instrumentId"])
       .collection("instances")
       .doc(data["instrument"]["serial"]);
 
     try {
-      await instruments.create(data["instrument"]);
-      await instruments.collection("entries").add({
-        type: 0,
-        timestamp: Date.now(),
-        details: "New Instrument Created",
-      });
-    } catch (e) {
-      console.log("Error Adding instrument :: " + e);
-      return { status: "failed", messege: e };
-    }
-    return { status: "success" };
-  }
-);
+      switch (data["operation"]) {
+        case 0: //create
+          await instruments.create(data["instrument"]);
+          await instruments.collection("entries").add({
+            type: 0,
+            timestamp: Date.now(),
+            details: "New Instrument Created",
+          });
+          break;
 
-exports.addInstrumentInstance = functions.https.onCall(
-  async (data, context) => {
-    const instruments = admin
-      .firestore()
-      .collection("teams")
-      .doc(data["teamID"])
-      .collection("instruments")
-      .doc(data["instrumentID"])
-      .collection("instances")
-      .doc(data["instrument"]["serial"]);
-    try {
-      await instruments.update(data["instrument"]);
+        case 1: //update
+          await instruments.update(data["instrument"]);
+
+          break;
+
+        case 2: //delete
+          break;
+      }
     } catch (e) {
       console.log("Error Adding instrument :: " + e);
       return { status: "failed", messege: e };
@@ -253,7 +257,7 @@ exports.addUserInventory = functions.https.onCall(async (data, context) => {
     .collection("inventory")
     .doc(partId);
   try {
-    await parts.set({ "count": data["count"] });
+    await parts.set({ count: data["count"] });
   } catch (e) {
     console.log("Error Adding Part :: " + e);
     return { status: "failed", messege: e };

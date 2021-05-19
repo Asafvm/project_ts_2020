@@ -108,14 +108,14 @@ class FirebaseFirestoreCloudFunctions {
   }
 
   static Future<HttpsCallableResult> uploadInstrumentInstance(
-      InstrumentInstance _newInstrument) async {
+      InstrumentInstance _newInstrument, Operation operation) async {
     return await FirebaseFunctions.instance
         .httpsCallable("addInstrumentInstance")
         .call(<String, dynamic>{
-      "teamID": TeamProvider().getCurrentTeam.getTeamId,
-      "instrumentID": _newInstrument.instrumentCode,
+      "operation": operation,
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "instrumentId": _newInstrument.instrumentCode,
       "instrument": _newInstrument.toJson(),
-      //"entries": _newInstrument.entries.map((e) => e.toJson()).toList()
     });
   }
 
@@ -127,15 +127,16 @@ class FirebaseFirestoreCloudFunctions {
       "teamID": TeamProvider().getCurrentTeam.getTeamId,
       "instrumentID": _newInstrument.instrumentCode,
       "instrument": _newInstrument.toJson(),
-      //"entries": _newInstrument.entries.map((e) => e.toJson()).toList()
     });
   }
 
   static Future<HttpsCallableResult> uploadInstrument(
-      Instrument _newInstrument) async {
+      Instrument instrument, Operation operation) async {
     return await FirebaseFunctions.instance.httpsCallable("addInstrument").call(
       <String, dynamic>{
-        "instrument": _newInstrument.toJson(),
+        "operation": operation,
+        "instrument": instrument.toJson(),
+        "instrumentId": instrument.id,
         "teamId": TeamProvider().getCurrentTeam.getTeamId
       },
     );

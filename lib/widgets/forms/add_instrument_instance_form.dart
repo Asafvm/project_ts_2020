@@ -74,7 +74,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
       //send to server
       try {
         await FirebaseFirestoreCloudFunctions.uploadInstrumentInstance(
-                _newInstInstrument)
+                _newInstInstrument, Operation.CREATE)
             .then((_) async => {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(

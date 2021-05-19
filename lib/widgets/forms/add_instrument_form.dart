@@ -175,7 +175,8 @@ class _AddInstrumentFormState extends State<AddInstrumentForm>
         _uploading = true;
       });
       try {
-        await FirebaseFirestoreCloudFunctions.uploadInstrument(_newInstrument)
+        var result = await FirebaseFirestoreCloudFunctions.uploadInstrument(
+                _newInstrument, Operation.CREATE)
             .then((_) async => {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -184,6 +185,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm>
                     ),
                   ),
                 });
+        print(result);
       } catch (error) {
         showDialog(
           context: context,
