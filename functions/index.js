@@ -131,10 +131,11 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
     .doc(data["teamId"])
     .collection("instruments");
 
-    console.log(data["instrument"]);
   try {
     switch (data["operation"]) {
       case 0: //create
+      console.log(data["Creating instrument"]);
+
         var snapshot = await instruments.get();
         snapshot.forEach((doc) => {
           //check for duplicates
@@ -155,6 +156,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
         break;
 
       case 1: //update
+      console.log(data["Updating instrument"]);
         if (data["instrumentId"] !== null)
           await instruments
             .doc(data["instrumentId"])

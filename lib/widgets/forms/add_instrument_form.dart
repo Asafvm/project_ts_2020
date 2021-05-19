@@ -176,7 +176,7 @@ class _AddInstrumentFormState extends State<AddInstrumentForm>
       });
       try {
         var result = await FirebaseFirestoreCloudFunctions.uploadInstrument(
-                _newInstrument, Operation.CREATE)
+                instrument: _newInstrument, operation: Operation.CREATE)
             .then((_) async => {
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(

@@ -112,29 +112,29 @@ class FirebaseFirestoreCloudFunctions {
     return await FirebaseFunctions.instance
         .httpsCallable("addInstrumentInstance")
         .call(<String, dynamic>{
-      "operation": operation,
+      "operation": operation.index,
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "instrumentId": _newInstrument.instrumentCode,
       "instrument": _newInstrument.toJson(),
     });
   }
 
-  static Future<HttpsCallableResult> updateInstrumentInstance(
-      InstrumentInstance _newInstrument) async {
-    return await FirebaseFunctions.instance
-        .httpsCallable("updateInstrumentInstance")
-        .call(<String, dynamic>{
-      "teamID": TeamProvider().getCurrentTeam.getTeamId,
-      "instrumentID": _newInstrument.instrumentCode,
-      "instrument": _newInstrument.toJson(),
-    });
-  }
+  // static Future<HttpsCallableResult> updateInstrumentInstance(
+  //     InstrumentInstance _newInstrument) async {
+  //   return await FirebaseFunctions.instance
+  //       .httpsCallable("updateInstrumentInstance")
+  //       .call(<String, dynamic>{
+  //     "teamID": TeamProvider().getCurrentTeam.getTeamId,
+  //     "instrumentID": _newInstrument.instrumentCode,
+  //     "instrument": _newInstrument.toJson(),
+  //   });
+  // }
 
   static Future<HttpsCallableResult> uploadInstrument(
-      Instrument instrument, Operation operation) async {
+      {Instrument instrument, Operation operation}) async {
     return await FirebaseFunctions.instance.httpsCallable("addInstrument").call(
       <String, dynamic>{
-        "operation": operation,
+        "operation": operation.index,
         "instrument": instrument.toJson(),
         "instrumentId": instrument.id,
         "teamId": TeamProvider().getCurrentTeam.getTeamId
@@ -183,7 +183,6 @@ class FirebaseFirestoreCloudFunctions {
 
   static Future<HttpsCallableResult> uploadSite(
       Site newSite, Operation operation) async {
-    print("OPERATION:::" + operation.index.toString());
     return await FirebaseFunctions.instance
         .httpsCallable("addSite")
         .call(<String, dynamic>{
