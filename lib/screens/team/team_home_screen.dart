@@ -2,13 +2,15 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
-import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/widgets/custom_drawer.dart';
+import 'package:teamshare/widgets/list_items/entry_list_item.dart';
+import 'package:teamshare/widgets/list_items/inventory_list_item.dart';
 
 class TeamHomeScreen extends StatefulWidget {
   final Team team;
@@ -28,23 +30,20 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
   @override
   Widget build(BuildContext context) {
     List<Site> siteList = Provider.of<List<Site>>(context);
-    List<InstrumentInstance> instrumentList =
-        Provider.of<List<InstrumentInstance>>(context);
+    List<Instrument> instrumentList = Provider.of<List<Instrument>>(context);
     List<Part> partList = Provider.of<List<Part>>(context);
+    List<Entry> entryList = Provider.of<List<Entry>>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(TeamProvider().getCurrentTeam.getTeamName),
-        actions: [],
-      ),
       drawer: CustomDrawer(),
-      body: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 1,
-              child: Stack(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: Text(TeamProvider().getCurrentTeam.getTeamName),
+            expandedHeight: 200,
+            stretch: true,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
                 fit: StackFit.expand,
                 children: [
                   Image(
@@ -57,7 +56,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
                       child: Container(
-                        color: Colors.black.withOpacity(0),
+                        color: Colors.black.withOpacity(.2),
                       ),
                     ),
                   ),
@@ -73,30 +72,84 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                 ],
               ),
             ),
-            Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        InfoCube(
-                          title: 'Sites',
-                          data: siteList.length,
-                        ),
-                        InfoCube(
-                          title: 'Instruments',
-                          data: instrumentList.length,
-                        ),
-                        InfoCube(
-                          title: 'Parts',
-                          data: partList.length,
-                        ),
-                      ],
+          ),
+          SliverFillRemaining(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  InfoCube(
+                    title: 'Sites',
+                    child: Center(
+                      child: Text(
+                        siteList.length.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 24),
+                      ),
                     ),
-                    InfoCube(title: 'Recent Activity', data: 1)
-                  ],
-                )),
-          ]),
+                  ),
+                  InfoCube(
+                    title: 'Instruments',
+                    child: Center(
+                      child: Text(
+                        instrumentList.length.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 24),
+                      ),
+                    ),
+                  ),
+                  InfoCube(
+                    title: 'Parts',
+                    child: Center(
+                      child: Text(
+                        partList.length.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 24),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              InfoCube(
+                title: 'Recent Activity',
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: entryList.length,
+                    itemBuilder: (context, index) =>
+                        EntryListItem(entryList[index]),
+                  ),
+                ),
+              ),
+              InfoCube(
+                title: 'Missing Inventroy',
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: partList.length,
+                    itemBuilder: (context, index) => PartListItem(
+                      key: UniqueKey(),
+                      part: partList[index],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ))
+        ],
+      ),
     );
   }
 
@@ -109,9 +162,9 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
 
 class InfoCube extends StatelessWidget {
   final String title;
-  final int data;
+  final Widget child;
 
-  const InfoCube({this.title, this.data});
+  const InfoCube({this.title, this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -121,39 +174,31 @@ class InfoCube extends StatelessWidget {
         padding: const EdgeInsets.all(3),
         margin: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: Colors.black, width: 3, style: BorderStyle.solid)),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+              color: Colors.black, width: 3, style: BorderStyle.solid),
+        ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
+              textAlign: TextAlign.center,
             ),
             Expanded(
-              flex: 3,
               child: Container(
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: Colors.black,
-                        width: 1,
-                        style: BorderStyle.solid)),
-                child: Center(
-                  child: Text(
-                    data.toString(),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 24),
-                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                      color: Colors.black, width: 1, style: BorderStyle.solid),
                 ),
+                child: child,
               ),
             ),
           ],

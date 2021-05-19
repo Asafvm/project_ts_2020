@@ -176,16 +176,17 @@ class _AddInstrumentFormState extends State<AddInstrumentForm>
       });
       try {
         var result = await FirebaseFirestoreCloudFunctions.uploadInstrument(
-                instrument: _newInstrument, operation: Operation.CREATE)
-            .then((_) async => {
-                  Navigator.of(context).pop(),
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Instrument Added Successfully!'),
-                    ),
-                  ),
-                });
-        print(result);
+            instrument: _newInstrument, operation: Operation.CREATE);
+        Navigator.of(context).pop();
+
+        if (result.data["status"] == "success")
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Instrument Added Successfully!'),
+            ),
+          );
+        else
+          throw result.data["messege"]["details"];
       } catch (error) {
         showDialog(
           context: context,

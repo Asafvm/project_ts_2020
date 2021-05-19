@@ -32,7 +32,7 @@ class EntryListItem extends StatelessWidget {
             Flexible(
               fit: FlexFit.tight,
               flex: 1,
-              child: Icon(Icons.info),
+              child: Icon(_getIcon(entry.type)),
             ),
             Flexible(
               fit: FlexFit.tight,
@@ -46,5 +46,22 @@ class EntryListItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getIcon(int type) {
+    switch (type) {
+      case 0:
+        return Icons.info;
+        break;
+
+      case 1:
+        return Icons.location_city;
+        break;
+
+      case 2:
+        return Icons.file_copy;
+        break;
+    }
+    return Icons.error;
   }
 }

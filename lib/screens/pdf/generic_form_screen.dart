@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
@@ -11,6 +10,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
+import 'package:intl/intl.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
@@ -95,15 +95,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 hintText: field.defaultValue,
                 labelText: field.hint,
                 labelStyle: TextStyle(color: Colors.black),
-
-                // validator: (value) {
-                //   if (value.isEmpty) return 'Password cannot be empty';
-                //   return null;
-                // },
-                // onSaved: (val) {
-                //   _authData['password'] = val;
-                // },
               ),
+              validator: (value) {
+                if (value.isEmpty && field.isMandatory)
+                  return 'Password cannot be empty';
+                return null;
+              },
             ),
           ),
           if (field.suffix != null)
@@ -150,10 +147,11 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         );
       }
       String dest = await FirebasePaths.rootTeamFolder();
+      final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
       File result = await doc.save(
           filename:
-              '${DateTime.now().toLocal()}_${widget.instance.instrumentCode}_${widget.instance.serial}.pdf');
+              '${formatter.format(DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch))}_${widget.instance.instrumentCode}_${widget.instance.serial}.pdf');
 
       Directory dir =
           await Directory('$dest/${widget.siteName}').create(recursive: true);

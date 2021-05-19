@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum ENTRY_TYPE { INFO, WARNING }
+enum ENTRY_TYPE { INFO, TRANSPORT, REPORT }
 
 class Entry {
   final int timestamp;

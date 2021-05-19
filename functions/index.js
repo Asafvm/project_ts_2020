@@ -144,7 +144,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
             throw new functions.https.HttpsError(
               "already-exists",
               "Instrument already exists",
-              "Duplicate code name"
+              "Referance code already in use"
             );
         });
         console.log(data["No duplicate found"]);
@@ -172,6 +172,29 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
   }
   return { status: "success" };
 });
+
+exports.autoEntryCollector = functions.firestore
+  .document("teams/{teamId}/instruments/{instrumentId}/instances/{instanceId}/entries/{entryId}")
+  .onWrite(async(change, context) =>  {
+    const entries = admin
+    .firestore()
+    .collection("teams")
+    .doc(context.params.teamId)
+    .collection("entries");
+
+    entries
+    .doc(context.params.entryId)
+    .create(
+      change.after.data(),
+    );
+
+    var log = (await entries.listDocuments());
+    if(log.length > 10)
+      entries.doc(log[0].id).delete();
+
+    
+  });
+
 
 //add instrument instance to team's inventory
 exports.addInstrumentInstance = functions.https.onCall(

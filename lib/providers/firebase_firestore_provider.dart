@@ -6,6 +6,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import '../helpers/firebase_paths.dart';
 
 ///*** class changed to static ***///
@@ -202,6 +203,20 @@ class FirebaseFirestoreProvider {
         .collection(
             "${FirebasePaths.instanceEntriesRef(instance.instrumentCode, instance.serial)}")
         .orderBy("timestamp", descending: descending) //newest first
+        .snapshots()
+        .map(
+          (query) => query.docs
+              .map(
+                (doc) => Entry.fromFirestore(doc),
+              )
+              .toList(),
+        );
+  }
+
+  static getTeamEntries() {
+    return FirebaseFirestore.instance
+        .collection("${FirebasePaths.teamEntriesRef}")
+        .orderBy("timestamp", descending: true) //newest first
         .snapshots()
         .map(
           (query) => query.docs

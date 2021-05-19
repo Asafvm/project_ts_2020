@@ -14,6 +14,8 @@ class FirebasePaths {
       '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentId/$instances';
   static String instanceEntriesRef(String instrumentId, String instanceId) =>
       '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentId/$instances/$instanceId/$entries';
+  static String get teamEntriesRef =>
+      '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$entries';
   static String instanceReportRef(String instrumentId) =>
       '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$instruments/$instrumentId/$reports';
   static String get partsStorageRef =>

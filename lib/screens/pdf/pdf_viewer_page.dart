@@ -96,50 +96,45 @@ class _PDFScreenState extends State<PDFScreen> {
               backgroundColor: Colors.grey,
               value: _progressValue,
             )
-          : AspectRatio(
-              aspectRatio: pdfSize.aspectRatio,
-              child: InteractiveViewer(
+          : GestureDetector(
+              onDoubleTap: () {},
+              onDoubleTapCancel: () {},
+              onDoubleTapDown: (details) {},
+              onLongPressStart: (details) => _addField(details.localPosition),
+              child: AspectRatio(
+                aspectRatio: pdfSize.aspectRatio,
                 child: Stack(
                   clipBehavior: Clip.hardEdge,
                   children: <Widget>[
-                    GestureDetector(
-                      onDoubleTap: () {},
-                      onDoubleTapCancel: () {},
-                      onDoubleTapDown: (details) {},
-                      child: PdfView(
-                        key: _keyPDF,
-                        documentLoader:
-                            Center(child: CircularProgressIndicator()),
-                        pageSnapping: false,
-                        pageLoader: Center(child: CircularProgressIndicator()),
-                        controller: _pdfController,
-                        scrollDirection: Axis.horizontal,
-                        onDocumentLoaded: (document) {},
-                        onPageChanged: (page) {
-                          setState(() {
-                            _actualPageNumber = page;
-                          });
-                          _updateLists(_actualPageNumber);
-                        },
-                      ),
+                    PdfView(
+                      key: _keyPDF,
+                      documentLoader:
+                          Center(child: CircularProgressIndicator()),
+                      pageSnapping: false,
+                      pageLoader: Center(child: CircularProgressIndicator()),
+                      controller: _pdfController,
+                      scrollDirection: Axis.horizontal,
+                      onDocumentLoaded: (document) {},
+                      onPageChanged: (page) {
+                        setState(() {
+                          _actualPageNumber = page;
+                        });
+                        _updateLists(_actualPageNumber);
+                      },
                     ),
                     if (pdfBox != null)
-                      InteractiveViewer(
-                        scaleEnabled: false,
-                        panEnabled: false,
-                        child: Stack(
-                          children: [
-                            for (Field field
-                                in _fieldsInPage) //put each field in a customfield wrapper
-                              CustomField(
-                                field: field,
-                                mqd: MediaQuery.of(context),
-                                editFunction: _editField,
-                                pdfSizeOnScreen: pdfBox.size,
-                                appbarHeight: appbar.preferredSize.height,
-                              ),
-                          ],
-                        ),
+                      Stack(
+                        children: [
+                          for (Field field
+                              in _fieldsInPage) //put each field in a customfield wrapper
+                            CustomField(
+                              field: field,
+                              mqd: MediaQuery.of(context),
+                              editFunction: _editField,
+                              pdfSizeOnScreen: pdfBox.size,
+                              appbarHeight: appbar.preferredSize.height,
+                            ),
+                        ],
                       )
                   ],
                 ),

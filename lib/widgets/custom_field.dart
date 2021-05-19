@@ -37,10 +37,15 @@ class _CustomFieldState extends State<CustomField> {
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: Colors.green),
       ),
-      child: Text(
-        '(${widget.field.index.toString()})' + widget.field.defaultValue,
-        style: TextStyle(fontSize: rectSize.height - 2),
-        softWrap: true,
+      child: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Text(
+          '(${widget.field.hint}) ${widget.field.defaultValue}',
+          style: TextStyle(
+            fontSize: rectSize.height - 6,
+          ),
+          softWrap: true,
+        ),
       ),
     );
     return Positioned(

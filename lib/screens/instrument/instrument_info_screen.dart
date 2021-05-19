@@ -72,31 +72,69 @@ class InstrumentInfoScreen extends StatelessWidget {
                   Flexible(
                     fit: FlexFit.tight,
                     flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          instrument.getCodeName(),
-                          style: textStyleTitle,
-                        ),
-                        Text(
-                          "Model: " + instrument.getModel(),
-                          style: textStyleContent,
-                        ),
-                        Text(
-                          "Serial: " + instance.serial,
-                          style: textStyleContent,
-                        ),
-                        Text(
-                          'Currently at: ${siteList.where((element) => instance.currentSiteId == element.id).first.name}',
-                          style: textStyleContent,
-                        ),
-                        Text(
-                          "Next: ",
-                          style: textStyleContent,
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(13.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            instrument.getCodeName(),
+                            style: textStyleTitle,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Model",
+                                style: textStyleContent,
+                              ),
+                              Text(
+                                instrument.getModel(),
+                                style: textStyleContent,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Serial",
+                                style: textStyleContent,
+                              ),
+                              Text(
+                                instance.serial,
+                                style: textStyleContent,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Site',
+                                style: textStyleContent,
+                              ),
+                              Text(
+                                '${instance.currentSiteId}',
+                                style: textStyleContent,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Maintenance",
+                              ),
+                              Text(
+                                "",
+                                style: textStyleContent,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 ],
@@ -180,13 +218,8 @@ class InstrumentInfoScreen extends StatelessWidget {
                                                       .data(),
                                                   pdfPath: downloadedPdfPath,
                                                   instance: instance,
-                                                  siteName: siteList
-                                                      .where((element) =>
-                                                          instance
-                                                              .currentSiteId ==
-                                                          element.id)
-                                                      .first
-                                                      .name,
+                                                  siteName:
+                                                      instance.currentSiteId,
                                                 ),
                                               ),
                                             );

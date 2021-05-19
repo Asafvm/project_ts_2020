@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
+import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/team/team_home_screen.dart';
 
 class TeamThumbnail extends StatelessWidget {
@@ -52,13 +54,17 @@ class TeamThumbnail extends StatelessWidget {
                         create: (context) =>
                             FirebaseFirestoreProvider.getSites(),
                         initialData: []),
-                    StreamProvider<List<InstrumentInstance>>(
-                        create: (context) => FirebaseFirestoreProvider
-                            .getAllInstrumentsInstances(),
+                    StreamProvider<List<Instrument>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getInstruments(),
                         initialData: []),
                     StreamProvider<List<Part>>(
                         create: (context) =>
                             FirebaseFirestoreProvider.getStorageParts(),
+                        initialData: []),
+                    StreamProvider<List<Entry>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getTeamEntries(),
                         initialData: []),
                   ],
                   child: TeamHomeScreen(
