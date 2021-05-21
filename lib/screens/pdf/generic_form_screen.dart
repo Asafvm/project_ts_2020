@@ -5,8 +5,8 @@ import 'package:path/path.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/models/field.dart';
-import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
@@ -14,26 +14,30 @@ import 'package:intl/intl.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;
-  final Map<String, dynamic> fields;
-  final InstrumentInstance instance;
+  final List<Field> fields;
+  final String instrumentId;
+  final String instanceId;
   final String siteName;
   const GenericFormScreen(
-      {this.fields, this.pdfPath, this.instance, this.siteName});
+      {this.fields,
+      this.pdfPath,
+      this.siteName,
+      this.instrumentId,
+      this.instanceId});
+
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
 }
 
 class _GenericFormScreenState extends State<GenericFormScreen> {
   Uint8List image;
-  List<Field> fields = [];
   var controllersArray = List<TextEditingController>.empty();
   @override
   void initState() {
     super.initState();
 
-    fields = widget.fields.values.map((e) => Field.fromJson(e)).toList();
     controllersArray = List<TextEditingController>.generate(
-        fields.length, (index) => TextEditingController());
+        widget.fields.length, (index) => TextEditingController());
   }
 
   @override
@@ -45,7 +49,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              for (Field field in fields) _buildGenericField(field),
+              for (Field field in widget.fields) _buildGenericField(field),
               SizedBox(
                 height: 10,
               ),
@@ -87,7 +91,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             flex: 2,
             fit: FlexFit.tight,
             child: TextFormField(
-              controller: controllersArray[fields.indexOf(field)],
+              controller: controllersArray[widget.fields.indexOf(field)],
               maxLength: (field.size.width / (field.size.height / 2.50))
                   .round(), //width of field / width of character
               decoration: InputDecoration(
@@ -121,50 +125,19 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
   Future<void> _preview(BuildContext context) async {
     try {
-      PdfMutableDocument doc = await PdfMutableDocument.path(widget.pdfPath);
-
-      //add field to pages
-
-      for (Field field in fields) {
-        var page = doc.getPage(field.page - 1);
-
-        page.add(
-          item: pdfWidgets.Positioned(
-            left: field.offset.dx * page.size.width,
-            top: field.offset.dy * page.size.height,
-            child: pdfWidgets.Padding(
-              padding: const pdfWidgets.EdgeInsets.all(5),
-              child: pdfWidgets.Text(
-                controllersArray[fields.indexOf(field)].text.isNotEmpty
-                    ? controllersArray[fields.indexOf(field)].text
-                    : field.defaultValue,
-                style: pdfWidgets.TextStyle(
-                  fontSize: field.size.height,
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-      String dest = await FirebasePaths.rootTeamFolder();
-      final DateFormat formatter = DateFormat('yyyy-MM-dd');
-
-      File result = await doc.save(
-          filename:
-              '${formatter.format(DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch))}_${widget.instance.instrumentCode}_${widget.instance.serial}.pdf');
-
-      Directory dir =
-          await Directory('$dest/${widget.siteName}').create(recursive: true);
-      result.copy('${dir.path}/${basename(result.path)}');
-
-      Applogger.consoleLog(MessegeType.info, "PDF Editing Done");
-
+      String resultPath = await PdfHelper.createPdf(
+          fields: widget.fields,
+          instanceId: widget.instanceId,
+          instrumentId: widget.instrumentId,
+          pdfPath: widget.pdfPath,
+          siteName: widget.siteName);
+      //display result
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => PDFScreen(
           fields: [],
-          pathPDF: result.path,
+          pathPDF: resultPath,
           onlyFields: true,
-          instrumentID: widget.instance.instrumentCode,
+          instrumentID: widget.instrumentId,
         ),
       ));
     } catch (e, s) {
@@ -175,9 +148,22 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   }
 
   Future<void> _submit(BuildContext context) async {
+    //update default values
+    widget.fields.forEach((field) {
+      field.defaultValue =
+          controllersArray.elementAt(widget.fields.indexOf(field)).text;
+    });
+    //upload fields
     var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
-        fields, widget.instance.instrumentCode, widget.instance.serial);
+        widget.fields,
+        widget.instrumentId,
+        widget.instanceId,
+        basenameWithoutExtension(widget.pdfPath));
     print(result.data);
-    if (result.data["status"] == "success") Navigator.of(context).pop();
+    if (result.data["status"] == "success") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Uploaded seccessfuly')));
+      Navigator.of(context).pop();
+    }
   }
 }

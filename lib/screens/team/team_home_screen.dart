@@ -88,7 +88,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).primaryColor,
-                            fontSize: 24),
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -100,7 +100,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).primaryColor,
-                            fontSize: 24),
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -112,7 +112,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).primaryColor,
-                            fontSize: 24),
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -126,8 +126,10 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: entryList.length,
-                    itemBuilder: (context, index) =>
-                        EntryListItem(entryList[index]),
+                    itemBuilder: (context, index) => EntryListItem(
+                      entry: entryList[index],
+                      showSub: true,
+                    ),
                   ),
                 ),
               ),
@@ -182,15 +184,18 @@ class InfoCube extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
+            Expanded(
+              flex: 0,
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
             Expanded(
+              flex: 1,
               child: Container(
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(

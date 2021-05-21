@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/entry.dart';
+import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import '../helpers/firebase_paths.dart';
 
 ///*** class changed to static ***///
@@ -79,7 +81,7 @@ class FirebaseFirestoreProvider {
   static Stream<List<DocumentSnapshot>> getInstrumentReports(
       String instrumentId) {
     return FirebaseFirestore.instance
-        .collection(FirebasePaths.instanceReportRef(instrumentId))
+        .collection(FirebasePaths.instrumentReportRef(instrumentId))
         .snapshots()
         .map((query) => query.docs);
   }
@@ -96,6 +98,13 @@ class FirebaseFirestoreProvider {
               )
               .toList(),
         );
+  }
+
+  static Future<InstrumentInstance> getInstanceInfo(
+      String instrumentId, String instanceId) async {
+    return InstrumentInstance.fromFirestore(await FirebaseFirestore.instance
+        .doc("${FirebasePaths.instanceRef(instrumentId)}/$instanceId")
+        .get());
   }
 
   static Stream<List<InstrumentInstance>> getAllInstrumentsInstances() {
@@ -119,8 +128,6 @@ class FirebaseFirestoreProvider {
   }
 
   static Stream<List<Site>> getSites() {
-    // String sitesRef =
-    //     "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites";
     return FirebaseFirestore.instance
         .collection(FirebasePaths.sitesRef)
         .snapshots()
@@ -133,10 +140,13 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  static Stream<List<Room>> getRooms(String siteId) {
-    // String roomRef =
-    //     "$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$rooms";
+  static Future<Site> getSiteInfo(String siteId) async {
+    return Site.fromFirestore(await FirebaseFirestore.instance
+        .doc('${FirebasePaths.sitesRef}/$siteId')
+        .get());
+  }
 
+  static Stream<List<Room>> getRooms(String siteId) {
     return FirebaseFirestore.instance
         .collection(FirebasePaths.roomRef(siteId))
         .snapshots()
@@ -150,9 +160,6 @@ class FirebaseFirestoreProvider {
   }
 
   static Stream<List<Contact>> getContacts() {
-    // String contactRef =
-    //     '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$contacts';
-
     return FirebaseFirestore.instance
         .collection(FirebasePaths.contactRef)
         .snapshots()
@@ -166,9 +173,6 @@ class FirebaseFirestoreProvider {
   }
 
   static Stream<List<String>> getContactsAtSite(String siteId, String roomId) {
-    // String contactRef =
-    //     '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$sites/$siteId/$rooms/$roomId/$contacts';
-
     return FirebaseFirestore.instance
         .collection(FirebasePaths.siteContactRef(siteId, roomId))
         .snapshots()
@@ -182,9 +186,6 @@ class FirebaseFirestoreProvider {
   }
 
   static Stream<List<String>> getTeamMembers() {
-    // String membersRef =
-    //     '$teams/${TeamProvider().getCurrentTeam.getTeamId}/$members';
-
     return FirebaseFirestore.instance
         .collection(FirebasePaths.membersRef)
         .snapshots()
@@ -213,7 +214,7 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  static getTeamEntries() {
+  static Stream<List<Entry>> getTeamEntries() {
     return FirebaseFirestore.instance
         .collection("${FirebasePaths.teamEntriesRef}")
         .orderBy("timestamp", descending: true) //newest first
@@ -225,5 +226,15 @@ class FirebaseFirestoreProvider {
               )
               .toList(),
         );
+  }
+
+  static Future<List<Field>> getReportFields(
+      {String instrumentId, String instanceId, String reportId}) async {
+    DocumentSnapshot result = await FirebaseFirestore.instance
+        .doc(
+            "${FirebasePaths.instanceReportRef(instrumentId, instanceId, reportId)}")
+        .get();
+
+    return result.data().values.map((field) => Field.fromJson(field)).toList();
   }
 }

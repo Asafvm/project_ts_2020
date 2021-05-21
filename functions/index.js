@@ -134,7 +134,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
   try {
     switch (data["operation"]) {
       case 0: //create
-      console.log(data["Creating instrument"]);
+        console.log(data["Creating instrument"]);
 
         var snapshot = await instruments.get();
         snapshot.forEach((doc) => {
@@ -156,7 +156,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
         break;
 
       case 1: //update
-      console.log(data["Updating instrument"]);
+        console.log(data["Updating instrument"]);
         if (data["instrumentId"] !== null)
           await instruments
             .doc(data["instrumentId"])
@@ -174,27 +174,21 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
 });
 
 exports.autoEntryCollector = functions.firestore
-  .document("teams/{teamId}/instruments/{instrumentId}/instances/{instanceId}/entries/{entryId}")
-  .onWrite(async(change, context) =>  {
+  .document(
+    "teams/{teamId}/instruments/{instrumentId}/instances/{instanceId}/entries/{entryId}"
+  )
+  .onWrite(async (change, context) => {
     const entries = admin
-    .firestore()
-    .collection("teams")
-    .doc(context.params.teamId)
-    .collection("entries");
+      .firestore()
+      .collection("teams")
+      .doc(context.params.teamId)
+      .collection("entries");
 
-    entries
-    .doc(context.params.entryId)
-    .create(
-      change.after.data(),
-    );
+    entries.doc(context.params.entryId).create(change.after.data());
 
-    var log = (await entries.listDocuments());
-    if(log.length > 10)
-      entries.doc(log[0].id).delete();
-
-    
+    var log = await entries.listDocuments();
+    if (log.length > 10) entries.doc(log[0].id).delete();
   });
-
 
 //add instrument instance to team's inventory
 exports.addInstrumentInstance = functions.https.onCall(
@@ -215,7 +209,11 @@ exports.addInstrumentInstance = functions.https.onCall(
           await instruments.collection("entries").add({
             type: 0,
             timestamp: Date.now(),
-            details: "New Instrument Created",
+            details: {
+              title: "Report Created",
+              instrumentId: data["instrumentId"],
+              instanceId: data["instrument"]["serial"],
+            },
           });
           break;
 
@@ -349,13 +347,19 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     console.log("id=" + reportid);
     const fields = instanceRef
       .collection("reports")
-      .doc(reportid)
+      .doc(data["reportName"] + "_" + reportid)
       .set(Object.assign({}, data["fields"]));
 
     const log = instanceRef.collection("entries").add({
       type: 2,
       timestamp: Date.now(),
-      details: "Report " + reportid + " Created",
+      details: {
+        title: "Report Created",
+        reportName: data["reportName"],
+        reportid: reportid,
+        instrumentId: data["instrumentId"],
+        instanceId: data["instanceId"],
+      },
     });
 
     promises.push(fields);
@@ -444,9 +448,15 @@ exports.linkInstruments = functions.https.onCall(async (data, context) => {
       });
       const insert = room.add(instrument);
 
-      const log = instanceRef
-        .collection("entries")
-        .add({ type: 1, timestamp: Date.now(), details: "Instrument Moved" });
+      const log = instanceRef.collection("entries").add({
+        type: 1,
+        timestamp: Date.now(),
+        details: {
+          title: "Intrument Moved",
+          instrumentId: data["instrumentId"],
+          instanceId: data["instanceId"],
+        },
+      });
       promises.push(update);
       promises.push(insert);
       promises.push(log);

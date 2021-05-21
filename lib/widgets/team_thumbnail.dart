@@ -48,25 +48,10 @@ class TeamThumbnail extends StatelessWidget {
           onTap: () => {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => MultiProvider(
-                  providers: [
-                    StreamProvider<List<Site>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getSites(),
-                        initialData: []),
-                    StreamProvider<List<Instrument>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getInstruments(),
-                        initialData: []),
-                    StreamProvider<List<Part>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getStorageParts(),
-                        initialData: []),
-                    StreamProvider<List<Entry>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getTeamEntries(),
-                        initialData: []),
-                  ],
+                builder: (_) => StreamProvider<List<Entry>>(
+                  create: (context) =>
+                      FirebaseFirestoreProvider.getTeamEntries(),
+                  initialData: [],
                   child: TeamHomeScreen(
                     team: team,
                   ),

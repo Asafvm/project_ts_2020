@@ -108,7 +108,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
             //list of files related to instrument
             stream: FirebaseFirestore.instance
                 .collection(
-                    FirebasePaths.instanceReportRef(widget.instrument.id))
+                    FirebasePaths.instrumentReportRef(widget.instrument.id))
                 .snapshots()
                 .map((list) => list.docs),
             builder: (context, snapshot) {

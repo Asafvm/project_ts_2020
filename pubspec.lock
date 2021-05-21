@@ -148,6 +148,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.17.0"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -366,13 +373,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
-  google_maps_cluster_manager:
-    dependency: "direct main"
+  google_maps:
+    dependency: transitive
     description:
-      name: google_maps_cluster_manager
+      name: google_maps
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "5.1.0"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -387,13 +394,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.4"
-  google_maps_webservice:
+  google_maps_flutter_web:
     dependency: "direct main"
     description:
-      name: google_maps_webservice
+      name: google_maps_flutter_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.20-nullsafety.5"
+    version: "0.3.0"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.0"
   http:
     dependency: "direct main"
     description:
@@ -450,6 +464,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.3"
+  js_wrapping:
+    dependency: transitive
+    description:
+      name: js_wrapping
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.0"
   json_annotation:
     dependency: "direct main"
     description:
@@ -629,6 +650,13 @@ packages:
     dependency: transitive
     description:
       name: qr
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
+  sanitize_html:
+    dependency: transitive
+    description:
+      name: sanitize_html
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"

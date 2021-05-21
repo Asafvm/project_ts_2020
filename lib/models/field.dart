@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Field {
   final double _minWidth = 10;
   final double _minHeight = 10;
@@ -83,4 +85,8 @@ class Field {
         'suffix': suffix,
         'isMandatory': isMandatory,
       };
+
+  static Field fromFirestore(QueryDocumentSnapshot documentSnapshot) {
+    return Field.fromJson(documentSnapshot.data());
+  }
 }

@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/models/instrument.dart';
@@ -10,7 +10,6 @@ import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/drawer_screens/FileExplorer.dart';
 import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/drawer_screens/inventory_screen.dart';
@@ -34,15 +33,6 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => MultiProvider(providers: [
-                    StreamProvider<List<Site>>(
-                      create: (context) => FirebaseFirestoreProvider.getSites(),
-                      initialData: [],
-                    ),
-                    StreamProvider<List<Instrument>>(
-                      create: (context) =>
-                          FirebaseFirestoreProvider.getInstruments(),
-                      initialData: [],
-                    ),
                     StreamProvider<List<InstrumentInstance>>(
                       create: (context) => FirebaseFirestoreProvider
                           .getAllInstrumentsInstances(),
@@ -60,16 +50,6 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => MultiProvider(providers: [
-                    StreamProvider<List<Part>>(
-                      create: (context) =>
-                          FirebaseFirestoreProvider.getStorageParts(),
-                      initialData: [],
-                    ),
-                    StreamProvider<List<Instrument>>(
-                      create: (context) =>
-                          FirebaseFirestoreProvider.getInstruments(),
-                      initialData: [],
-                    ),
                     StreamProvider<List<String>>(
                       create: (context) =>
                           FirebaseFirestoreProvider.getTeamMembers(),
@@ -80,35 +60,29 @@ class CustomDrawer extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            leading: Icon(Icons.library_books),
-            title: Text('Files'),
-            onTap: () async {
-              Future<Directory> dir =
-                  Directory('${await FirebasePaths.rootTeamFolder()}')
-                      .create(recursive: true);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => FileExplorer(
-                    path: dir,
+          if (!kIsWeb)
+            ListTile(
+              leading: Icon(Icons.library_books),
+              title: Text('Files'),
+              onTap: () async {
+                Future<Directory> dir =
+                    Directory('${await FirebasePaths.rootTeamFolder()}')
+                        .create(recursive: true);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => FileExplorer(
+                      path: dir,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
           ListTile(
             leading: Icon(Icons.map),
             title: Text('Map'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StreamProvider<List<Site>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getSites(),
-                        initialData: [],
-                        child: MapScreen()),
-                  ));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MapScreen()));
             },
           ),
           Divider(),
@@ -144,6 +118,18 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           Divider(),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text('About'),
+            onTap: () {
+              showAboutDialog(
+                  context: context,
+                  applicationIcon: Icon(Icons.group),
+                  applicationName: 'TeamShare',
+                  applicationVersion: '0.9a');
+              //Navigator.of(context).pop();
+            },
+          ),
         ],
       ),
     );

@@ -158,8 +158,8 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<HttpsCallableResult> uploadInstanceReport(
-      List<Field> fields, String instrumentId, String instanceId) async {
+  static Future<HttpsCallableResult> uploadInstanceReport(List<Field> fields,
+      String instrumentId, String instanceId, String reportName) async {
     String teamId = TeamProvider().getCurrentTeam.getTeamId;
 
     return await FirebaseFunctions.instance
@@ -168,6 +168,7 @@ class FirebaseFirestoreCloudFunctions {
       "teamId": teamId,
       "instrumentId": instrumentId,
       "instanceId": instanceId,
+      "reportName": reportName,
       "fields": fields.map((field) => field.toJson()).toList(),
     });
   }

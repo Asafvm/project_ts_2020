@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/image_helper.dart';
 import 'package:teamshare/models/entry.dart';
+import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
@@ -75,62 +76,57 @@ class InstrumentInfoScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(13.0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Text(
                             instrument.getCodeName(),
                             style: textStyleTitle,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Table(
+                            border: TableBorder(
+                                horizontalInside:
+                                    BorderSide(color: Colors.grey, width: 1)),
+                            defaultVerticalAlignment:
+                                TableCellVerticalAlignment.middle,
                             children: [
-                              Text(
-                                "Model",
-                                style: textStyleContent,
-                              ),
-                              Text(
-                                instrument.getModel(),
-                                style: textStyleContent,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Serial",
-                                style: textStyleContent,
-                              ),
-                              Text(
-                                instance.serial,
-                                style: textStyleContent,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Site',
-                                style: textStyleContent,
-                              ),
-                              Text(
-                                '${instance.currentSiteId}',
-                                style: textStyleContent,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Maintenance",
-                              ),
-                              Text(
-                                "",
-                                style: textStyleContent,
-                              ),
+                              TableRow(children: [
+                                Text(
+                                  "Model",
+                                  style: textStyleContent,
+                                ),
+                                Text(
+                                  instrument.getModel(),
+                                  style: textStyleContent,
+                                ),
+                              ]),
+                              TableRow(children: [
+                                Text(
+                                  "Serial",
+                                  style: textStyleContent,
+                                ),
+                                Text(
+                                  instance.serial,
+                                  style: textStyleContent,
+                                ),
+                              ]),
+                              TableRow(children: [
+                                Text(
+                                  'Site',
+                                  style: textStyleContent,
+                                ),
+                                Text(
+                                  '${instance.currentSiteId}',
+                                  style: textStyleContent,
+                                ),
+                              ]),
+                              TableRow(children: [
+                                Text(
+                                  "Maintenance",
+                                ),
+                                Text(
+                                  "",
+                                  style: textStyleContent,
+                                ),
+                              ]),
                             ],
                           ),
                         ],
@@ -169,13 +165,17 @@ class InstrumentInfoScreen extends StatelessWidget {
                                   instance),
                               initialData: [],
                               builder: (context, snapshot) {
-                                return ListView.builder(
-                                  itemCount: snapshot.data.length,
-                                  itemBuilder: (context, index) {
-                                    return EntryListItem(
-                                        snapshot.data.elementAt(index));
-                                  },
-                                );
+                                if (snapshot.hasData)
+                                  return ListView.builder(
+                                    itemCount: snapshot.data.length,
+                                    itemBuilder: (context, index) {
+                                      return EntryListItem(
+                                          entry:
+                                              snapshot.data.elementAt(index));
+                                    },
+                                  );
+                                else
+                                  return Container();
                               },
                             ),
                           ),
@@ -186,14 +186,14 @@ class InstrumentInfoScreen extends StatelessWidget {
                                   .getInstrumentReports(instrument.id),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  List<DocumentSnapshot> docList =
+                                  List<DocumentSnapshot> reportList =
                                       snapshot.data;
 
                                   return ListView.builder(
                                     shrinkWrap: true,
                                     itemBuilder: (ctx, index) => ListTile(
                                       leading: Icon(Icons.picture_as_pdf),
-                                      title: Text(docList[index].id),
+                                      title: Text(reportList[index].id),
                                       trailing: OutlinedButton(
                                         child: Text(
                                           "Create",
@@ -203,7 +203,7 @@ class InstrumentInfoScreen extends StatelessWidget {
                                           String downloadedPdfPath =
                                               await FirebaseStorageProvider
                                                   .downloadFile(
-                                                      '${FirebasePaths.instrumentReportTemplatePath(instrument.id)}/${docList[index].id}');
+                                                      '${FirebasePaths.instrumentReportTemplatePath(instrument.id)}/${reportList[index].id}');
                                           if (downloadedPdfPath == null) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(SnackBar(
@@ -214,10 +214,16 @@ class InstrumentInfoScreen extends StatelessWidget {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     GenericFormScreen(
-                                                  fields: snapshot.data[index]
-                                                      .data(),
+                                                  fields: reportList[index]
+                                                      .data()
+                                                      .values
+                                                      .map((field) =>
+                                                          Field.fromJson(field))
+                                                      .toList(),
                                                   pdfPath: downloadedPdfPath,
-                                                  instance: instance,
+                                                  instanceId: instance.serial,
+                                                  instrumentId:
+                                                      instance.instrumentCode,
                                                   siteName:
                                                       instance.currentSiteId,
                                                 ),
@@ -226,7 +232,7 @@ class InstrumentInfoScreen extends StatelessWidget {
                                         },
                                       ),
                                     ),
-                                    itemCount: docList.length,
+                                    itemCount: reportList.length,
                                   );
                                 } else {
                                   return Container();

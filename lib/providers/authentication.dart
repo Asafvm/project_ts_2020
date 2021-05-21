@@ -122,4 +122,8 @@ class Authentication with ChangeNotifier {
     Timer(Duration(seconds: timeToExpiry), tryAutoLogin);
     // Timer(Duration(seconds: timeToExpiry), logout);
   }
+
+  void forgotPassword(String email) {
+    FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+  }
 }

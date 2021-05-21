@@ -17,13 +17,9 @@ class InstrumentInstanceListItem extends StatelessWidget {
       onTap: () => {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (BuildContext context) => StreamProvider<List<Site>>(
-              create: (context) => FirebaseFirestoreProvider.getSites(),
-              initialData: [],
-              child: InstrumentInfoScreen(
-                instrument: instrument,
-                instance: instance,
-              ),
+            builder: (BuildContext context) => InstrumentInfoScreen(
+              instrument: instrument,
+              instance: instance,
             ),
           ),
         )

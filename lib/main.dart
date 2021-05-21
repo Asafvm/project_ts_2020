@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/helpers/custom_route.dart';
+import 'package:teamshare/models/entry.dart';
+import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
@@ -8,6 +11,8 @@ import 'package:teamshare/screens/login_screen.dart';
 import 'package:teamshare/screens/main_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/screens/splash_screen.dart';
+
+import 'models/part.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +55,17 @@ class TeamShare extends StatelessWidget {
               StreamProvider<List<String>>(
                   create: (context) =>
                       FirebaseFirestoreProvider.getUserTeamList(),
+                  initialData: []),
+              StreamProvider<List<Site>>(
+                  create: (context) => FirebaseFirestoreProvider.getSites(),
+                  initialData: []),
+              StreamProvider<List<Instrument>>(
+                  create: (context) =>
+                      FirebaseFirestoreProvider.getInstruments(),
+                  initialData: []),
+              StreamProvider<List<Part>>(
+                  create: (context) =>
+                      FirebaseFirestoreProvider.getStorageParts(),
                   initialData: []),
             ],
             child: Consumer<Authentication>(

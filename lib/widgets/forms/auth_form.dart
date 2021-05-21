@@ -169,7 +169,11 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                           "Forgot password?",
                           textAlign: TextAlign.start,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (_authData["email"].isNotEmpty &&
+                              !emailRegExp.hasMatch(_authData["email"]))
+                            Authentication().forgotPassword(_authData["email"]);
+                        },
                       ),
                   ],
                 ),
