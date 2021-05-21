@@ -14,6 +14,8 @@ import 'package:teamshare/widgets/list_items/inventory_list_item.dart';
 
 class TeamHomeScreen extends StatefulWidget {
   final Team team;
+
+  static const String routeName = '/team_home_screen';
   const TeamHomeScreen({Key key, this.team}) : super(key: key);
 
   @override

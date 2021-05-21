@@ -90,7 +90,9 @@ class CustomDrawer extends StatelessWidget {
             leading: Icon(Icons.person),
             title: Text('Admin'),
             onTap: () {
-              Navigator.of(context).pushNamed(AdminMenuScreen.routeName);
+              Navigator.of(context).pushNamed(
+                AdminMenuScreen.routeName,
+              );
             },
           ),
           ListTile(

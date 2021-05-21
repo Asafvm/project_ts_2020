@@ -1,16 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:teamshare/helpers/firebase_paths.dart';
-import 'package:teamshare/helpers/pdf_handler.dart';
-import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
-import 'package:intl/intl.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String pdfPath;

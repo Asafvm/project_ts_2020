@@ -12,7 +12,7 @@ import 'package:teamshare/screens/admin/admin_site_screen.dart';
 import 'package:teamshare/screens/admin/admin_team_managment_screen.dart';
 
 class AdminMenuScreen extends StatelessWidget {
-  static const String routeName = '/admin_menu_screen';
+  static const String routeName = '/team_home_screen/admin_menu_screen';
   final String siteId;
 
   const AdminMenuScreen({this.siteId});
