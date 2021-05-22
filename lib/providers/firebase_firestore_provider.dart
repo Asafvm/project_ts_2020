@@ -26,9 +26,9 @@ class FirebaseFirestoreProvider {
     return stream;
   }
 
-  static Stream<List<Part>> getStorageParts() {
+  static Stream<List<Part>> getCatalogParts() {
     return FirebaseFirestore.instance
-        .collection(FirebasePaths.partsStorageRef)
+        .collection(FirebasePaths.partsStorageCatalogRef)
         .snapshots()
         .map(
           (query) => query.docs
@@ -39,30 +39,14 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  static Stream<List<String>> getPersonalParts() {
+  static Stream<List<MapEntry<String, dynamic>>> getInventoryParts(
+      String member) {
     return FirebaseFirestore.instance
-        .collection(FirebasePaths.partsPersonalRef)
+        .collection(FirebasePaths.partsInventoryRef(member))
         .snapshots()
-        .map(
-          (query) => query.docs
-              .map(
-                (doc) => doc.id,
-              )
-              .toList(),
-        );
-  }
-
-  static Stream<List<String>> getMemberParts(String memberId) {
-    return FirebaseFirestore.instance
-        .collection(FirebasePaths.partsMemberRef(memberId))
-        .snapshots()
-        .map(
-          (query) => query.docs
-              .map(
-                (doc) => doc.id,
-              )
-              .toList(),
-        );
+        .map((query) => query.docs
+            .map((doc) => MapEntry(doc.id, doc.data()["count"]))
+            .toList());
   }
 
   static Stream<List<Instrument>> getInstruments() {

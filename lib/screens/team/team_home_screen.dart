@@ -82,70 +82,80 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
             children: [
               Row(
                 children: [
-                  InfoCube(
-                    title: 'Sites',
-                    child: Center(
-                      child: Text(
-                        siteList.length.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 16),
+                  Expanded(
+                    child: InfoCube(
+                      title: 'Sites',
+                      child: Center(
+                        child: Text(
+                          siteList.length.toString(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 16),
+                        ),
                       ),
                     ),
                   ),
-                  InfoCube(
-                    title: 'Instruments',
-                    child: Center(
-                      child: Text(
-                        instrumentList.length.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 16),
+                  Expanded(
+                    child: InfoCube(
+                      title: 'Instruments',
+                      child: Center(
+                        child: Text(
+                          instrumentList.length.toString(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 16),
+                        ),
                       ),
                     ),
                   ),
-                  InfoCube(
-                    title: 'Parts',
-                    child: Center(
-                      child: Text(
-                        partList.length.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                            fontSize: 16),
+                  Expanded(
+                    child: InfoCube(
+                      title: 'Parts',
+                      child: Center(
+                        child: Text(
+                          partList.length.toString(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 16),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              InfoCube(
-                title: 'Recent Activity',
-                child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: entryList.length,
-                    itemBuilder: (context, index) => EntryListItem(
-                      entry: entryList[index],
-                      showSub: true,
+              Expanded(
+                child: InfoCube(
+                  title: 'Recent Activity',
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: entryList.length,
+                      itemBuilder: (context, index) => EntryListItem(
+                        entry: entryList[index],
+                        showSub: true,
+                      ),
                     ),
                   ),
                 ),
               ),
-              InfoCube(
-                title: 'Missing Inventroy',
-                child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: partList.length,
-                    itemBuilder: (context, index) => PartListItem(
-                      key: UniqueKey(),
-                      part: partList[index],
+              Expanded(
+                child: InfoCube(
+                  title: 'Missing Inventroy',
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: partList.length,
+                      itemBuilder: (context, index) => PartListItem(
+                        key: UniqueKey(),
+                        part: partList[index],
+                      ),
                     ),
                   ),
                 ),
@@ -172,44 +182,42 @@ class InfoCube extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        height: 100,
-        padding: const EdgeInsets.all(3),
-        margin: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: Colors.black, width: 3, style: BorderStyle.solid),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              flex: 0,
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.all(3),
+      margin: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border:
+            Border.all(color: Colors.black, width: 3, style: BorderStyle.solid),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            flex: 0,
+            child: Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
               ),
+              textAlign: TextAlign.center,
             ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                      color: Colors.black, width: 1, style: BorderStyle.solid),
-                ),
-                child: child,
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: Colors.black, width: 1, style: BorderStyle.solid),
               ),
+              child: child,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

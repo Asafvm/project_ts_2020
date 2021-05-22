@@ -11,6 +11,7 @@ import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
+import 'package:teamshare/screens/drawer_screens/inventory_screen.dart';
 
 import 'authentication.dart';
 
@@ -240,6 +241,19 @@ class FirebaseFirestoreCloudFunctions {
       "siteId": siteId,
       "roomId": roomId,
       "contacts": selected.map((contact) => {"contactId": contact.id}).toList(),
+    });
+  }
+
+  static Future<HttpsCallableResult> transferParts(
+      String origin, String destination, Part part, int amount) async {
+    return await FirebaseFunctions.instance
+        .httpsCallable("transferParts")
+        .call(<String, dynamic>{
+      "teamId": TeamProvider().getCurrentTeam.getTeamId,
+      "origin": origin,
+      "destination": destination,
+      "partId": part.id,
+      "amount": amount,
     });
   }
 }

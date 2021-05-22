@@ -53,60 +53,17 @@ class _PartListItemState extends State<PartListItem> {
           widget.part.getreference(),
           maxLines: 1,
         ),
-        trailing: SizedBox(
-          width: 50,
-          child: widget.inventoryMode
-              ? IconButton(
-                  icon: Icon(Icons.import_export),
-                  onPressed: () => _inventoryChange(_partCount))
-              : Container(),
-        ),
+        // trailing: SizedBox(
+        //   width: 50,
+        //   child: widget.inventoryMode
+        //       ? IconButton(
+        //           icon: Icon(Icons.import_export),
+        //           onPressed: () => _inventoryChange(_partCount))
+        //       : Container(),
+        // ),
       ),
     );
   }
 
-  void _inventoryChange(int partCount) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => StatefulBuilder(builder: (context, setState) {
-        return AlertDialog(
-          title: Text('Inventory Change'),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                  icon: Icon(Icons.arrow_circle_down_outlined),
-                  onPressed: () {
-                    setState(() {
-                      if (partCount > 0) partCount--;
-                    });
-                  }),
-              Text(partCount.toString()),
-              IconButton(
-                  icon: Icon(Icons.arrow_circle_up_outlined),
-                  onPressed: () {
-                    setState(() {
-                      partCount++;
-                    });
-                  })
-            ],
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context), child: Text("Cancel")),
-            TextButton(
-                onPressed: () async => {
-                      print(await FirebaseFirestoreCloudFunctions
-                          .addUserInventory(widget.part, partCount)),
-                      Navigator.pop(context)
-                    },
-                child: Text("OK")),
-          ],
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        );
-      }),
-    );
-  }
+  
 }

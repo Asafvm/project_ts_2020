@@ -266,23 +266,50 @@ exports.addPart = functions.https.onCall(async (data, context) => {
   return { status: "success" };
 });
 
-exports.addUserInventory = functions.https.onCall(async (data, context) => {
+exports.transferParts = functions.https.onCall(async (data, context) => {
   const teamId = data["teamId"];
-  const userId = data["userId"];
+  const originId = data["origin"];
+  const destinationId = data["destination"];
   const partId = data["partId"];
+  const amount = data["amount"];
 
-  const parts = admin
+  const originParts = admin
     .firestore()
     .collection("teams")
     .doc(teamId)
     .collection("members")
-    .doc(userId)
+    .doc(originId)
     .collection("inventory")
     .doc(partId);
+
+  const destinationParts = admin
+    .firestore()
+    .collection("teams")
+    .doc(teamId)
+    .collection("members")
+    .doc(destinationId)
+    .collection("inventory")
+    .doc(partId);
+
   try {
-    await parts.set({ count: data["count"] });
+    originPartData = (await originParts.get()).get("count");
+    destPartData = (await destinationParts.get()).exists
+      ? (await destinationParts.get()).get("count")
+      : 0;
+      console.log("moving "+amount+" unit\\s from "+originId+" ("+originPartData+") to "+destinationId+" ("+destPartData+")");
+    if (originPartData >= amount) {
+      //var destCount =
+      await originParts.set({ count: originPartData - amount });
+      await destinationParts.set({
+        count: destPartData === 0 ? amount : destPartData + amount,
+      });
+    } else throw new functions.https.HttpsError(
+      "not-enough",
+      "Quantity too small",
+      "Not enough quantity to complete transfer"
+    ); 
   } catch (e) {
-    console.log("Error Adding Part :: " + e);
+    console.log("Error Adding Part :: " + e.toString());
     return { status: "failed", messege: e };
   }
   return { status: "success" };

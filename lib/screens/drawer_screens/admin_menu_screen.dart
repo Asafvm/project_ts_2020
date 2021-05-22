@@ -123,7 +123,7 @@ class AdminMenuScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => StreamProvider<List<Part>>(
                           create: (context) =>
-                              FirebaseFirestoreProvider.getStorageParts(),
+                              FirebaseFirestoreProvider.getCatalogParts(),
                           initialData: [],
                           child: AdminPartScreen(),
                         ),

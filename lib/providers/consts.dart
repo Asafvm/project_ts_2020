@@ -102,6 +102,7 @@ const String contacts = "contacts";
 const String members = "members";
 const String parts = "parts";
 const String inventory = "inventory";
+const String storage = "storage";
 const String entries = "entries";
 const String reports = "reports";
 const String report_templates = "report_templates";

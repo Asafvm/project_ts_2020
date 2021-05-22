@@ -20,7 +20,6 @@ class _FileExplorerState extends State<FileExplorer> {
   List<bool> _selectedList = [];
   static List<FileSystemEntity> files;
   List<FileSystemEntity> filteredFiles;
-  bool _isFolder = false;
 
   String _textFilter = '';
 
@@ -111,12 +110,12 @@ class _FileExplorerState extends State<FileExplorer> {
                     onChanged: (value) => setState(() {
                       _textFilter = value;
 
-                      // filteredFiles
-                      //     .where((element) => element.path
-                      //         .substring(element.path.lastIndexOf('/') + 1)
-                      //         .toLowerCase()
-                      //         .contains(value.toLowerCase()))
-                      //     .toList();
+                      filteredFiles
+                          .where((element) => element.path
+                              .substring(element.path.lastIndexOf('/') + 1)
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                          .toList();
                     }),
                   ),
                   Expanded(
@@ -130,10 +129,6 @@ class _FileExplorerState extends State<FileExplorer> {
                           .length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        if (files[index].path.endsWith("")) {
-                          _isFolder = true;
-                        }
-
                         FileSystemEntity file = files[index];
                         FileStat fileStats = file.statSync();
                         return _multiSelect
@@ -157,7 +152,7 @@ class _FileExplorerState extends State<FileExplorer> {
                                 subtitle:
                                     Text('${fileStats.modified.toLocal()}'),
                                 secondary: Icon(
-                                    fileStats.type.toString() == "file"
+                                    fileStats.type == FileSystemEntityType.file
                                         ? Icons.file_copy
                                         : Icons.folder),
                               )
@@ -251,5 +246,6 @@ class _FileExplorerState extends State<FileExplorer> {
                   .create(),
             ),
           ));
+    return false;
   }
 }

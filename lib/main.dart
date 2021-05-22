@@ -65,7 +65,7 @@ class TeamShare extends StatelessWidget {
                   initialData: []),
               StreamProvider<List<Part>>(
                   create: (context) =>
-                      FirebaseFirestoreProvider.getStorageParts(),
+                      FirebaseFirestoreProvider.getCatalogParts(),
                   initialData: []),
             ],
             child: Consumer<Authentication>(
