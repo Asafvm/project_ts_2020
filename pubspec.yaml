@@ -53,7 +53,7 @@ dependencies:
   # CupertinoIcons
   cupertino_icons: ^1.0.2
   #misc
-  auto_size_text: ^3.0.0-nullsafety.0
+  draw_graph: ^1.0.0
   fluttercontactpicker: ^4.3.1
   image_picker: ^0.7.2
   intl: ^0.17.0 #date formatter

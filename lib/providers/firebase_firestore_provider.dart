@@ -8,6 +8,7 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/models/report.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
 import '../helpers/firebase_paths.dart';
@@ -221,5 +222,16 @@ class FirebaseFirestoreProvider {
         .get();
 
     return result.data().values.map((field) => Field.fromJson(field)).toList();
+  }
+
+  static Stream<List<Report>> getAllReportFields(
+      {String instrumentId, String instanceId, String reportId}) {
+    return FirebaseFirestore.instance
+        .collection(
+            "${FirebasePaths.instanceReportRef(instrumentId, instanceId, "")}")
+        .orderBy('timestamp', descending: false)
+        .snapshots()
+        .map((query) =>
+            query.docs.map((doc) => Report.fromFirestore(doc)).toList());
   }
 }

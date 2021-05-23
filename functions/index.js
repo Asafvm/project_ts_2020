@@ -296,18 +296,31 @@ exports.transferParts = functions.https.onCall(async (data, context) => {
     destPartData = (await destinationParts.get()).exists
       ? (await destinationParts.get()).get("count")
       : 0;
-      console.log("moving "+amount+" unit\\s from "+originId+" ("+originPartData+") to "+destinationId+" ("+destPartData+")");
+    console.log(
+      "moving " +
+        amount +
+        " unit\\s from " +
+        originId +
+        " (" +
+        originPartData +
+        ") to " +
+        destinationId +
+        " (" +
+        destPartData +
+        ")"
+    );
     if (originPartData >= amount) {
       //var destCount =
       await originParts.set({ count: originPartData - amount });
       await destinationParts.set({
         count: destPartData === 0 ? amount : destPartData + amount,
       });
-    } else throw new functions.https.HttpsError(
-      "not-enough",
-      "Quantity too small",
-      "Not enough quantity to complete transfer"
-    ); 
+    } else
+      throw new functions.https.HttpsError(
+        "not-enough",
+        "Quantity too small",
+        "Not enough quantity to complete transfer"
+      );
   } catch (e) {
     console.log("Error Adding Part :: " + e.toString());
     return { status: "failed", messege: e };
@@ -374,8 +387,12 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     console.log("id=" + reportid);
     const fields = instanceRef
       .collection("reports")
-      .doc(data["reportName"] + "_" + reportid)
-      .set(Object.assign({}, data["fields"]));
+      .add({
+        timestamp: Date.now(),
+        reportName: data["reportName"],
+        reportid: reportid,
+        fields: Object.assign({}, data["fields"]),
+      });
 
     const log = instanceRef.collection("entries").add({
       type: 2,

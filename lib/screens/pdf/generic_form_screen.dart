@@ -161,4 +161,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       Navigator.of(context).pop();
     }
   }
+
+  Size calcTextSize(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      textScaleFactor: WidgetsBinding.instance.window.textScaleFactor,
+    )..layout();
+    return textPainter.size;
+  }
 }
