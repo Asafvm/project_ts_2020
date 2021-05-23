@@ -53,20 +53,23 @@ class TeamShare extends StatelessWidget {
                 value: Authentication(),
               ),
               StreamProvider<List<String>>(
-                  create: (context) =>
-                      FirebaseFirestoreProvider.getUserTeamList(),
-                  initialData: []),
-              StreamProvider<List<Site>>(
-                  create: (context) => FirebaseFirestoreProvider.getSites(),
-                  initialData: []),
-              StreamProvider<List<Instrument>>(
-                  create: (context) =>
-                      FirebaseFirestoreProvider.getInstruments(),
-                  initialData: []),
-              StreamProvider<List<Part>>(
-                  create: (context) =>
-                      FirebaseFirestoreProvider.getCatalogParts(),
-                  initialData: []),
+                create: (context) =>
+                    FirebaseFirestoreProvider.getUserTeamList(),
+                initialData: [],
+              ),
+              // StreamProvider<List<Site>>(
+              //   create: (context) => FirebaseFirestoreProvider.getSites(),
+              //   initialData: [],
+              //   updateShouldNotify: (previous, current) => previous != current,
+              // ),
+              // StreamProvider<List<Instrument>>(
+              //     create: (context) =>
+              //         FirebaseFirestoreProvider.getInstruments(),
+              //     initialData: []),
+              // StreamProvider<List<Part>>(
+              //     create: (context) =>
+              //         FirebaseFirestoreProvider.getCatalogParts(),
+              //     initialData: []),
             ],
             child: Consumer<Authentication>(
               builder: (ctx, auth, _) {

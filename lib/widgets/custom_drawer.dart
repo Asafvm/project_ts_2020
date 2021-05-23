@@ -9,6 +9,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/authentication.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/drawer_screens/FileExplorer.dart';
 import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
@@ -55,6 +56,11 @@ class CustomDrawer extends StatelessWidget {
                           FirebaseFirestoreProvider.getTeamMembers(),
                       initialData: [],
                     ),
+                    StreamProvider<List<MapEntry<String, dynamic>>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getInventoryParts(
+                                '$storage'),
+                        initialData: [])
                   ], child: InventoryScreen()),
                 ),
               );

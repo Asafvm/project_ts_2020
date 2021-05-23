@@ -210,7 +210,7 @@ exports.addInstrumentInstance = functions.https.onCall(
             type: 0,
             timestamp: Date.now(),
             details: {
-              title: "Report Created",
+              title: "Instrument Created",
               instrumentId: data["instrumentId"],
               instanceId: data["instrument"]["serial"],
             },

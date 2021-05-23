@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:teamshare/main.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/field.dart';

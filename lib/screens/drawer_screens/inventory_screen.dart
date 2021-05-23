@@ -72,7 +72,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   tooltip: 'Show Missing \\ Inventory',
                 ),
                 IconButton(
-                    icon: Icon(Icons.share),
+                    icon: Icon(Icons.height),
                     onPressed: () {
                       setState(() {
                         _transfer = !_transfer;
@@ -88,50 +88,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           Expanded(
             flex: _transfer ? 9 ~/ 2 : 9,
             child: _missing
-                ? StreamBuilder<List<MapEntry<String, dynamic>>>(
-                    stream: FirebaseFirestoreProvider.getInventoryParts(
-                        Authentication().userEmail),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        Map<String, dynamic> parts =
-                            Map<String, dynamic>.fromEntries(snapshot.data);
-                        List<Part> filtered = catalog
-                            //filter mandatory parts
-                            .where((part) => part.personalStockMin > 0)
-                            .toList();
-                        return ListView.builder(
-                          itemBuilder: (context, index) {
-                            Part part = filtered[index];
-                            int quantity = parts[part.id] != null
-                                ? (part.personalStockMin - parts[part.id])
-                                : (-part.personalStockMin);
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Expanded(
-                                    flex: 8, child: PartListItem(part: part)),
-                                Expanded(
-                                  child: Container(
-                                    child: Center(
-                                      child: Text(
-                                        quantity.toString(),
-                                        style: TextStyle(
-                                            color: quantity > 0
-                                                ? Colors.orange
-                                                : Colors.red,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            );
-                          },
-                          itemCount: filtered.length,
-                        );
-                      } else
-                        return Container();
-                    })
+                ? MissingPartWindow(catalog: catalog)
                 : InventoryWindow(
                     target: Authentication().userEmail,
                     title: 'My Inventory',
@@ -148,6 +105,65 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   String _chooseTarget() {
     return '$storage';
+  }
+}
+
+class MissingPartWindow extends StatelessWidget {
+  const MissingPartWindow({
+    Key key,
+    @required this.catalog,
+  }) : super(key: key);
+
+  final List<Part> catalog;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<MapEntry<String, dynamic>>>(
+        stream: FirebaseFirestoreProvider.getInventoryParts(
+            Authentication().userEmail),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Map<String, dynamic> parts =
+                Map<String, dynamic>.fromEntries(snapshot.data);
+            List<Part> filtered = catalog
+                //filter mandatory parts
+                .where((part) => part.personalStockMin > 0)
+                .toList();
+            return MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  Part part = filtered[index];
+                  int quantity = parts[part.id] != null
+                      ? (part.personalStockMin - parts[part.id])
+                      : (-part.personalStockMin);
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(flex: 8, child: PartListItem(part: part)),
+                      Expanded(
+                        child: Container(
+                          child: Center(
+                            child: Text(
+                              quantity.toString(),
+                              style: TextStyle(
+                                  color:
+                                      quantity > 0 ? Colors.orange : Colors.red,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  );
+                },
+                itemCount: filtered.length,
+              ),
+            );
+          } else
+            return Container();
+        });
   }
 }
 
