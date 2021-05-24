@@ -2,22 +2,24 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/helpers/signature.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
 class GenericFormScreen extends StatefulWidget {
-  final String pdfPath;
+  final String pdfId;
   final List<Field> fields;
   final String instrumentId;
   final String instanceId;
   final String siteName;
   const GenericFormScreen(
       {this.fields,
-      this.pdfPath,
+      this.pdfId,
       this.siteName,
       this.instrumentId,
       this.instanceId});
@@ -29,6 +31,8 @@ class GenericFormScreen extends StatefulWidget {
 class _GenericFormScreenState extends State<GenericFormScreen> {
   Uint8List image;
   var controllersArray = List<TextEditingController>.empty();
+
+  bool _loading = false;
   @override
   void initState() {
     super.initState();
@@ -60,7 +64,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                       label: Text("Preview"),
                     ),
                   TextButton.icon(
-                    icon: Icon(Icons.send),
+                    icon: _loading
+                        ? CircularProgressIndicator()
+                        : Icon(Icons.send),
                     onPressed: () => _submit(context),
                     label: Text("Submit"),
                   )
@@ -89,6 +95,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             flex: 2,
             fit: FlexFit.tight,
             child: TextFormField(
+              enabled: !_loading,
               controller: controllersArray[widget.fields.indexOf(field)],
               maxLength: (field.size.width / (field.size.height / 2.50))
                   .round(), //width of field / width of character
@@ -123,6 +130,14 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
   Future<void> _preview(BuildContext context) async {
     try {
+      String downloadedPdfPath = await FirebaseStorageProvider.downloadFile(
+          '${FirebasePaths.instrumentReportTemplatePath(widget.instrumentId)}/${widget.pdfId}');
+      if (downloadedPdfPath == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Could not download report. Please check your internet connection.')));
+        return;
+      }
       //get signature
       Uint8List imagedata = await Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
@@ -131,7 +146,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         fields: widget.fields,
         instanceId: widget.instanceId,
         instrumentId: widget.instrumentId,
-        pdfPath: widget.pdfPath,
+        pdfPath: downloadedPdfPath,
         siteName: widget.siteName,
         signature: imagedata,
       );
@@ -153,6 +168,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   }
 
   Future<void> _submit(BuildContext context) async {
+    setState(() {
+      _loading = true;
+    });
     //update default values
     widget.fields.forEach((field) {
       field.defaultValue =
@@ -163,8 +181,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         widget.fields,
         widget.instrumentId,
         widget.instanceId,
-        basenameWithoutExtension(widget.pdfPath));
-    print(result.data);
+        basenameWithoutExtension(widget.pdfId));
+    setState(() {
+      _loading = false;
+    });
     if (result.data["status"] == "success") {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Uploaded seccessfuly')));

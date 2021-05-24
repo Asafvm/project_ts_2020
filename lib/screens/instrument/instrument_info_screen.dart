@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:draw_graph/draw_graph.dart';
 import 'package:draw_graph/models/feature.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -258,45 +259,32 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                   ),
                                                   style: outlinedButtonStyle,
                                                   onPressed: () async {
-                                                    String downloadedPdfPath =
-                                                        await FirebaseStorageProvider
-                                                            .downloadFile(
-                                                                '${FirebasePaths.instrumentReportTemplatePath(widget.instrument.id)}/${reportList[index].id}');
-                                                    if (downloadedPdfPath ==
-                                                        null) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(SnackBar(
-                                                              content: Text(
-                                                                  'Could not download report. Please check your internet connection.')));
-                                                    } else
-                                                      Navigator.of(context)
-                                                          .push(
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              GenericFormScreen(
-                                                            fields: reportList[
-                                                                    index]
-                                                                .data()
-                                                                .values
-                                                                .map((field) =>
-                                                                    Field.fromJson(
-                                                                        field))
-                                                                .toList(),
-                                                            pdfPath:
-                                                                downloadedPdfPath,
-                                                            instanceId: widget
-                                                                .instance
-                                                                .serial,
-                                                            instrumentId: widget
-                                                                .instance
-                                                                .instrumentCode,
-                                                            siteName: widget
-                                                                .instance
-                                                                .currentSiteId,
-                                                          ),
+                                                    Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            GenericFormScreen(
+                                                          fields: reportList[
+                                                                  index]
+                                                              .data()
+                                                              .values
+                                                              .map((field) =>
+                                                                  Field.fromJson(
+                                                                      field))
+                                                              .toList(),
+                                                          pdfId:
+                                                              reportList[index]
+                                                                  .id,
+                                                          instanceId: widget
+                                                              .instance.serial,
+                                                          instrumentId: widget
+                                                              .instance
+                                                              .instrumentCode,
+                                                          siteName: widget
+                                                              .instance
+                                                              .currentSiteId,
                                                         ),
-                                                      );
+                                                      ),
+                                                    );
                                                   },
                                                 ),
                                               ),
@@ -334,34 +322,6 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
       ),
     );
   }
-
-  Future createReport(List<DocumentSnapshot> reportList, int index,
-      BuildContext context) async {
-    {
-      String downloadedPdfPath = await FirebaseStorageProvider.downloadFile(
-          '${FirebasePaths.instrumentReportTemplatePath(widget.instrument.id)}/${reportList[index].id}');
-      if (downloadedPdfPath == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Could not download report. Please check your internet connection.')));
-      } else
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => GenericFormScreen(
-              fields: reportList[index]
-                  .data()
-                  .values
-                  .map((field) => Field.fromJson(field))
-                  .toList(),
-              pdfPath: downloadedPdfPath,
-              instanceId: widget.instance.serial,
-              instrumentId: widget.instance.instrumentCode,
-              siteName: widget.instance.currentSiteId,
-            ),
-          ),
-        );
-    }
-  }
 }
 
 class ReportGraph extends StatelessWidget {
@@ -380,7 +340,7 @@ class ReportGraph extends StatelessWidget {
   Widget build(BuildContext context) {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
-    int _dataLimit = mqd.orientation == Orientation.portrait ? 4 : 6;
+    int _dataLimit = mqd.orientation == Orientation.portrait ? 4 : 8;
     int _ySize = 5;
 
     return SingleChildScrollView(
@@ -468,7 +428,8 @@ class ReportGraph extends StatelessWidget {
                           ),
                           LineGraph(
                             features: [feature],
-                            size: Size(mqd.size.width * .9, 300),
+                            size:
+                                Size(mqd.size.width * .9, mqd.size.width * .2),
                             labelX: labelX,
                             labelY: labelY[feature.title],
                             showDescription: true,
