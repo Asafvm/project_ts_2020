@@ -273,7 +273,39 @@ exports.transferParts = functions.https.onCall(async (data, context) => {
   const partId = data["partId"];
   const amount = data["amount"];
 
-  const originParts = admin
+  const destinationParts = admin
+  .firestore()
+  .collection("teams")
+  .doc(teamId)
+  .collection("members")
+  .doc(destinationId)
+  .collection("inventory")
+  .doc(partId);
+
+  try {
+  if(originId===null && destinationId==="storage"){
+    //add to storage (stocktaking mode)
+    destPartData = (await destinationParts.get()).exists
+      ? (await destinationParts.get()).get("count")
+      : 0;
+    console.log(
+      "adding " +
+        amount +
+        " unit\\s to " +
+        destinationId +
+        " (" +
+        destPartData +
+        ")"
+    );
+      await destinationParts.set({
+        count: destPartData === 0 ? amount : destPartData + amount,
+      });
+    
+
+  }else{
+    //move between inventories
+
+    const originParts = admin
     .firestore()
     .collection("teams")
     .doc(teamId)
@@ -282,16 +314,6 @@ exports.transferParts = functions.https.onCall(async (data, context) => {
     .collection("inventory")
     .doc(partId);
 
-  const destinationParts = admin
-    .firestore()
-    .collection("teams")
-    .doc(teamId)
-    .collection("members")
-    .doc(destinationId)
-    .collection("inventory")
-    .doc(partId);
-
-  try {
     originPartData = (await originParts.get()).get("count");
     destPartData = (await destinationParts.get()).exists
       ? (await destinationParts.get()).get("count")
@@ -310,7 +332,6 @@ exports.transferParts = functions.https.onCall(async (data, context) => {
         ")"
     );
     if (originPartData >= amount) {
-      //var destCount =
       await originParts.set({ count: originPartData - amount });
       await destinationParts.set({
         count: destPartData === 0 ? amount : destPartData + amount,
@@ -321,6 +342,18 @@ exports.transferParts = functions.https.onCall(async (data, context) => {
         "Quantity too small",
         "Not enough quantity to complete transfer"
       );
+
+  }
+
+
+
+  
+  
+
+  
+
+
+    
   } catch (e) {
     console.log("Error Adding Part :: " + e.toString());
     return { status: "failed", messege: e };

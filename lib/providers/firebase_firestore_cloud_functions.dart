@@ -96,18 +96,6 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<HttpsCallableResult> addUserInventory(
-      Part part, int partCount) async {
-    return await FirebaseFunctions.instance
-        .httpsCallable("addUserInventory")
-        .call(<String, dynamic>{
-      "teamId": TeamProvider().getCurrentTeam.getTeamId,
-      "userId": Authentication().userEmail,
-      "partId": part.id,
-      "count": partCount,
-    });
-  }
-
   static Future<HttpsCallableResult> uploadInstrumentInstance(
       InstrumentInstance _newInstrument, Operation operation) async {
     return await FirebaseFunctions.instance

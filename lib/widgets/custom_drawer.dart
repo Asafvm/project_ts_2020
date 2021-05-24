@@ -4,10 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
-import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
-import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
@@ -60,6 +58,10 @@ class CustomDrawer extends StatelessWidget {
                         create: (context) =>
                             FirebaseFirestoreProvider.getInventoryParts(
                                 '$storage'),
+                        initialData: []),
+                    StreamProvider<List<Part>>(
+                        create: (context) =>
+                            FirebaseFirestoreProvider.getCatalogParts(),
                         initialData: [])
                   ], child: InventoryScreen()),
                 ),

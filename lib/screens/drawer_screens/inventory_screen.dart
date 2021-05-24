@@ -22,7 +22,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // List<Instrument> instruments = Provider.of<List<Instrument>>(context);
     List<String> members = Provider.of<List<String>>(context);
     List<Part> catalog = Provider.of<List<Part>>(context);
 
@@ -36,6 +35,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           ),
         );
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Inventory'),
         actions: [],
@@ -88,7 +88,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
           Expanded(
             flex: _transfer ? 9 ~/ 2 : 9,
             child: _missing
-                ? MissingPartWindow(catalog: catalog)
+                ? InfoCube(
+                    title: 'Missing Inventory',
+                    child: MissingPartWindow(
+                        catalog: catalog
+                            .where((element) =>
+                                element.reference.contains(_searchText) ||
+                                element.description.contains(_searchText))
+                            .toList()),
+                  )
                 : InventoryWindow(
                     target: Authentication().userEmail,
                     title: 'My Inventory',
@@ -143,6 +151,7 @@ class MissingPartWindow extends StatelessWidget {
                     children: [
                       Expanded(flex: 8, child: PartListItem(part: part)),
                       Expanded(
+                        flex: 2,
                         child: Container(
                           child: Center(
                             child: Text(
