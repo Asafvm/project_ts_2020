@@ -18,27 +18,61 @@ class _InventoryScreenState extends State<InventoryScreen> {
   String _searchText = ''; // = TextEditingController();
   bool _transfer = false;
   bool _missing = false;
-  String _transferTarget = '';
+  String _transferTarget = '$storage';
+  int _bottomNavIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     List<String> members = Provider.of<List<String>>(context);
     List<Part> catalog = Provider.of<List<Part>>(context);
 
-    Widget getTransferPartner(String partner) => Expanded(
+    Widget getTransferPartner() => Expanded(
           flex: 9 ~/ 2,
           child: InventoryWindow(
-            target: '$partner',
-            title: '$partner Inventory',
-            partStream: FirebaseFirestoreProvider.getInventoryParts(partner),
+            target: '$_transferTarget',
+            title: '$_transferTarget Inventory',
+            partStream:
+                FirebaseFirestoreProvider.getInventoryParts(_transferTarget),
             filter: _searchText,
           ),
         );
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Inventory'),
         actions: [],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _bottomNavIndex,
+        onTap: (value) {
+          _bottomNavIndex = value;
+          switch (value) {
+            case 0:
+              setState(() {
+                _transfer = !_transfer;
+                if (_transfer) {
+                  _missing = false;
+                  _transferTarget = _chooseTarget();
+                }
+              });
+              break;
+            case 1:
+              setState(() {
+                _missing = !_missing;
+                if (_missing) _transfer = false;
+              });
+              break;
+          }
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.height),
+            label: 'External Inventory',
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.repeat), label: 'Show Missing')
+        ],
       ),
       body: Column(
         children: [
@@ -50,6 +84,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   child: Container(
                     padding: EdgeInsets.all(10),
                     child: TextField(
+                      autofocus: false,
                       onChanged: (value) {
                         setState(() {
                           _searchText = value;
@@ -61,27 +96,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.repeat),
-                  onPressed: () {
-                    setState(() {
-                      _missing = !_missing;
-                      if (_missing) _transfer = false;
-                    });
-                  },
-                  tooltip: 'Show Missing \\ Inventory',
-                ),
-                IconButton(
-                    icon: Icon(Icons.height),
-                    onPressed: () {
-                      setState(() {
-                        _transfer = !_transfer;
-                        if (_transfer) {
-                          _missing = false;
-                          _transferTarget = _chooseTarget();
-                        }
-                      });
-                    })
+                if (_transfer)
+                  PopupMenuButton<String>(
+                    onSelected: (String value) => setState(() {
+                      _transferTarget = value;
+                    }),
+                    icon: Icon(Icons.account_circle),
+                    itemBuilder: (context) => members
+                        .where(
+                            (element) => element != Authentication().userEmail)
+                        .map((e) =>
+                            PopupMenuItem<String>(value: e, child: Text(e)))
+                        .toList(),
+                  )
               ],
             ),
           ),
@@ -105,7 +132,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     filter: _searchText,
                   ),
           ),
-          if (_transfer) getTransferPartner(_transferTarget),
+          if (_transfer) getTransferPartner(),
         ],
       ),
     );
