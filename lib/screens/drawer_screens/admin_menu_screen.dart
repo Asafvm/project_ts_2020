@@ -34,6 +34,7 @@ class AdminMenuScreen extends StatelessWidget {
       margin: EdgeInsets.all(10),
       padding: EdgeInsets.all(5),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton(
             icon: Icon(
@@ -57,96 +58,110 @@ class AdminMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData mqd = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Admin Menu"),
       ),
       body: Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: mqd.orientation == Orientation.portrait
+                ? 10
+                : mqd.size.width / 4),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: createButton(Icons.group, () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => StreamProvider<List<String>>(
-                          initialData: [],
-                          create: (context) =>
-                              FirebaseFirestoreProvider.getTeamMembers(),
-                          child: AdminTeamManagmentScreen(),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: createButton(Icons.group, () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => StreamProvider<List<String>>(
+                            initialData: [],
+                            create: (context) =>
+                                FirebaseFirestoreProvider.getTeamMembers(),
+                            child: AdminTeamManagmentScreen(),
+                          ),
                         ),
-                      ),
-                    );
-                  }, 'Team Managment', context),
-                ),
-              ],
+                      );
+                    }, 'Team Managment', context),
+                  ),
+                ],
+              ),
             ),
-            Row(
-              children: [
-                Expanded(
-                    child: createButton(Icons.location_city, () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => StreamProvider<List<Site>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getSites(),
-                        initialData: [],
-                        child: AdminSiteScreen(),
-                      ),
-                    ),
-                  );
-                }, 'Site', context)),
-                Expanded(
-                  child: createButton(Icons.computer, () {
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      child: createButton(Icons.location_city, () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => StreamProvider<List<Instrument>>(
+                        builder: (_) => StreamProvider<List<Site>>(
                           create: (context) =>
-                              FirebaseFirestoreProvider.getInstruments(),
+                              FirebaseFirestoreProvider.getSites(),
                           initialData: [],
-                          child: AdminInstrumentScreen(),
+                          child: AdminSiteScreen(),
                         ),
                       ),
                     );
-                  }, 'Instruments', context),
-                ),
-              ],
+                  }, 'Site', context)),
+                  Expanded(
+                    child: createButton(Icons.computer, () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => StreamProvider<List<Instrument>>(
+                            create: (context) =>
+                                FirebaseFirestoreProvider.getInstruments(),
+                            initialData: [],
+                            child: AdminInstrumentScreen(),
+                          ),
+                        ),
+                      );
+                    }, 'Instruments', context),
+                  ),
+                ],
+              ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: createButton(Icons.developer_board, () {
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: createButton(Icons.developer_board, () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => StreamProvider<List<Part>>(
+                            create: (context) =>
+                                FirebaseFirestoreProvider.getCatalogParts(),
+                            initialData: [],
+                            child: AdminPartScreen(),
+                          ),
+                        ),
+                      );
+                    }, 'Parts', context),
+                  ),
+                  Expanded(
+                      child: createButton(Icons.perm_contact_calendar, () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => StreamProvider<List<Part>>(
+                        builder: (_) => StreamProvider<List<Contact>>(
                           create: (context) =>
-                              FirebaseFirestoreProvider.getCatalogParts(),
+                              FirebaseFirestoreProvider.getContacts(),
                           initialData: [],
-                          child: AdminPartScreen(),
+                          child: AdminContactScreen(
+                            siteId: siteId,
+                          ),
                         ),
                       ),
                     );
-                  }, 'Parts', context),
-                ),
-                Expanded(
-                    child: createButton(Icons.perm_contact_calendar, () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => StreamProvider<List<Contact>>(
-                        create: (context) =>
-                            FirebaseFirestoreProvider.getContacts(),
-                        initialData: [],
-                        child: AdminContactScreen(
-                          siteId: siteId,
-                        ),
-                      ),
-                    ),
-                  );
-                }, 'Contacts', context)),
-              ],
+                  }, 'Contacts', context)),
+                ],
+              ),
             ),
           ],
         ),

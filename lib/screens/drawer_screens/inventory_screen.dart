@@ -218,6 +218,8 @@ class InventoryWindow extends StatefulWidget {
 }
 
 class _InventoryWindowState extends State<InventoryWindow> {
+  bool _loading = false;
+
   @override
   Widget build(BuildContext context) {
     List<Part> catalog = Provider.of<List<Part>>(context);
@@ -308,39 +310,51 @@ class _InventoryWindowState extends State<InventoryWindow> {
                 children: [
                   IconButton(
                       icon: Icon(Icons.arrow_circle_down_outlined),
-                      onPressed: () {
-                        setState(() {
-                          if (partCount > 0) partCount--;
-                        });
-                      }),
+                      onPressed: _loading
+                          ? null
+                          : () {
+                              setState(() {
+                                if (partCount > 0) partCount--;
+                              });
+                            }),
                   Text(partCount.toString()),
                   IconButton(
                       icon: Icon(Icons.arrow_circle_up_outlined),
-                      onPressed: () {
-                        setState(() {
-                          if (partCount < maxCount) partCount++;
-                        });
-                      })
+                      onPressed: _loading
+                          ? null
+                          : () {
+                              setState(() {
+                                if (partCount < maxCount) partCount++;
+                              });
+                            })
                 ],
               ),
             ],
           ),
           actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context), child: Text("Cancel")),
-            TextButton(
+            OutlinedButton(
+                style: outlinedButtonStyle,
+                onPressed: _loading ? null : () => Navigator.pop(context),
+                child: Text("Cancel")),
+            OutlinedButton(
+                style: outlinedButtonStyle,
                 onPressed: partCount == 0
                     ? null
                     : () async {
+                        setState(() {
+                          _loading = true;
+                        });
                         await FirebaseFirestoreCloudFunctions.transferParts(
                                 origin, destination, part, partCount)
                             .catchError((error) {
                           print(error);
                         });
-
+                        setState(() {
+                          _loading = true;
+                        });
                         Navigator.pop(context);
                       },
-                child: Text("OK")),
+                child: _loading ? CircularProgressIndicator() : Text("OK")),
           ],
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

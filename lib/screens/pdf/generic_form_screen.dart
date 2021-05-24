@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:teamshare/helpers/pdf_helper.dart';
@@ -52,11 +53,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton.icon(
-                    icon: Icon(Icons.preview),
-                    onPressed: () => _preview(context),
-                    label: Text("Preview"),
-                  ),
+                  if (!kIsWeb)
+                    TextButton.icon(
+                      icon: Icon(Icons.preview),
+                      onPressed: () => _preview(context),
+                      label: Text("Preview"),
+                    ),
                   TextButton.icon(
                     icon: Icon(Icons.send),
                     onPressed: () => _submit(context),

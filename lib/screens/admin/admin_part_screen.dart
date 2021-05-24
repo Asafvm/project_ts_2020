@@ -16,12 +16,10 @@ class AdminPartScreen extends StatefulWidget {
 }
 
 class _AdminPartScreenState extends State<AdminPartScreen> {
-  bool _stocktaking = false;
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
-    // List<MapEntry<String, dynamic>> _storageList =
-    //     Provider.of<List<MapEntry<String, dynamic>>>(context);
     List<Part> _partList = Provider.of<List<Part>>(context);
     return StreamProvider<List<MapEntry<String, dynamic>>>.value(
       value: FirebaseFirestoreProvider.getInventoryParts('$storage'),
@@ -29,17 +27,6 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Manage Parts"),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.storage),
-              onPressed: () {
-                setState(() {
-                  _stocktaking = !_stocktaking;
-                });
-              },
-              tooltip: 'Stocktaking',
-            )
-          ],
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(
@@ -59,9 +46,6 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                       shrinkWrap: true,
                       key: UniqueKey(), //new Key(Strings.randomString(20)),
                       itemBuilder: (ctx, index) {
-                        // Map<String, dynamic> parts =
-                        //     Map<String, dynamic>.fromEntries(_storageList);
-
                         return Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -78,47 +62,63 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                 builder: (context, value, child) {
                                   Map<String, dynamic> parts =
                                       Map<String, dynamic>.fromEntries(value);
-
                                   var res =
                                       parts[_partList.elementAt(index).id];
-
                                   return GestureDetector(
                                     onTap: () {
                                       final controller =
                                           TextEditingController();
                                       showDialog(
                                         context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: Text('Set amount'),
-                                          content: TextField(
-                                            controller: controller,
-                                            keyboardType: TextInputType.number,
-                                            decoration: DecorationLibrary
-                                                .inputDecoration(
-                                                    'Amount', context),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                                onPressed: () async {
-                                                  await FirebaseFirestoreCloudFunctions
-                                                      .transferParts(
-                                                          null,
-                                                          '$storage',
-                                                          _partList
-                                                              .elementAt(index),
-                                                          int.parse(
-                                                              controller.text));
+                                        builder: (context) => StatefulBuilder(
+                                            builder: (context, setState) {
+                                          return AlertDialog(
+                                            title: Text(
+                                                'Set amount\n${_partList.elementAt(index).description}'),
+                                            content: TextField(
+                                              controller: controller,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: DecorationLibrary
+                                                  .inputDecoration(
+                                                      'Amount', context),
+                                            ),
+                                            actions: [
+                                              OutlinedButton(
+                                                  style: outlinedButtonStyle,
+                                                  onPressed: () async {
+                                                    setState(() {
+                                                      _loading = true;
+                                                    });
+                                                    await FirebaseFirestoreCloudFunctions
+                                                        .transferParts(
+                                                            null,
+                                                            '$storage',
+                                                            _partList.elementAt(
+                                                                index),
+                                                            int.parse(controller
+                                                                .text));
+                                                    setState(() {
+                                                      _loading = false;
+                                                    });
 
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: Text('OK')),
-                                            TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: Text('Cancel'))
-                                          ],
-                                        ),
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: _loading
+                                                      ? CircularProgressIndicator()
+                                                      : Text('OK')),
+                                              OutlinedButton(
+                                                  style: outlinedButtonStyle,
+                                                  onPressed: _loading
+                                                      ? null
+                                                      : () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                  child: Text('Cancel'))
+                                            ],
+                                          );
+                                        }),
                                       );
                                     },
                                     child: Container(
@@ -135,7 +135,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                   );
                                 },
                               ),
-                            )
+                            ),
                           ],
                         );
                       },

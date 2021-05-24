@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
@@ -56,7 +57,7 @@ class EntryListItem extends StatelessWidget {
               : Container(),
           trailing: SizedBox(
             width: 30,
-            child: entry.type == 2
+            child: entry.type == 2 && !kIsWeb
                 ? IconButton(
                     icon: Icon(Icons.file_download),
                     onPressed: () async {

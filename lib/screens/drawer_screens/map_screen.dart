@@ -62,12 +62,9 @@ class _MapScreenState extends State<MapScreen> {
               ),
           ],
         ),
-        body: Consumer<List<Site>>(
-          builder: (context, sitesList, child) =>
-              Consumer<List<InstrumentInstance>>(
-                  builder: (context, instanceList, child) =>
-                      _loadMap(sitesList, instanceList)),
-        ),
+        body: Consumer2<List<Site>, List<InstrumentInstance>>(
+            builder: (context, sitesList, instanceList, child) =>
+                _loadMap(sitesList, instanceList)),
       ),
     );
   }

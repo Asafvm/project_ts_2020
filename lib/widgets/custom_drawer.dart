@@ -9,7 +9,7 @@ import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/screens/drawer_screens/FileExplorer.dart';
+import 'package:teamshare/screens/drawer_screens/file_explorer.dart';
 import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/drawer_screens/inventory_screen.dart';
 import 'package:teamshare/screens/drawer_screens/map_screen.dart';
@@ -136,7 +136,7 @@ class CustomDrawer extends StatelessWidget {
                   context: context,
                   applicationIcon: Icon(Icons.group),
                   applicationName: 'TeamShare',
-                  applicationVersion: '0.99a');
+                  applicationVersion: '0.99b');
               //Navigator.of(context).pop();
             },
           ),

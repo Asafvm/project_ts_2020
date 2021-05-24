@@ -274,86 +274,63 @@ exports.transferParts = functions.https.onCall(async (data, context) => {
   const amount = data["amount"];
 
   const destinationParts = admin
-  .firestore()
-  .collection("teams")
-  .doc(teamId)
-  .collection("members")
-  .doc(destinationId)
-  .collection("inventory")
-  .doc(partId);
-
-  try {
-  if(originId===null && destinationId==="storage"){
-    //add to storage (stocktaking mode)
-    destPartData = (await destinationParts.get()).exists
-      ? (await destinationParts.get()).get("count")
-      : 0;
-    console.log(
-      "adding " +
-        amount +
-        " unit\\s to " +
-        destinationId +
-        " (" +
-        destPartData +
-        ")"
-    );
-      await destinationParts.set({
-        count: destPartData === 0 ? amount : destPartData + amount,
-      });
-    
-
-  }else{
-    //move between inventories
-
-    const originParts = admin
     .firestore()
     .collection("teams")
     .doc(teamId)
     .collection("members")
-    .doc(originId)
+    .doc(destinationId)
     .collection("inventory")
     .doc(partId);
 
-    originPartData = (await originParts.get()).get("count");
-    destPartData = (await destinationParts.get()).exists
-      ? (await destinationParts.get()).get("count")
-      : 0;
-    console.log(
-      "moving " +
-        amount +
-        " unit\\s from " +
-        originId +
-        " (" +
-        originPartData +
-        ") to " +
-        destinationId +
-        " (" +
-        destPartData +
-        ")"
-    );
-    if (originPartData >= amount) {
-      await originParts.set({ count: originPartData - amount });
+  try {
+    if (originId === null && destinationId === "storage") {
+      //set storage amount (stocktaking mode)
+
+      console.log("Setting " + amount + " unit\\s to " + destinationId);
       await destinationParts.set({
-        count: destPartData === 0 ? amount : destPartData + amount,
+        count: amount,
       });
-    } else
-      throw new functions.https.HttpsError(
-        "not-enough",
-        "Quantity too small",
-        "Not enough quantity to complete transfer"
+    } else {
+      //move between inventories
+
+      const originParts = admin
+        .firestore()
+        .collection("teams")
+        .doc(teamId)
+        .collection("members")
+        .doc(originId)
+        .collection("inventory")
+        .doc(partId);
+
+      originPartData = (await originParts.get()).get("count");
+      destPartData = (await destinationParts.get()).exists
+        ? (await destinationParts.get()).get("count")
+        : 0;
+      console.log(
+        "moving " +
+          amount +
+          " unit\\s from " +
+          originId +
+          " (" +
+          originPartData +
+          ") to " +
+          destinationId +
+          " (" +
+          destPartData +
+          ")"
       );
-
-  }
-
-
-
-  
-  
-
-  
-
-
-    
+      if (originPartData >= amount) {
+        await originParts.set({ count: originPartData - amount });
+        await destinationParts.set({
+          count: destPartData === 0 ? amount : destPartData + amount,
+        });
+      } else
+        throw new functions.https.HttpsError(
+          "not-enough",
+          "Quantity too small",
+          "Not enough quantity to complete transfer"
+        );
+    }
   } catch (e) {
     console.log("Error Adding Part :: " + e.toString());
     return { status: "failed", messege: e };
@@ -418,19 +395,17 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     ).toString();
     while (reportid.length < 6) reportid = "0" + reportid; //6-digit report id
     console.log("id=" + reportid);
-    const fields = instanceRef
-      .collection("reports")
-      .add({
-        timestamp: Date.now(),
-        reportName: data["reportName"],
-        reportid: reportid,
-        fields: Object.assign({}, data["fields"]),
-      });
+    const fields = instanceRef.collection("reports").add({
+      timestamp: Date.now(),
+      reportName: data["reportName"],
+      reportid: reportid,
+      fields: Object.assign({}, data["fields"]),
+    });
 
-      var oneYearFromNow = new Date();
-      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    var oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
-      instanceRef.update({nextMaintenance : oneYearFromNow.getTime()})
+    instanceRef.update({ nextMaintenance: oneYearFromNow.getTime() });
 
     const log = instanceRef.collection("entries").add({
       type: 2,
