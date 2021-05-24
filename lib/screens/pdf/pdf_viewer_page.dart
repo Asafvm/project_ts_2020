@@ -90,11 +90,13 @@ class _PDFScreenState extends State<PDFScreen> {
         ),
       ),
       body: _uploading
-          ? CircularProgressIndicator(
-              valueColor: _progressColor,
-              strokeWidth: 5,
-              backgroundColor: Colors.grey,
-              value: _progressValue,
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: _progressColor,
+                strokeWidth: 5,
+                backgroundColor: Colors.grey,
+                value: _progressValue,
+              ),
             )
           : GestureDetector(
               onDoubleTap: () {},

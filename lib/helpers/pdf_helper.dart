@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/src/widgets/image.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:teamshare/helpers/pdf_handler.dart';
@@ -15,13 +17,25 @@ class PdfHelper {
       String instanceId,
       bool isNew,
       String pdfPath,
-      String siteName}) async {
+      String siteName,
+      Uint8List signature}) async {
     //open pdf file
     PdfMutableDocument doc = await PdfMutableDocument.path(pdfPath);
 
     //add field to pages
     for (Field field in fields) {
       var page = doc.getPage(field.page - 1);
+      if (signature != null)
+        page.add(
+            item: pdfWidgets.Positioned(
+                left: page.size.width - 200,
+                top: page.size.height - 200,
+                child: pdfWidgets.SizedBox(
+                    height: 100,
+                    width: 200,
+                    child: pdfWidgets.Center(
+                        child: pdfWidgets.Image(
+                            pdfWidgets.MemoryImage(signature))))));
 
       page.add(
         item: pdfWidgets.Positioned(
