@@ -36,139 +36,157 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Site> sites = Provider.of<List<Site>>(context);
-    List<Instrument> instruments = Provider.of<List<Instrument>>(context);
+    // List<Site> sites = Provider.of<List<Site>>(context);
+    // List<Instrument> instruments = Provider.of<List<Instrument>>(context);
     instances = Provider.of<List<InstrumentInstance>>(context);
     _filterInstanceList();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Reports"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Flexible(
-              flex: 1,
-              child: Row(
+    return MultiProvider(
+      providers: [
+        StreamProvider<List<Site>>.value(
+          value: FirebaseFirestoreProvider.getSites(),
+          initialData: [],
+        ),
+        StreamProvider<List<Instrument>>.value(
+            value: FirebaseFirestoreProvider.getInstruments(), initialData: []),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Reports"),
+        ),
+        body: Consumer<List<Site>>(
+          builder: (context, sites, child) => Center(
+            child: Consumer<List<Instrument>>(
+              builder: (context, instruments, child) => Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(
-                    child: DropdownButton(
-                      hint: Text(_selectedSite ?? "Site"),
-                      items: sites
-                          .map((e) => DropdownMenuItem<String>(
-                                value: e.id,
-                                child: Text(e.name),
-                              ))
-                          .toList(),
-                      onChanged: (value) => {
-                        setState(() {
-                          _selectedSite = sites
-                              .where((element) => element.id == value)
-                              .first
-                              .name;
-                          _siteFilter = value;
-                          _roomFilter = '';
-                        })
-                      },
-                    ),
-                  ),
-                  if (_siteFilter != '')
-                    Expanded(
-                      child: StreamBuilder<List<Room>>(
-                        stream: FirebaseFirestoreProvider.getRooms(_siteFilter),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            _roomList = snapshot.data;
+                  Flexible(
+                    flex: 1,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButton(
+                            hint: Text(_selectedSite ?? "Site"),
+                            items: sites
+                                .map((e) => DropdownMenuItem<String>(
+                                      value: e.id,
+                                      child: Text(e.name),
+                                    ))
+                                .toList(),
+                            onChanged: (value) => {
+                              setState(() {
+                                _selectedSite = sites
+                                    .where((element) => element.id == value)
+                                    .first
+                                    .name;
+                                _siteFilter = value;
+                                _roomFilter = '';
+                              })
+                            },
+                          ),
+                        ),
+                        if (_siteFilter != '')
+                          Expanded(
+                            child: StreamBuilder<List<Room>>(
+                              stream: FirebaseFirestoreProvider.getRooms(
+                                  _siteFilter),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  _roomList = snapshot.data;
 
-                            return DropdownButton(
-                              hint: Text(_selectedRoom ?? "Room"),
-                              items: snapshot.data
-                                  .map((room) => DropdownMenuItem<String>(
-                                        value: room.id,
-                                        child: Text(room.roomTitle),
+                                  return DropdownButton(
+                                    hint: Text(_selectedRoom ?? "Room"),
+                                    items: snapshot.data
+                                        .map((room) => DropdownMenuItem<String>(
+                                              value: room.id,
+                                              child: Text(room.roomTitle),
+                                            ))
+                                        .toList(),
+                                    onChanged: (value) => {
+                                      setState(() {
+                                        _selectedRoom = _roomList
+                                            .where((element) =>
+                                                element.id == value)
+                                            .first
+                                            .roomTitle;
+                                        _roomFilter = value;
+                                        _instrumentFilter = '';
+                                      })
+                                    },
+                                  );
+                                } else
+                                  return Container();
+                              },
+                            ),
+                          ),
+                        if (_siteFilter != '' && _roomFilter != '')
+                          Expanded(
+                            child: DropdownButton(
+                              hint: Text(_selectedInstrument ?? "Instrument"),
+                              items: instruments
+                                  .map((e) => DropdownMenuItem<String>(
+                                        value: e.getCodeName(),
+                                        child: Text(e.getCodeName()),
                                       ))
                                   .toList(),
-                              onChanged: (value) => {
-                                setState(() {
-                                  _selectedRoom = _roomList
-                                      .where((element) => element.id == value)
-                                      .first
-                                      .roomTitle;
-                                  _roomFilter = value;
-                                  _instrumentFilter = '';
-                                })
+                              onChanged: (value) {
+                                _selectedInstrument = instruments
+                                    .where((element) => element.id == value)
+                                    .first
+                                    .codeName;
+                                _instrumentFilter = value;
                               },
-                            );
-                          } else
-                            return Container();
-                        },
-                      ),
+                            ),
+                          ),
+                        if (_siteFilter != '' &&
+                            _roomFilter != '' &&
+                            _instrumentFilter != '')
+                          Expanded(
+                            child: DropdownButton(
+                              hint: Text("Serial"),
+                              items: instances
+                                  .where((element) =>
+                                      (element.currentRoomId == _roomFilter) &&
+                                      (element.currentSiteId == _siteFilter) &&
+                                      (element.instrumentCode ==
+                                          _instrumentFilter))
+                                  .map((e) => DropdownMenuItem<String>(
+                                        value: e.serial,
+                                        child: Text(e.serial),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                _instrumentFilter = value;
+                              },
+                            ),
+                          ),
+                      ],
                     ),
-                  if (_siteFilter != '' && _roomFilter != '')
-                    Expanded(
-                      child: DropdownButton(
-                        hint: Text(_selectedInstrument ?? "Instrument"),
-                        items: instruments
-                            .map((e) => DropdownMenuItem<String>(
-                                  value: e.getCodeName(),
-                                  child: Text(e.getCodeName()),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          _selectedInstrument = instruments
-                              .where((element) => element.id == value)
-                              .first
-                              .codeName;
-                          _instrumentFilter = value;
-                        },
-                      ),
-                    ),
-                  if (_siteFilter != '' &&
-                      _roomFilter != '' &&
-                      _instrumentFilter != '')
-                    Expanded(
-                      child: DropdownButton(
-                        hint: Text("Serial"),
-                        items: instances
-                            .where((element) =>
-                                (element.currentRoomId == _roomFilter) &&
-                                (element.currentSiteId == _siteFilter) &&
-                                (element.instrumentCode == _instrumentFilter))
-                            .map((e) => DropdownMenuItem<String>(
-                                  value: e.serial,
-                                  child: Text(e.serial),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          _instrumentFilter = value;
-                        },
-                      ),
-                    ),
+                  ),
+                  Flexible(flex: 1, child: Text(_statistics)),
+                  Flexible(
+                    flex: 8,
+                    child: Container(
+                        child: instruments.isNotEmpty
+                            ? ListView.builder(
+                                itemCount: filteredInstances.length,
+                                itemBuilder: (context, index) {
+                                  return InstrumentInstanceListItem(
+                                    instance: filteredInstances[index],
+                                    instrument: instruments
+                                        .where((element) =>
+                                            element.codeName ==
+                                            filteredInstances[index]
+                                                .instrumentCode)
+                                        .first,
+                                  );
+                                },
+                              )
+                            : Container()),
+                  )
                 ],
               ),
             ),
-            Flexible(flex: 1, child: Text(_statistics)),
-            Flexible(
-              flex: 8,
-              child: Container(
-                  child: instruments.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: filteredInstances.length,
-                          itemBuilder: (context, index) {
-                            return InstrumentInstanceListItem(
-                              instance: filteredInstances[index],
-                              instrument: instruments
-                                  .where((element) =>
-                                      element.codeName ==
-                                      filteredInstances[index].instrumentCode)
-                                  .first,
-                            );
-                          },
-                        )
-                      : Container()),
-            )
-          ],
+          ),
         ),
       ),
     );

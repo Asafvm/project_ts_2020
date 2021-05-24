@@ -1,4 +1,3 @@
-
 import 'package:clippy_flutter/clippy_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -32,24 +31,30 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Site> sitesList = Provider.of<List<Site>>(context);
+    // List<Site> sitesList = Provider.of<List<Site>>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Map'),
-        actions: [
-          if (widget.isSelecting)
-            IconButton(
-              icon: Icon(Icons.save),
-              onPressed: _pickedLocation == null
-                  ? null
-                  : () {
-                      Navigator.of(context).pop(_pickedLocation);
-                    },
-            ),
-        ],
+    return StreamProvider<List<Site>>.value(
+      value: FirebaseFirestoreProvider.getSites(),
+      initialData: [],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Map'),
+          actions: [
+            if (widget.isSelecting)
+              IconButton(
+                icon: Icon(Icons.save),
+                onPressed: _pickedLocation == null
+                    ? null
+                    : () {
+                        Navigator.of(context).pop(_pickedLocation);
+                      },
+              ),
+          ],
+        ),
+        body: Consumer<List<Site>>(
+          builder: (context, sitesList, child) => _loadMap(sitesList),
+        ),
       ),
-      body: _loadMap(sitesList),
     );
   }
 
