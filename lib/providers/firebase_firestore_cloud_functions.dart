@@ -11,7 +11,6 @@ import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/providers/team_provider.dart';
-import 'package:teamshare/screens/drawer_screens/inventory_screen.dart';
 
 import 'authentication.dart';
 

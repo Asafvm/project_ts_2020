@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
-import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/part/part_info_screen.dart';
 
@@ -20,7 +19,6 @@ class PartListItem extends StatefulWidget {
 class _PartListItemState extends State<PartListItem> {
   @override
   Widget build(BuildContext context) {
-    int _partCount = 0;
     return Card(
       child: ListTile(
         onTap: () => Navigator.of(context).push(
@@ -64,6 +62,4 @@ class _PartListItemState extends State<PartListItem> {
       ),
     );
   }
-
-  
 }

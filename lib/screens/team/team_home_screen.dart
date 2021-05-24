@@ -12,7 +12,6 @@ import 'package:teamshare/providers/team_provider.dart';
 import 'package:teamshare/screens/drawer_screens/inventory_screen.dart';
 import 'package:teamshare/widgets/custom_drawer.dart';
 import 'package:teamshare/widgets/list_items/entry_list_item.dart';
-import 'package:teamshare/widgets/list_items/inventory_list_item.dart';
 
 class TeamHomeScreen extends StatefulWidget {
   final Team team;

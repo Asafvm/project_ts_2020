@@ -46,8 +46,6 @@ class _PDFScreenState extends State<PDFScreen> {
     title: Text('Creating Form'),
   );
 
-  final _transformationController = TransformationController();
-
   @override
   void initState() {
     super.initState();
@@ -248,9 +246,5 @@ class _PDFScreenState extends State<PDFScreen> {
     await showDialog(
             context: context, builder: (_) => _buildAlertDialog(messege))
         .then((value) => Navigator.of(context).pop());
-  }
-
-  void _value() {
-    print("Changed");
   }
 }

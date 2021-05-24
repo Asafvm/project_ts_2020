@@ -9,7 +9,7 @@ import 'package:teamshare/screens/main_screen.dart';
 import 'package:teamshare/screens/team/team_home_screen.dart';
 
 class RouteGenerator {
-  static Route<dynamic> generateRout(RouteSettings settings) {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
 
     switch (settings.name) {
@@ -49,6 +49,7 @@ class RouteGenerator {
       default:
         return _errorRoute();
     }
+    return _errorRoute();
   }
 
   static Route _errorRoute() {
