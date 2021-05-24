@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
-import 'package:teamshare/models/site.dart';
-import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_info_screen.dart';
 
 class InstrumentInstanceListItem extends StatelessWidget {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
   final Instrument instrument;
   final InstrumentInstance instance;
   InstrumentInstanceListItem({this.instrument, this.instance});
@@ -37,7 +36,8 @@ class InstrumentInstanceListItem extends StatelessWidget {
             child: Icon(Icons.computer),
           ),
           title: Text(instance.serial),
-          subtitle: Text("Last maintenance = ???"),
+          subtitle: Text(
+              '${instance.nextMaintenance == null ? "Maintenance needed" : "Next maintenance = " + formatter.format(DateTime.fromMillisecondsSinceEpoch(instance.nextMaintenance))}'),
         ),
       ),
     );

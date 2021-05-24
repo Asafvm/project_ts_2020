@@ -86,6 +86,19 @@ class FirebaseFirestoreProvider {
         );
   }
 
+  // static Stream<List<InstrumentInstance>> getSiteInstances(String siteId) {
+  //   return FirebaseFirestore.instance
+  //       .collection('${FirebasePaths.roomRef(siteId)}}')
+  //       .snapshots()
+  //       .map(
+  //         (query) => query.docs
+  //             .map(
+  //               (room) => room.id,
+  //             )
+  //             .toList(),
+  //       );
+  // }
+
   static Future<InstrumentInstance> getInstanceInfo(
       String instrumentId, String instanceId) async {
     return InstrumentInstance.fromFirestore(await FirebaseFirestore.instance

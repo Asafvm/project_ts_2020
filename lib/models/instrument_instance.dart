@@ -5,6 +5,8 @@ class InstrumentInstance {
   final String serial;
   String currentSiteId = 'Main';
   String currentRoomId = '';
+  int nextMaintenance; //timestamp - millisecondsSinceEpoch
+  int warranty; //timestamp - millisecondsSinceEpoch
   String imgUrl;
 
   InstrumentInstance({this.instrumentCode, this.serial});
@@ -15,6 +17,8 @@ class InstrumentInstance {
         'instrumentCode': instrumentCode,
         'currentSiteId': currentSiteId,
         'currentRoomId': currentRoomId,
+        'nextMaintenance': nextMaintenance,
+        'warranty': warranty,
         'serial': serial,
         'imgUrl': imgUrl,
       };
@@ -23,6 +27,8 @@ class InstrumentInstance {
       : instrumentCode = data['instrumentCode'],
         currentSiteId = data['currentSiteId'],
         currentRoomId = data['currentRoomId'],
+        nextMaintenance = data['nextMaintenance'],
+        warranty = data["warranty"],
         serial = data['serial'],
         imgUrl = data['imgUrl'];
 
@@ -32,5 +38,13 @@ class InstrumentInstance {
 
   String get getCurrentLocation {
     return currentSiteId;
+  }
+
+  bool get isUnderWarranty {
+    return warranty == null
+        ? false
+        : DateTime.now().millisecondsSinceEpoch - warranty < 0
+            ? true
+            : false;
   }
 }

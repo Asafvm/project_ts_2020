@@ -39,6 +39,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
   @override
   Widget build(BuildContext context) {
     MediaQueryData mqd = MediaQuery.of(context);
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
     var textStyleTitle = TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold);
     var textStyleContent = TextStyle(fontSize: 20.0);
@@ -156,7 +157,12 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                     "Maintenance",
                                   ),
                                   Text(
-                                    "",
+                                    widget.instance.nextMaintenance == null
+                                        ? ""
+                                        : formatter.format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                widget
+                                                    .instance.nextMaintenance)),
                                     style: textStyleContent,
                                   ),
                                 ]),

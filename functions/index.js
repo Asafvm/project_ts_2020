@@ -427,6 +427,11 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
         fields: Object.assign({}, data["fields"]),
       });
 
+      var oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+      instanceRef.update({nextMaintenance : oneYearFromNow.getTime()})
+
     const log = instanceRef.collection("entries").add({
       type: 2,
       timestamp: Date.now(),

@@ -108,17 +108,6 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  // static Future<HttpsCallableResult> updateInstrumentInstance(
-  //     InstrumentInstance _newInstrument) async {
-  //   return await FirebaseFunctions.instance
-  //       .httpsCallable("updateInstrumentInstance")
-  //       .call(<String, dynamic>{
-  //     "teamID": TeamProvider().getCurrentTeam.getTeamId,
-  //     "instrumentID": _newInstrument.instrumentCode,
-  //     "instrument": _newInstrument.toJson(),
-  //   });
-  // }
-
   static Future<HttpsCallableResult> uploadInstrument(
       {Instrument instrument, Operation operation}) async {
     return await FirebaseFunctions.instance.httpsCallable("addInstrument").call(

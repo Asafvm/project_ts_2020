@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:clippy_flutter/clippy_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
@@ -33,9 +36,17 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     // List<Site> sitesList = Provider.of<List<Site>>(context);
 
-    return StreamProvider<List<Site>>.value(
-      value: FirebaseFirestoreProvider.getSites(),
-      initialData: [],
+    return MultiProvider(
+      providers: [
+        StreamProvider<List<Site>>.value(
+          value: FirebaseFirestoreProvider.getSites(),
+          initialData: [],
+        ),
+        StreamProvider<List<InstrumentInstance>>.value(
+          value: FirebaseFirestoreProvider.getAllInstrumentsInstances(),
+          initialData: [],
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: Text('Map'),
@@ -52,13 +63,16 @@ class _MapScreenState extends State<MapScreen> {
           ],
         ),
         body: Consumer<List<Site>>(
-          builder: (context, sitesList, child) => _loadMap(sitesList),
+          builder: (context, sitesList, child) =>
+              Consumer<List<InstrumentInstance>>(
+                  builder: (context, instanceList, child) =>
+                      _loadMap(sitesList, instanceList)),
         ),
       ),
     );
   }
 
-  Widget _loadMap(List<Site> sitesList) {
+  Widget _loadMap(List<Site> sitesList, List<InstrumentInstance> instanceList) {
     //calculate the center of an existing group of sites (if any)
     LatLng initialPos = LatLng(32.113540, 34.817882);
     if (sitesList.isNotEmpty) {
@@ -70,7 +84,7 @@ class _MapScreenState extends State<MapScreen> {
             markers.add(new Marker(
                 position: LatLng(site.address.lat, site.address.lng),
                 onTap: () => _markerTap(site),
-                icon: BitmapDescriptor.defaultMarker, //TODO: change color here
+                icon: _colorSelector(instanceList, site.id),
                 markerId: MarkerId(site.id))),
             if (site.address.lat > latMax) latMax = site.address.lat,
             if (site.address.lat < latMin) latMin = site.address.lat,
@@ -227,5 +241,33 @@ class _MapScreenState extends State<MapScreen> {
         zoom: zoom, //TODO: calculate zoom
       ),
     ));
+  }
+
+  BitmapDescriptor _colorSelector(
+      List<InstrumentInstance> instanceList, String siteId) {
+    double color = BitmapDescriptor.hueRed;
+    List<InstrumentInstance> filtered = instanceList
+        .where((instance) => instance.currentSiteId == siteId)
+        .where((element) => element.nextMaintenance != null)
+        .toList();
+
+    if (filtered.isEmpty)
+      return BitmapDescriptor.defaultMarkerWithHue(color);
+    else {
+      int minNextMaintance = filtered
+          .reduce((value, element) =>
+              min(value.nextMaintenance, element.nextMaintenance))
+          .nextMaintenance;
+      int diff = DateTime(minNextMaintance).difference(DateTime.now()).inDays;
+
+      if (diff < 0)
+        color = BitmapDescriptor.hueRed;
+      else if (diff < 30)
+        color = BitmapDescriptor.hueOrange;
+      else
+        color = BitmapDescriptor.hueGreen;
+    }
+
+    return BitmapDescriptor.defaultMarkerWithHue(color);
   }
 }
