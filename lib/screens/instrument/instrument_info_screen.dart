@@ -18,7 +18,6 @@ import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
-import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/pdf/generic_form_screen.dart';
 import 'package:teamshare/widgets/list_items/entry_list_item.dart';
 
@@ -409,16 +408,18 @@ class ReportGraph extends StatelessWidget {
             });
 
             return Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: features
                     .map(
                       (feature) => Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
-                              feature.title, //change to feature title
+                              feature.title,
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
@@ -426,20 +427,22 @@ class ReportGraph extends StatelessWidget {
                               ),
                             ),
                           ),
-                          LineGraph(
-                            features: [feature],
-                            size:
-                                Size(mqd.size.width * .9, mqd.size.width * .2),
-                            labelX: labelX,
-                            labelY: labelY[feature.title],
-                            showDescription: true,
-                            graphColor: Colors.black,
-                            graphOpacity: 0.2,
-                            verticalFeatureDirection: true,
-                            descriptionHeight: 100,
-                          ),
-                          SizedBox(
-                            height: 50,
+                          SingleChildScrollView(
+                            child: LineGraph(
+                              features: [feature],
+                              size: Size(
+                                  mqd.size.width * .9,
+                                  mqd.orientation == Orientation.portrait
+                                      ? mqd.size.width * .6
+                                      : mqd.size.width * .25),
+                              labelX: labelX,
+                              labelY: labelY[feature.title],
+                              showDescription: true,
+                              graphColor: Colors.black,
+                              graphOpacity: 0.2,
+                              verticalFeatureDirection: true,
+                              descriptionHeight: 100,
+                            ),
                           ),
                         ],
                       ),

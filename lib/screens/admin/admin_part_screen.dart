@@ -20,7 +20,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Part> _partList = Provider.of<List<Part>>(context);
+    List<Part> _catalogParts = Provider.of<List<Part>>(context);
     return StreamProvider<List<MapEntry<String, dynamic>>>.value(
       value: FirebaseFirestoreProvider.getInventoryParts('$storage'),
       initialData: [],
@@ -40,19 +40,21 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
             title: '$storage',
             child: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: _partList.isEmpty
+              child: _catalogParts.isEmpty
                   ? Center(child: Text("You haven't registered any parts yet"))
                   : ListView.builder(
                       shrinkWrap: true,
                       key: UniqueKey(), //new Key(Strings.randomString(20)),
                       itemBuilder: (ctx, index) {
+                        Part catalogPart = _catalogParts.elementAt(index);
+
                         return Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Expanded(
                               flex: 8,
                               child: PartListItem(
-                                part: _partList.elementAt(index),
+                                part: catalogPart,
                                 key: UniqueKey(),
                               ),
                             ),
@@ -60,10 +62,9 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                               flex: 2,
                               child: Consumer<List<MapEntry<String, dynamic>>>(
                                 builder: (context, value, child) {
-                                  Map<String, dynamic> parts =
+                                  Map<String, dynamic> storageParts =
                                       Map<String, dynamic>.fromEntries(value);
-                                  var res =
-                                      parts[_partList.elementAt(index).id];
+
                                   return GestureDetector(
                                     onTap: () {
                                       final controller =
@@ -74,7 +75,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                             builder: (context, setState) {
                                           return AlertDialog(
                                             title: Text(
-                                                'Set amount\n${_partList.elementAt(index).description}'),
+                                                'Set amount\n${catalogPart.description}'),
                                             content: TextField(
                                               controller: controller,
                                               keyboardType:
@@ -94,8 +95,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                                         .transferParts(
                                                             null,
                                                             '$storage',
-                                                            _partList.elementAt(
-                                                                index),
+                                                            catalogPart,
                                                             int.parse(controller
                                                                 .text));
                                                     setState(() {
@@ -123,13 +123,25 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                     },
                                     child: Container(
                                       child: Center(
-                                        child: Text(res == null
-                                            ? "0"
-                                            : parts[_partList
-                                                    .elementAt(index)
-                                                    .id
-                                                    .toString()]
-                                                .toString()),
+                                        child: Text(
+                                          storageParts[catalogPart.id] == null
+                                              ? "0"
+                                              : storageParts[catalogPart.id]
+                                                  .toString(),
+                                          style: TextStyle(
+                                            color: catalogPart.mainStockMin > 0
+                                                ? storageParts[
+                                                            catalogPart.id] ==
+                                                        null
+                                                    ? Colors.red
+                                                    : catalogPart.mainStockMin >
+                                                            storageParts[
+                                                                catalogPart.id]
+                                                        ? Colors.red
+                                                        : Colors.black
+                                                : Colors.black,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   );
@@ -139,7 +151,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                           ],
                         );
                       },
-                      itemCount: _partList.length,
+                      itemCount: _catalogParts.length,
                     ),
             ),
           ),

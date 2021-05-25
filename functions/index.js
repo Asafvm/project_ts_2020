@@ -509,9 +509,9 @@ exports.linkInstruments = functions.https.onCall(async (data, context) => {
         type: 1,
         timestamp: Date.now(),
         details: {
-          title: "Intrument Moved",
-          instrumentId: data["instrumentId"],
-          instanceId: data["instanceId"],
+          'title': "Intrument Moved",
+          'instrumentId': instrument.instrumentCode,
+          'instanceId': instrument.instanceSerial,
         },
       });
       promises.push(update);
