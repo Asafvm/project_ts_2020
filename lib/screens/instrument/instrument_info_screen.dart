@@ -358,8 +358,8 @@ class ReportGraph extends StatelessWidget {
                 reports.length,
                 (index) =>
                     '${reports.elementAt(index).reportId}\n${formatter.format(DateTime.fromMillisecondsSinceEpoch(reports.elementAt(index).timestamp))}');
-            labelX = labelX
-                .sublist(labelX.length > 4 ? labelX.length - _dataLimit : 0);
+            labelX = labelX.sublist(
+                labelX.length > _dataLimit ? labelX.length - _dataLimit : 0);
 
             Map<String, List<String>> labelY = Map<String, List<String>>();
 
@@ -369,10 +369,13 @@ class ReportGraph extends StatelessWidget {
                     .map((field) => field.hint)
                     .toList() ??
                 [];
-
             //create feature
-            List<Feature> features =
-                titles.map((title) => Feature(title: title, data: [])).toList();
+            List<Feature> features = titles
+                .map((title) => Feature(
+                    title: title,
+                    data: [],
+                    color: Theme.of(context).primaryColor))
+                .toList();
             //get feature data
             reports.forEach((report) {
               report.fields
@@ -386,25 +389,25 @@ class ReportGraph extends StatelessWidget {
             });
             //scale data
             features.forEach((feature) {
-              List<double> data = feature.data;
+              //limit size
+              List<double> data = feature.data.sublist(
+                  feature.data.length > _dataLimit
+                      ? feature.data.length - _dataLimit
+                      : 0);
               double datamin =
                   data.reduce((value, element) => min(value, element));
               double datamax =
                   data.reduce((value, element) => max(value, element));
               double factor = datamax - datamin;
               //scale between 0 and 1
-              feature.data = feature.data
-                  .map((element) => (element - datamin) / factor)
+              feature.data = data
+                  .map((element) => ((element - datamin) / factor))
                   .toList();
-              //limit size
-              feature.data = feature.data.sublist(feature.data.length > 4
-                  ? feature.data.length - _dataLimit
-                  : 0);
-
+              //generate feature Y labels
               labelY[feature.title] = List<String>.generate(
-                  _ySize,
-                  (index) => (datamin + index * ((datamax - datamin) / _ySize))
-                      .toString());
+                  _ySize + 1,
+                  (index) =>
+                      (datamin + index * (factor / _ySize)).toStringAsFixed(2));
             });
 
             return Column(

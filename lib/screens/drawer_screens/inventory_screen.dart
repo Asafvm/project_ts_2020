@@ -346,13 +346,12 @@ class _InventoryWindowState extends State<InventoryWindow> {
                         });
                         await FirebaseFirestoreCloudFunctions.transferParts(
                                 origin, destination, part, partCount)
+                            .then((value) => setState(() {
+                                  _loading = false;
+                                }))
                             .catchError((error) {
                           print(error);
-                        });
-                        setState(() {
-                          _loading = true;
-                        });
-                        Navigator.pop(context);
+                        }).whenComplete(() => Navigator.pop(context));
                       },
                 child: _loading ? CircularProgressIndicator() : Text("OK")),
           ],
