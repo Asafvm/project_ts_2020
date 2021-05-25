@@ -23,18 +23,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData mqd = MediaQuery.of(context);
     List<String> members = Provider.of<List<String>>(context);
     List<Part> catalog = Provider.of<List<Part>>(context);
 
-    Widget getTransferPartner() => Expanded(
-          flex: 9 ~/ 2,
-          child: InventoryWindow(
-            target: '$_transferTarget',
-            title: '$_transferTarget Inventory',
-            partStream:
-                FirebaseFirestoreProvider.getInventoryParts(_transferTarget),
-            filter: _searchText,
-          ),
+    Widget getTransferPartner() => InventoryWindow(
+          target: '$_transferTarget',
+          title: '$_transferTarget Inventory',
+          partStream:
+              FirebaseFirestoreProvider.getInventoryParts(_transferTarget),
+          filter: _searchText,
         );
 
     return Scaffold(
@@ -76,8 +74,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            flex: 1,
+          Container(
+            height: mqd.size.height * .12,
             child: Row(
               children: [
                 Expanded(
@@ -115,14 +113,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
           Expanded(
             flex: _transfer ? 9 ~/ 2 : 9,
             child: _missing
-                ? InfoCube(
-                    title: 'Missing Inventory',
-                    child: MissingPartWindow(
-                        catalog: catalog
-                            .where((element) =>
-                                element.reference.contains(_searchText) ||
-                                element.description.contains(_searchText))
-                            .toList()),
+                ? AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    child: InfoCube(
+                      title: 'Missing Inventory',
+                      child: MissingPartWindow(
+                          catalog: catalog
+                              .where((element) =>
+                                  element.reference.contains(_searchText) ||
+                                  element.description.contains(_searchText))
+                              .toList()),
+                    ),
                   )
                 : InventoryWindow(
                     target: Authentication().userEmail,
@@ -132,7 +133,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     filter: _searchText,
                   ),
           ),
-          if (_transfer) getTransferPartner(),
+          //Expanded(
+          //flex: 9 ~/ 2,
+          //child:
+          AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              height: _transfer ? mqd.size.height * .3 : 0,
+              child: getTransferPartner()), //),
         ],
       ),
     );
