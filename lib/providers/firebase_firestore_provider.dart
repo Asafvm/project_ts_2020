@@ -18,13 +18,12 @@ class FirebaseFirestoreProvider {
 //Get from Firebase
 
   static Stream<List<String>> getUserTeamList() {
-    Stream<List<String>> stream = FirebaseFirestore.instance
+    return FirebaseFirestore.instance
         .collection(FirebasePaths.teamsRef)
         .snapshots()
         .map(
           (query) => query.docs.map((doc) => doc.id).toList(),
         );
-    return stream;
   }
 
   static Stream<List<Part>> getCatalogParts() {
@@ -183,17 +182,13 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  static Stream<List<String>> getTeamMembers() {
+  static Stream<Iterable<MapEntry<String, bool>>> getTeamMembers() {
     return FirebaseFirestore.instance
         .collection(FirebasePaths.membersRef)
         .snapshots()
-        .map(
-          (query) => query.docs
-              .map(
-                (doc) => doc.id,
-              )
-              .toList(),
-        );
+        .map((query) => query.docs.map<MapEntry<String, bool>>(
+              (doc) => MapEntry(doc.id, doc.data()["admin"] as bool),
+            ));
   }
 
   static Stream<List<Entry>> getEntries(InstrumentInstance instance,

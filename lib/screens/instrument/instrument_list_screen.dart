@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teamshare/helpers/image_helper.dart';
+import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/team.dart';
@@ -80,7 +80,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
                 ),
               ),
               onTap: () async => {
-                widget.instrument.imgUrl = await ImageHelper.takePicture(
+                widget.instrument.imgUrl = await PickerHelper.takePicture(
                     context: context,
                     uploadPath:
                         FirebasePaths.instrumentImagePath(widget.instrument.id),

@@ -49,7 +49,7 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => MultiProvider(providers: [
-                    StreamProvider<List<String>>(
+                    StreamProvider<Iterable<MapEntry<String, bool>>>(
                       create: (context) =>
                           FirebaseFirestoreProvider.getTeamMembers(),
                       initialData: [],

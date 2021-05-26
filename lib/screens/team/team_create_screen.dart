@@ -4,6 +4,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
+import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:path/path.dart' as path;
@@ -23,9 +25,9 @@ class TeamCreateScreen extends StatefulWidget {
 }
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
-  Set<String> members = Set<String>(); //using set to avoid duplicates
-  bool __imgPicked = false;
-  String _picUrl = 'assets/pics/add_image.png';
+  Map<String, bool> members = Map<String, bool>();
+  bool _imgPicked = false;
+  String _picUrl;
   bool _loading = false;
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData mqd = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Create"),
@@ -85,38 +88,42 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
             Step(
               //GENERAL INFORMATION
               title: Text("Info"),
-              content: Row(
+
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: TextButton(
-                      child: __imgPicked
-                          ? Image.file(File(_picUrl))
-                          : Image.asset(_picUrl),
-                      onPressed: _takePicture,
+                  InkWell(
+                    child: Container(
+                      constraints:
+                          BoxConstraints(maxHeight: 100, maxWidth: 100),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: _picUrl == null
+                                ? AssetImage('assets/pics/unknown.jpg')
+                                : Image.file(File(_picUrl)).image,
+                            fit: BoxFit.fitHeight),
+                      ),
                     ),
+                    onTap: () async => {
+                      _picUrl = await PickerHelper.takePicture(
+                        context: context,
+                      ),
+                    },
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          initialValue: _name,
-                          decoration: InputDecoration(
-                            labelText: "Team name",
-                          ),
-                          maxLines: 1,
-                          onChanged: (value) => {_name = value},
-                        ),
-                        TextFormField(
-                          initialValue: _description,
-                          decoration: InputDecoration(labelText: "Description"),
-                          maxLines: 1,
-                          onChanged: (value) => {_description = value},
-                        ),
-                      ],
-                    ),
-                  )
+                  TextFormField(
+                    initialValue: _name,
+                    decoration:
+                        DecorationLibrary.inputDecoration('Team Name', context),
+                    maxLines: 1,
+                    onChanged: (value) => {_name = value},
+                  ),
+                  TextFormField(
+                    initialValue: _description,
+                    decoration: DecorationLibrary.inputDecoration(
+                        'Description', context),
+                    maxLines: 8,
+                    onChanged: (value) => {_description = value},
+                  ),
                 ],
               ),
               isActive: _currentStep == STEPS.INFO.index ? true : false,
@@ -137,34 +144,43 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                       itemBuilder: (BuildContext context, int index) {
                         return MemberListItem(
                             key: UniqueKey(),
-                            name: members.elementAt(index),
-                            removeFunction: _removeFromList);
+                            name: members.keys.elementAt(index),
+                            isSelected: false,
+                            onSwitch: (String name, bool value) {
+                              members[name] = value;
+                            },
+                            onRemove: (String name) {
+                              setState(() {
+                                members.remove(name);
+                              });
+                            });
                       },
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        TextButton(
-                          style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith(getColor),
-                          ), // shape: RoundedRectangleBorder
+                        OutlinedButton(
+                          style:
+                              outlinedButtonStyle, // shape: RoundedRectangleBorder
                           onPressed: () async {
                             final EmailContact contact =
                                 await FlutterContactPicker.pickEmailContact(
                                     askForPermission: true);
                             setState(() {
-                              members.add(contact.email.email);
+                              members.addEntries(
+                                  [MapEntry(contact.email.email, false)]);
                             });
                           },
                           child: Text("Add From Contacts"),
                         ),
-                        TextButton(
+                        OutlinedButton(
+                          style: outlinedButtonStyle,
                           onPressed: () async {
                             String email = await _getMailManually(context);
                             if (email.isNotEmpty) {
                               setState(() {
-                                members.add(email.toLowerCase());
+                                members.addEntries(
+                                    [MapEntry(email.toLowerCase(), false)]);
                               });
                             }
                           },
@@ -221,29 +237,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
         },
       ),
     ).then((value) => {Navigator.of(context).pop()});
-  }
-
-  Future<void> _takePicture() async {
-    final picker = ImagePicker();
-    final imageFile = await picker.getImage(
-      source: ImageSource.gallery,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-    final appDir = await syspath.getApplicationDocumentsDirectory();
-    final picName = path.basename(imageFile.path);
-    File image = File(imageFile.path);
-    File savedImage = await image.copy('${appDir.path}/$picName');
-    setState(() {
-      _picUrl = savedImage.path;
-      __imgPicked = true;
-    });
-  }
-
-  _removeFromList(String value) {
-    setState(() {
-      members.remove(value);
-    });
   }
 
   Future<String> _getMailManually(BuildContext context) {
@@ -307,11 +300,13 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
       setState(() {
         _loading = true;
       });
-      members.add(Authentication().userEmail);
+      members.addEntries([
+        MapEntry(Authentication().userEmail.toLowerCase(), true)
+      ]); //set creator as admin
 
       HttpsCallableResult result =
-          await FirebaseFirestoreCloudFunctions.addTeam(_name, _description,
-              members.toList(), __imgPicked ? _picUrl : null);
+          await FirebaseFirestoreCloudFunctions.addTeam(
+              _name, _description, members, _imgPicked ? _picUrl : null);
 
       if (result.data["status"] == "success") {
         ScaffoldMessenger.of(context).showSnackBar(

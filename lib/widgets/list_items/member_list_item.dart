@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 
-class MemberListItem extends StatelessWidget {
+class MemberListItem extends StatefulWidget {
   final String name;
-  final Function removeFunction;
+  bool isSelected;
+  final Function onRemove;
+  final Function onSwitch;
 
-  const MemberListItem({Key key, this.name, this.removeFunction})
-      : super(key: key);
+  MemberListItem({
+    UniqueKey key,
+    this.isSelected,
+    this.name,
+    this.onRemove,
+    this.onSwitch,
+  }) : super(key: key);
 
+  @override
+  _MemberListItemState createState() => _MemberListItemState();
+}
+
+class _MemberListItemState extends State<MemberListItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -21,24 +33,29 @@ class MemberListItem extends StatelessWidget {
               flex: 1,
               fit: FlexFit.tight,
               child: Text(
-                name,
+                widget.name,
                 textAlign: TextAlign.start,
               ),
             ),
-            removeFunction != null
+            widget.onRemove != null
                 ? Row(
                     children: [
                       Switch(
                         activeColor: Theme.of(context).primaryColor,
-                        onChanged: (bool value) {},
-                        value: false,
+                        onChanged: (bool value) {
+                          setState(() {
+                            widget.isSelected = value;
+                          });
+                          widget.onSwitch(widget.name, value);
+                        },
+                        value: widget.isSelected,
                       ),
                       IconButton(
                         icon: Icon(
                           Icons.remove_circle,
                           color: Colors.red,
                         ),
-                        onPressed: () => removeFunction(name),
+                        onPressed: () => widget.onRemove(widget.name),
                       ),
                     ],
                   )

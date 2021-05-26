@@ -24,7 +24,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   Widget build(BuildContext context) {
     MediaQueryData mqd = MediaQuery.of(context);
-    List<String> members = Provider.of<List<String>>(context);
+    Map<String, bool> members = Map<String, bool>.fromEntries(
+        Provider.of<Iterable<MapEntry<String, bool>>>(context));
     List<Part> catalog = Provider.of<List<Part>>(context);
 
     Widget getTransferPartner() => InventoryWindow(
@@ -100,7 +101,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       _transferTarget = value;
                     }),
                     icon: Icon(Icons.account_circle),
-                    itemBuilder: (context) => members
+                    itemBuilder: (context) => members.keys
                         .where(
                             (element) => element != Authentication().userEmail)
                         .map((e) =>

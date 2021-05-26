@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/helpers/image_helper.dart';
+import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
@@ -81,7 +81,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                         ),
                         onTap: () async => {
                           widget.instance.imgUrl =
-                              await ImageHelper.takePicture(
+                              await PickerHelper.takePicture(
                                   context: context,
                                   uploadPath: FirebasePaths.instanceImagePath(
                                       widget.instance.instrumentCode,

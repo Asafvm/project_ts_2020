@@ -25,7 +25,7 @@ class FirebaseFirestoreCloudFunctions {
 //Get from Firebase
 
   static Future<HttpsCallableResult> addTeam(String name, String description,
-      [List<String> members = const [], String picUrl]) async {
+      [Map<String, bool> members, String picUrl]) async {
     //step 1: upload team and get id
     HttpsCallableResult teaminfo = await FirebaseFunctions.instance
         .httpsCallable("addTeam")
@@ -55,10 +55,21 @@ class FirebaseFirestoreCloudFunctions {
   }
 
   static Future<HttpsCallableResult> addTeamMember(
-      String teamid, List<String> members) async {
+      String teamid, Map<String, bool> members) async {
     //step 1: upload team and get id
     return await FirebaseFunctions.instance
         .httpsCallable("addTeamMember")
+        .call(<String, dynamic>{
+      'teamId': teamid,
+      "members": members,
+    });
+  }
+
+  static Future<HttpsCallableResult> removeTeamMember(
+      String teamid, List<String> members) async {
+    //step 1: upload team and get id
+    return await FirebaseFunctions.instance
+        .httpsCallable("removeTeamMember")
         .call(<String, dynamic>{
       'teamId': teamid,
       "members": members,

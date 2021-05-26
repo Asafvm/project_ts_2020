@@ -1,7 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/helpers/image_helper.dart';
+import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
@@ -109,7 +109,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                               tooltip: 'Take a picture',
                               onPressed: () async => {
                                 widget.site.imgUrl =
-                                    await ImageHelper.takePicture(
+                                    await PickerHelper.takePicture(
                                         context: context,
                                         uploadPath: FirebasePaths.siteImagePath(
                                             widget.site.id),
@@ -179,7 +179,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                           ),
                         ),
                         onTap: () async => {
-                          widget.site.imgUrl = await ImageHelper.takePicture(
+                          widget.site.imgUrl = await PickerHelper.takePicture(
                               context: context,
                               uploadPath:
                                   FirebasePaths.siteImagePath(widget.site.id),

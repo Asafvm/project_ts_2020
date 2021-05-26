@@ -80,7 +80,8 @@ class AdminMenuScreen extends StatelessWidget {
                     child: createButton(Icons.group, () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => StreamProvider<List<String>>(
+                          builder: (_) =>
+                              StreamProvider<Iterable<MapEntry<String, bool>>>(
                             initialData: [],
                             create: (context) =>
                                 FirebaseFirestoreProvider.getTeamMembers(),

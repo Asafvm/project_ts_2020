@@ -23,14 +23,18 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
   }
   try {
     const members = data["members"];
-
-    const promises = [];
-    members.forEach((member) => {
-      const p = teams.doc(teamid.id).collection("members").doc(member).set({});
-
-      promises.push(p);
-    });
-    await Promise.all(promises);
+    if (members !== null) {
+      const promises = [];
+      for (const [key, value] of Object.entries(members)) {
+        const p = teams
+          .doc(teamid.id)
+          .collection("members")
+          .doc(key)
+          .set({ admin: value });
+        promises.push(p);
+      }
+      await Promise.all(promises);
+    }
   } catch (e) {
     console.log("Error adding members ::" + e);
     return { status: "failed", messege: e.toString() };
@@ -40,28 +44,53 @@ exports.addTeam = functions.https.onCall(async (data, context) => {
 });
 
 //add team member
+//TODO: split to add and remove functions
 exports.addTeamMember = functions.https.onCall(async (data, context) => {
   const teams = admin
     .firestore()
     .collection("teams")
     .doc(data["teamId"])
     .collection("members"); //setting referance
+  const members = data["members"];
 
   try {
-    const members = data["members"];
-
     const promises = [];
-    members.forEach((member) => {
-      const p = teams.doc(member).set({});
-
+    //add all members
+    for (const [key, value] of Object.entries(members)) {
+      const p = teams.doc(key).set({ admin: value });
       promises.push(p);
-    });
+    }
+
     await Promise.all(promises);
   } catch (e) {
     console.log("Error adding members ::" + e);
     return { status: "failed", messege: e.toString() };
   }
+  return { status: "success" };
+});
 
+exports.removeTeamMember = functions.https.onCall(async (data, context) => {
+  const teams = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("members"); //setting referance
+  const members = data["members"];
+  //remove members
+
+  try {
+    const promises = [];
+    //add all members
+    members.forEach((member) => {
+      const p = teams.doc(member).delete();
+      promises.push(p);
+    });
+
+    await Promise.all(promises);
+  } catch (e) {
+    console.log("Error adding members ::" + e);
+    return { status: "failed", messege: e.toString() };
+  }
   return { status: "success" };
 });
 
@@ -509,9 +538,9 @@ exports.linkInstruments = functions.https.onCall(async (data, context) => {
         type: 1,
         timestamp: Date.now(),
         details: {
-          'title': "Intrument Moved",
-          'instrumentId': instrument.instrumentCode,
-          'instanceId': instrument.instanceSerial,
+          title: "Intrument Moved",
+          instrumentId: instrument.instrumentCode,
+          instanceId: instrument.instanceSerial,
         },
       });
       promises.push(update);

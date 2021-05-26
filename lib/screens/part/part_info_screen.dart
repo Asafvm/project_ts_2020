@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/helpers/image_helper.dart';
+import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
@@ -48,7 +48,7 @@ class _PartInfoScreenState extends State<PartInfoScreen>
                     ),
                   ),
                   onTap: () async => {
-                    widget.part.imgUrl = await ImageHelper.takePicture(
+                    widget.part.imgUrl = await PickerHelper.takePicture(
                         context: context,
                         uploadPath: FirebasePaths.partImagePath(widget.part.id),
                         fileName: 'partImg'),

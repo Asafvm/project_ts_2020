@@ -23,4 +23,10 @@ class Team {
         description = data['description'].toString().trim(),
         logoUrl = data['logoUrl'],
         creatorEmail = data['creatorEmail'].toString().trim();
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'description': description,
+        'creatorEmail': creatorEmail,
+      };
 }

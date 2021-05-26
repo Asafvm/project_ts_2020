@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:fluttercontactpicker/fluttercontactpicker.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/models/team.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
@@ -16,257 +17,171 @@ class AdminTeamManagmentScreen extends StatefulWidget {
 
 class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
   Team currentTeam = TeamProvider().getCurrentTeam;
-  List<String> members = [];
+  Map<String, bool> members = Map<String, bool>();
+  List<String> membersToRemove = List<String>.empty(growable: true);
   final scaffoldState = GlobalKey<ScaffoldState>();
-
   bool _isExpanded = false;
-
   int _maxLines = 2;
+  bool _changedMembers = false;
+  bool _changedDetails = false;
+  bool _changedLogo = false;
+  double _progress = 0;
+
+  bool _updating = false;
+
+  bool _init = true;
 
   @override
   Widget build(BuildContext context) {
-    members = Provider.of<List<String>>(context);
+    if (members.isEmpty)
+      members = Map<String, bool>.fromEntries(
+          Provider.of<Iterable<MapEntry<String, bool>>>(context,
+              listen: _init)); //stop listening if data recieved
+
     return Scaffold(
       key: scaffoldState,
       appBar: AppBar(
         title: Text("Team Managment"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.save),
+              onPressed: _changedDetails ||
+                      _changedLogo ||
+                      _changedMembers ||
+                      membersToRemove.isNotEmpty
+                  ? () async {
+                      await _updateTeam();
+                      setState(() {
+                        _init = false;
+                        _changedDetails = false;
+                        _changedLogo = false;
+                        _changedMembers = false;
+                      });
+                    }
+                  : null)
+        ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Stack(
+      body: _updating
+          ? Center(
+              child: CircularProgressIndicator(
+                value: _progress,
+              ),
+            )
+          : Column(
               children: [
-                InkWell(
-                  onTap: () => _takePicture(context),
+                Expanded(
+                  flex: 3,
+                  child: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          String _img = await PickerHelper.takePicture(
+                              context: context,
+                              fileName: 'logoUrl',
+                              uploadPath: null);
+                          if (_img.isNotEmpty)
+                            setState(() {
+                              currentTeam.logoUrl = _img;
+                              _changedLogo = true;
+                            });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: currentTeam.logoUrl == null
+                                    ? AssetImage(
+                                        'assets/pics/unknown.jpg') //no pic
+                                    : currentTeam.logoUrl.contains("http")
+                                        ? NetworkImage(currentTeam
+                                            .logoUrl) //cloud storage pic
+                                        : Image.file(File(currentTeam.logoUrl))
+                                            .image, //local pic
+                                fit: BoxFit.fitHeight),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: IconButton(
+                          icon: Icon(Icons.person_add),
+                          onPressed: () async {
+                            String contact =
+                                await PickerHelper.pickContact(context);
+                            if (contact != null && contact.isNotEmpty) {
+                              setState(() {
+                                members.addEntries([MapEntry(contact, false)]);
+                                _changedMembers = true;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () => _editTeamName(context),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        child: Text(
+                          currentTeam.name,
+                          style: TextStyle(fontSize: 26),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
                   child: Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: currentTeam.logoUrl == null
-                              ? AssetImage('assets/pics/unknown.jpg')
-                              : NetworkImage(currentTeam.logoUrl),
-                          fit: BoxFit.fitHeight),
+                    color: Colors.black12,
+                    padding: const EdgeInsets.all(15),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        currentTeam.description,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: _isExpanded ? null : _maxLines,
+                      ),
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: Icon(Icons.person_add),
-                    onPressed: () => _pickContact(context),
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () => _editTeamName(context),
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  child: Text(
-                    currentTeam.name,
-                    style: TextStyle(fontSize: 26),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              color: Colors.black12,
-              padding: const EdgeInsets.all(15),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  currentTeam.description,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: _isExpanded ? null : _maxLines,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 6,
-            child: Container(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: members.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return MemberListItem(
-                    key: UniqueKey(),
-                    name: members.elementAt(index),
-                    removeFunction:
-                        members.elementAt(index) == currentTeam.creatorEmail
-                            ? null
-                            : () {},
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _takePicture(BuildContext context) {
-    scaffoldState.currentState.showBottomSheet(
-      (context) {
-        return Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  top: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                      style: BorderStyle.solid))),
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.photo), onPressed: _pickFromGallery),
-              ),
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.camera_alt_rounded),
-                    onPressed: _pickFromCamera),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _pickContact(BuildContext context) {
-    scaffoldState.currentState.showBottomSheet(
-      (context) {
-        return Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                  color: Colors.black, width: 2, style: BorderStyle.solid),
-            ),
-          ),
-          height: 100,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.contact_mail),
-                    onPressed: _pickFromContacts),
-              ),
-              Expanded(
-                child: IconButton(
-                    icon: Icon(Icons.keyboard), onPressed: _writeManualy),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future _pickFromGallery() async {
-    final imageFile = await ImagePicker().getImage(
-      source: ImageSource.gallery,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-
-    await FirebaseFirestoreCloudFunctions.updateTeamLogo(
-            teamid: currentTeam.id, url: imageFile.path)
-        .then((_) => currentTeam.logoUrl = imageFile.path);
-  }
-
-  Future _pickFromCamera() async {
-    final imageFile = await ImagePicker().getImage(
-      source: ImageSource.camera,
-      maxHeight: 100,
-      maxWidth: 100,
-    );
-
-    await FirebaseFirestoreCloudFunctions.updateTeamLogo(
-            teamid: currentTeam.id, url: imageFile.path)
-        .then((_) => currentTeam.logoUrl = imageFile.path);
-  }
-
-  Future _pickFromContacts() async {
-    final EmailContact contact =
-        await FlutterContactPicker.pickEmailContact(askForPermission: true);
-    if (contact != null) {
-      setState(() {
-        members.add(contact.email.email);
-      });
-      await FirebaseFirestoreCloudFunctions.addTeamMember(
-          currentTeam.id, [contact.email.email]);
-    }
-  }
-
-  Future _writeManualy() async {
-    TextEditingController _textController = TextEditingController();
-    bool _valid = true;
-
-    return showDialog(
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text("Enter Email"),
-              content: TextField(
-                controller: _textController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  errorText: _valid ? null : "Must be a valid email",
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () async {
-                    if (_textController.text.isEmpty ||
-                        !emailRegExp.hasMatch(_textController.text)) {
-                      setState(() {
-                        _valid = false;
-                      });
-                    } else {
-                      setState(() {
-                        _valid = true;
-                        members.add(_textController.text);
-                      });
-
-                      await FirebaseFirestoreCloudFunctions.addTeamMember(
-                          currentTeam.id, [_textController.text]);
-                      Navigator.of(context).pop("");
-                    }
-                  },
-                  child: Text(
-                    "OK",
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop("");
-                  },
-                  child: Text(
-                    "Cancel",
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: members.keys.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return MemberListItem(
+                          key: UniqueKey(),
+                          name: members.keys.elementAt(index),
+                          isSelected: members[members.keys.elementAt(index)],
+                          onSwitch: (String name, bool value) {
+                            members[name] = value;
+                            _changedMembers = true;
+                          },
+                          onRemove: members.keys.elementAt(index) ==
+                                  currentTeam.creatorEmail
+                              ? null
+                              : (String name) {
+                                  setState(() {
+                                    members.remove(name);
+                                    membersToRemove.add(name);
+                                  });
+                                },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
-              elevation: 10,
-            );
-          },
-        );
-      },
-      context: context,
+            ),
     );
   }
 
@@ -296,17 +211,19 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                TextButton(
+                OutlinedButton(
+                    style: outlinedButtonStyle,
                     onPressed: () {
-                      FirebaseFirestoreCloudFunctions.updateTeam(
-                          teamid: currentTeam.id,
-                          data: {
-                            'name': teamText.text,
-                            'description': descText.text
-                          }).whenComplete(() => Navigator.of(context).pop());
+                      setState(() {
+                        currentTeam.name = teamText.text;
+                        currentTeam.description = descText.text;
+                        _changedDetails = true;
+                      });
+                      Navigator.of(context).pop();
                     },
                     child: Text("Save")),
-                TextButton(
+                OutlinedButton(
+                    style: outlinedButtonStyle,
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -316,6 +233,40 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
           ],
         ),
       );
+    });
+  }
+
+  Future<void> _updateTeam() async {
+    setState(() {
+      _updating = true;
+      _progress = 0;
+    });
+    if (!(currentTeam.logoUrl == null) &&
+        !currentTeam.logoUrl.contains("http") &&
+        _changedLogo)
+      await FirebaseFirestoreCloudFunctions.updateTeamLogo(
+          teamid: currentTeam.id, url: currentTeam.logoUrl);
+    setState(() {
+      _progress = 30;
+    });
+    if (_changedMembers)
+      await FirebaseFirestoreCloudFunctions.addTeamMember(
+          currentTeam.id, members);
+    setState(() {
+      _progress = 50;
+    });
+    if (membersToRemove.isNotEmpty)
+      await FirebaseFirestoreCloudFunctions.removeTeamMember(
+          currentTeam.id, membersToRemove);
+    setState(() {
+      _progress = 70;
+    });
+    if (_changedDetails)
+      await FirebaseFirestoreCloudFunctions.updateTeam(
+          teamid: currentTeam.id, data: currentTeam.toJson());
+    setState(() {
+      _progress = 100;
+      _updating = false;
     });
   }
 }
