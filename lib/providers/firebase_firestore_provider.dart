@@ -10,6 +10,7 @@ import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/report.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
+import 'package:teamshare/providers/authentication.dart';
 import '../helpers/firebase_paths.dart';
 
 ///*** class changed to static ***///
@@ -189,6 +190,13 @@ class FirebaseFirestoreProvider {
         .map((query) => query.docs.map<MapEntry<String, bool>>(
               (doc) => MapEntry(doc.id, doc.data()["admin"] as bool),
             ));
+  }
+
+  static Future<bool> getPermissions() async {
+    return await FirebaseFirestore.instance
+        .doc('${FirebasePaths.membersRef}/${Authentication().userEmail}')
+        .get()
+        .then((value) => value.data()['admin']);
   }
 
   static Stream<List<Entry>> getEntries(InstrumentInstance instance,

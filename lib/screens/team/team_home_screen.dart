@@ -32,9 +32,6 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // List<Site> siteList = Provider.of<List<Site>>(context);
-    // List<Instrument> instrumentList = Provider.of<List<Instrument>>(context);
-    // List<Part> partList = Provider.of<List<Part>>(context);
     List<Entry> entryList = Provider.of<List<Entry>>(context);
     return MultiProvider(
       providers: [

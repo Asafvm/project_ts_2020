@@ -3,13 +3,10 @@ import 'dart:io';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/authentication.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart' as syspath;
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/widgets/list_items/member_list_item.dart';
@@ -145,9 +142,11 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                         return MemberListItem(
                             key: UniqueKey(),
                             name: members.keys.elementAt(index),
-                            isSelected: false,
+                            isSelected: members[members.keys.elementAt(index)],
                             onSwitch: (String name, bool value) {
-                              members[name] = value;
+                              setState(() {
+                                members[name] = value;
+                              });
                             },
                             onRemove: (String name) {
                               setState(() {
@@ -224,12 +223,23 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
             title: Text("Confirm"),
             content: Text("Create $_name?"),
             actions: [
-              TextButton(
-                onPressed: _uploadTeam,
+              OutlinedButton(
+                style: outlinedButtonStyle,
+                onPressed: () async {
+                  setState(() {
+                    _loading = true;
+                  });
+                  await _uploadTeam();
+                  setState(() {
+                    _loading = false;
+                  });
+                  Navigator.of(context).pop();
+                },
                 child: _loading ? CircularProgressIndicator() : Text("Ok"),
               ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+              OutlinedButton(
+                style: outlinedButtonStyle,
+                onPressed: _loading ? null : () => Navigator.of(context).pop(),
                 child: Text("Cancel"),
               ),
             ],
@@ -258,7 +268,8 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                 ),
               ),
               actions: [
-                TextButton(
+                OutlinedButton(
+                  style: outlinedButtonStyle,
                   onPressed: () {
                     if (_textController.text.isEmpty ||
                         !emailRegExp.hasMatch(_textController.text)) {
@@ -277,7 +288,8 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                     "OK",
                   ),
                 ),
-                TextButton(
+                OutlinedButton(
+                  style: outlinedButtonStyle,
                   onPressed: () {
                     Navigator.of(context).pop("");
                   },
@@ -295,11 +307,8 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
     );
   }
 
-  void _uploadTeam() async {
+  Future<void> _uploadTeam() async {
     if (Authentication().isAuth) {
-      setState(() {
-        _loading = true;
-      });
       members.addEntries([
         MapEntry(Authentication().userEmail.toLowerCase(), true)
       ]); //set creator as admin
@@ -321,11 +330,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
           ),
         );
       }
-
-      setState(() {
-        _loading = false;
-      });
-      Navigator.of(context).pop();
     } else
       Applogger.consoleLog(MessegeType.error, "User is not connected");
   }
