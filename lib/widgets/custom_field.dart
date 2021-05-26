@@ -4,7 +4,7 @@ import 'package:teamshare/models/field.dart';
 class CustomField extends StatefulWidget {
   final Field field;
   final MediaQueryData mqd;
-  final Function editFunction;
+  final Function onClick;
   final Size pdfSizeOnScreen;
   final double appbarHeight;
   final double scale;
@@ -12,7 +12,7 @@ class CustomField extends StatefulWidget {
   CustomField(
       {this.field,
       this.mqd,
-      this.editFunction,
+      this.onClick,
       this.pdfSizeOnScreen,
       this.scale,
       this.focalPoint,
@@ -66,7 +66,7 @@ class _CustomFieldState extends State<CustomField> {
             _selected = false;
           })
         },
-        onLongPress: () => widget.editFunction(context, widget.field),
+        onLongPress: () => widget.onClick(widget.field),
         child: _selected
             ? Stack(clipBehavior: Clip.none, children: [
                 field,

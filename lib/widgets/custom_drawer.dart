@@ -98,7 +98,7 @@ class CustomDrawer extends StatelessWidget {
             ),
             Divider(),
             Consumer<bool>(
-              builder: (context, admin, child) => admin
+              builder: (context, admin, child) => admin ?? false
                   ? ListTile(
                       leading: Icon(Icons.person),
                       title: Text('Admin'),

@@ -63,16 +63,12 @@ class _PDFScreenState extends State<PDFScreen> {
     _updateLists(_initialPage);
 
     //set function to run once after first frame
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => afterFirstLayout(context));
-  }
-
-  void afterFirstLayout(BuildContext context) {
-    // Calling the same function "after layout" to resolve the issue.
-    if (_keyPDF.currentContext != null)
-      setState(() {
-        pdfBox = _keyPDF.currentContext.findRenderObject() as RenderBox;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_keyPDF.currentContext != null)
+        setState(() {
+          pdfBox = _keyPDF.currentContext.findRenderObject() as RenderBox;
+        });
+    });
   }
 
   @override
@@ -97,10 +93,14 @@ class _PDFScreenState extends State<PDFScreen> {
               ),
             )
           : GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onDoubleTap: () {},
               onDoubleTapCancel: () {},
               onDoubleTapDown: (details) {},
               onLongPressStart: (details) => _addField(details.localPosition),
+              onScaleStart: (details) => print("Scale start"),
+              onScaleUpdate: (details) => print("Scale update"),
+              onScaleEnd: (details) => print("Scale end"),
               child: AspectRatio(
                 aspectRatio: pdfSize.aspectRatio,
                 child: Stack(
@@ -130,7 +130,9 @@ class _PDFScreenState extends State<PDFScreen> {
                             CustomField(
                               field: field,
                               mqd: MediaQuery.of(context),
-                              editFunction: _editField,
+                              onClick: (Field field) async {
+                                await _editField(context, field);
+                              },
                               pdfSizeOnScreen: pdfBox.size,
                               appbarHeight: appbar.preferredSize.height,
                             ),
@@ -159,17 +161,13 @@ class _PDFScreenState extends State<PDFScreen> {
     }
   }
 
-  Future<void> _editField(BuildContext context, Field field) async {
-    final Field f = await showModalBottomSheet(
+  Future<Field> _editField(BuildContext context, Field field) async {
+    // final Field f =
+    return await showModalBottomSheet(
         context: context,
         builder: (_) {
           return AddFieldForm(field);
         });
-    if (f != null)
-      setState(() {
-        _fields.removeWhere((rm) => rm.index == f.index);
-        _fields.add(f);
-      });
   }
 
   void _updateLists(int page) {
