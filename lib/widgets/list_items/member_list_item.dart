@@ -43,12 +43,9 @@ class _MemberListItemState extends State<MemberListItem> {
                       Switch(
                         activeColor: Theme.of(context).primaryColor,
                         onChanged: (bool value) {
-                          // setState(() {
-                          //   widget.isSelected = value;
-                          // });
                           widget.onSwitch(widget.name, value);
                         },
-                        value: widget.isSelected,
+                        value: widget.isSelected ?? false,
                       ),
                       IconButton(
                         icon: Icon(

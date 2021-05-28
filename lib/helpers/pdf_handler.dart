@@ -16,7 +16,7 @@ class PdfRawImage {
   PdfRawImage({this.data, this.size});
 }
 
-class _PdfFileHandler {
+class PdfFileHandler {
   static Future<File> getFileFromAssets(String filename) async {
     assert(filename != null);
     final byteData = await rootBundle.load(filename);
@@ -110,8 +110,8 @@ class PdfMutableDocument {
         _filePath = filePath;
 
   static Future<PdfMutableDocument> asset(String assetName) async {
-    var copy = await _PdfFileHandler.getFileFromAssets(assetName);
-    final rawImages = await _PdfFileHandler.loadPdf(copy.path);
+    var copy = await PdfFileHandler.getFileFromAssets(assetName);
+    final rawImages = await PdfFileHandler.loadPdf(copy.path);
     final pages =
         rawImages.map((raw) => PdfMutablePage(background: raw)).toList();
     return PdfMutableDocument._(
@@ -121,7 +121,7 @@ class PdfMutableDocument {
   static Future<PdfMutableDocument> path(String fullPath) async {
     var copy = File(fullPath); //work on a copy of the original
     final rawImages =
-        await _PdfFileHandler.loadPdf(copy.path); //convert pages to images
+        await PdfFileHandler.loadPdf(copy.path); //convert pages to images
     final pages = rawImages
         .map((raw) => PdfMutablePage(background: raw))
         .toList(); //convert images to pdf pages
@@ -140,6 +140,6 @@ class PdfMutableDocument {
   }
 
   Future<File> save({String filename}) async {
-    return _PdfFileHandler.save(build(), filename ?? _filePath);
+    return PdfFileHandler.save(build(), filename ?? _filePath);
   }
 }
