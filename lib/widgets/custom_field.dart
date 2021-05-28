@@ -7,16 +7,16 @@ class CustomField extends StatefulWidget {
   final Function onClick;
   final Size pdfSizeOnScreen;
   final double appbarHeight;
+  final Offset centerOffset;
   final double scale;
-  final Offset focalPoint;
   CustomField(
       {this.field,
       this.mqd,
       this.onClick,
       this.pdfSizeOnScreen,
-      this.scale,
-      this.focalPoint,
-      this.appbarHeight});
+      this.appbarHeight,
+      this.centerOffset,
+      this.scale});
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -35,12 +35,14 @@ class _CustomFieldState extends State<CustomField> {
       height: rectSize.height,
       width: rectSize.width,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
         border: Border.all(width: 1, color: Colors.green),
       ),
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Text(
-          '(${widget.field.hint}) ${widget.field.defaultValue}',
+          '${widget.field.offset}',
+          // '(${widget.field.hint}) ${widget.field.defaultValue}',
           style: TextStyle(
             fontSize: rectSize.height - 6,
           ),
@@ -51,10 +53,8 @@ class _CustomFieldState extends State<CustomField> {
     return Positioned(
       height: rectSize.height,
       width: rectSize.width,
-      top: widget.field.offset.dy *
-          widget.pdfSizeOnScreen.height, // / widget.scale,
-      left: widget.field.offset.dx *
-          widget.pdfSizeOnScreen.width, // / widget.scale,
+      top: widget.field.offset.dy * widget.pdfSizeOnScreen.height,
+      left: widget.field.offset.dx * widget.pdfSizeOnScreen.width,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => setState(() {
@@ -125,12 +125,17 @@ class _CustomFieldState extends State<CustomField> {
                   //subtract the height of the status bar and appbar
                   setState(() {
                     widget.field.offset = Offset(
-                        (details.offset.dx -
-                                widget.mqd.viewPadding.topLeft.dx) /
+                        ((details.offset.dx -
+                                        widget.mqd.viewPadding.topLeft.dx) /
+                                    widget.scale +
+                                widget.centerOffset.dx) /
                             widget.pdfSizeOnScreen.width,
-                        (details.offset.dy -
-                                widget.mqd.padding.top -
-                                widget.appbarHeight) /
+                        ((details.offset.dy -
+                                        widget.mqd.padding.top -
+                                        // 33 - //???
+                                        widget.appbarHeight) /
+                                    widget.scale +
+                                widget.centerOffset.dy) /
                             widget.pdfSizeOnScreen.height);
                   });
                 },
