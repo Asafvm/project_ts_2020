@@ -107,12 +107,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
               ),
               validator: (value) {
                 if (value.isEmpty && field.isMandatory)
-                  return 'Password cannot be empty';
+                  return 'Cannot be empty';
                 return null;
               },
             ),
           ),
-          if (field.suffix != null)
+          if (field.suffix.isNotEmpty)
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
@@ -138,6 +138,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 'Could not download report. Please check your internet connection.')));
         return;
       }
+
+      //update default values
+      widget.fields.forEach((field) {
+        field.defaultValue =
+            controllersArray.elementAt(widget.fields.indexOf(field)).text;
+      });
       //get signature
       Uint8List imagedata = await Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
@@ -154,10 +160,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       //display result
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => PDFScreen(
-          fields: [],
+          viewOnly: true,
           pathPDF: resultPath,
-          onlyFields: true,
-          instrumentID: widget.instrumentId,
         ),
       ));
     } catch (e, s) {

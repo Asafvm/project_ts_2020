@@ -74,7 +74,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                             MaterialPageRoute(
                               builder: (context) => PDFScreen(
                                 pathPDF: result.paths.first,
-                                instrumentID: widget.instrument.getCodeName(),
+                                instrument: widget.instrument,
                               ),
                             ), //documentID = Instrument document id
                           );
@@ -166,7 +166,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
           builder: (context) => PDFScreen(
             pathPDF: path,
             fields: fields,
-            instrumentID: widget.instrument.getCodeName(),
+            instrument: widget.instrument,
             onlyFields: true,
           ),
         ));

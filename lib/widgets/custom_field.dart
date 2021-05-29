@@ -5,6 +5,7 @@ class CustomField extends StatefulWidget {
   final Field field;
   final MediaQueryData mqd;
   final Function onClick;
+  final Function onDrag;
   final Size pdfSizeOnScreen;
   final double appbarHeight;
   final Offset centerOffset;
@@ -16,7 +17,8 @@ class CustomField extends StatefulWidget {
       this.pdfSizeOnScreen,
       this.appbarHeight,
       this.centerOffset,
-      this.scale});
+      this.scale,
+      this.onDrag});
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -121,24 +123,25 @@ class _CustomFieldState extends State<CustomField> {
               ])
             : Draggable(
                 data: widget.field.index,
-                onDragEnd: (details) {
-                  //subtract the height of the status bar and appbar
-                  setState(() {
-                    widget.field.offset = Offset(
-                        ((details.offset.dx -
-                                        widget.mqd.viewPadding.topLeft.dx) /
-                                    widget.scale +
-                                widget.centerOffset.dx) /
-                            widget.pdfSizeOnScreen.width,
-                        ((details.offset.dy -
-                                        widget.mqd.padding.top -
-                                        // 33 - //???
-                                        widget.appbarHeight) /
-                                    widget.scale +
-                                widget.centerOffset.dy) /
-                            widget.pdfSizeOnScreen.height);
-                  });
-                },
+                onDragEnd: (details) =>
+                    widget.onDrag(widget.field, details.offset),
+                //  {
+                //   //subtract the height of the status bar and appbar
+                //   setState(() {
+                //     widget.field.offset = Offset(
+                //         ((details.offset.dx -
+                //                         widget.mqd.viewPadding.topLeft.dx) /
+                //                     widget.scale +
+                //                 widget.centerOffset.dx) /
+                //             widget.pdfSizeOnScreen.width,
+                //         ((details.offset.dy -
+                //                         widget.mqd.padding.top -
+                //                         widget.appbarHeight) /
+                //                     widget.scale +
+                //                 widget.centerOffset.dy) /
+                //             widget.pdfSizeOnScreen.height);
+                //   });
+                // },
                 feedback: field,
                 child: field,
                 childWhenDragging: Container(),

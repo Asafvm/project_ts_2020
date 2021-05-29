@@ -186,9 +186,7 @@ class _FileExplorerState extends State<FileExplorer> {
                                     Navigator.of(context)
                                         .push(MaterialPageRoute(
                                       builder: (context) => PDFScreen(
-                                          fields: [],
-                                          instrumentID: "",
-                                          onlyFields: true,
+                                          viewOnly: true,
                                           pathPDF: files[index].path),
                                     ));
                                 },
