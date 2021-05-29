@@ -24,6 +24,7 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  double latMax, lngMax, latMin, lngMin;
   LatLng _pickedLocation;
   Set<Marker> markers = Set<Marker>();
 
@@ -73,10 +74,10 @@ class _MapScreenState extends State<MapScreen> {
     //calculate the center of an existing group of sites (if any)
     LatLng initialPos = LatLng(32.113540, 34.817882);
     if (sitesList.isNotEmpty) {
-      double latMax = sitesList.first.address.lat,
-          lngMax = sitesList.first.address.lng,
-          latMin = sitesList.first.address.lat,
-          lngMin = sitesList.first.address.lng;
+      latMax = sitesList.first.address.lat;
+      lngMax = sitesList.first.address.lng;
+      latMin = sitesList.first.address.lat;
+      lngMin = sitesList.first.address.lng;
       sitesList.forEach((site) => {
             markers.add(new Marker(
                 position: LatLng(site.address.lat, site.address.lng),
@@ -228,14 +229,14 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  Future<void> _setLocation(LatLng initialPos, [double zoom = 16]) async {
+  Future<void> _setLocation(LatLng initialPos, [double zoom = 14]) async {
     final GoogleMapController controller = await _controller.future;
 
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
         bearing: 0,
         target: LatLng(initialPos.latitude, initialPos.longitude),
-        zoom: zoom, //TODO: calculate zoom
+        zoom: zoom,
       ),
     ));
   }

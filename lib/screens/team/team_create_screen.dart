@@ -36,7 +36,6 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mqd = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Create"),

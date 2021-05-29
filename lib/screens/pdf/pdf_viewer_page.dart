@@ -160,69 +160,62 @@ class _PDFScreenState extends State<PDFScreen> {
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         width: 1, color: Colors.black)),
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.deferToChild,
-                                  onLongPressStart: (details) =>
-                                      _addField(details.localPosition),
-                                  child: InteractiveViewer(
-                                    maxScale: 3,
-                                    minScale: 1,
-                                    onInteractionUpdate: (details) {
-                                      _viewScaleRecorder = details.scale;
-                                    },
-                                    onInteractionEnd: (details) {
-                                      _viewScale =
-                                          (_viewScale * _viewScaleRecorder)
-                                              .clamp(1.0, 3.0)
-                                              .toDouble();
-                                      var vector3 = _transformController.value
-                                          .getTranslation();
-                                      setState(() {
-                                        _centerOffset =
-                                            -Offset(vector3[0], vector3[1]) /
-                                                _viewScale;
-                                      });
-                                    },
-                                    transformationController:
-                                        _transformController,
-                                    child: Stack(
-                                      clipBehavior: Clip.hardEdge,
-                                      children: <Widget>[
-                                        Image.memory(
-                                          snapshot.data
-                                              .elementAt(_actualPageNumber - 1)
-                                              .data,
-                                          key: _keyPDF,
-                                        ),
-                                        if (pdfBox != null)
-                                          for (Field field in _fields.where(
-                                              (field) =>
-                                                  field.page ==
-                                                  _actualPageNumber)) //put each field in a customfield wrapper
-                                            CustomField(
-                                              field: field,
-                                              centerOffset: _centerOffset,
-                                              scale: _viewScale,
-                                              mqd: MediaQuery.of(context),
-                                              onClick: (Field field) async {
-                                                await _editField(
-                                                    context, field);
-                                                setState(() {});
-                                              },
-                                              onDrag: (Field field,
-                                                  Offset dragDetails) {
-                                                setState(() {
-                                                  field.offset =
-                                                      calculateFieldOffset(
-                                                          dragDetails);
-                                                });
-                                              },
-                                              pdfSizeOnScreen: pdfBox.size,
-                                              appbarHeight:
-                                                  appbar.preferredSize.height,
-                                            ),
-                                      ],
-                                    ),
+                                child: InteractiveViewer(
+                                  maxScale: 3,
+                                  minScale: 1,
+                                  onInteractionUpdate: (details) {
+                                    _viewScaleRecorder = details.scale;
+                                  },
+                                  onInteractionEnd: (details) {
+                                    _viewScale =
+                                        (_viewScale * _viewScaleRecorder)
+                                            .clamp(1.0, 3.0)
+                                            .toDouble();
+                                    var vector3 = _transformController.value
+                                        .getTranslation();
+                                    setState(() {
+                                      _centerOffset =
+                                          -Offset(vector3[0], vector3[1]) /
+                                              _viewScale;
+                                    });
+                                  },
+                                  transformationController:
+                                      _transformController,
+                                  child: Stack(
+                                    clipBehavior: Clip.hardEdge,
+                                    children: <Widget>[
+                                      Image.memory(
+                                        snapshot.data
+                                            .elementAt(_actualPageNumber - 1)
+                                            .data,
+                                        key: _keyPDF,
+                                      ),
+                                      if (pdfBox != null)
+                                        for (Field field in _fields.where((field) =>
+                                            field.page ==
+                                            _actualPageNumber)) //put each field in a customfield wrapper
+                                          CustomField(
+                                            field: field,
+                                            centerOffset: _centerOffset,
+                                            scale: _viewScale,
+                                            mqd: MediaQuery.of(context),
+                                            onClick: (Field field) async {
+                                              await _editField(context, field);
+                                              setState(() {});
+                                            },
+                                            onDrag: (Field field,
+                                                Offset dragDetails) {
+                                              setState(() {
+                                                field.offset =
+                                                    calculateFieldOffset(
+                                                        dragDetails);
+                                              });
+                                            },
+                                            pdfSizeOnScreen: pdfBox.size,
+                                            appbarHeight:
+                                                appbar.preferredSize.height,
+                                          ),
+                                    ],
                                   ),
                                 ),
                               ),

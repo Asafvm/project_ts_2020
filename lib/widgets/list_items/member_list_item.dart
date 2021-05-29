@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MemberListItem extends StatefulWidget {
   final String name;
-  bool isSelected;
+  final bool isSelected;
   final Function onRemove;
   final Function onSwitch;
 
