@@ -86,10 +86,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                         Container(
                           padding: EdgeInsets.all(2),
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: Colors.grey,
-                            ),
+                            border: Border.all(),
                           ),
                           child: Image.network(
                             _previewImageUrl,
@@ -127,8 +124,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                           child: Container(
                             padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                                border:
-                                    Border.all(width: 1, color: Colors.black),
+                                border: Border.all(),
                                 borderRadius: BorderRadius.circular(15),
                                 color: Colors.white),
                             child: Material(
@@ -213,10 +209,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 1,
-                          color: Colors.black,
-                          style: BorderStyle.solid),
+                      border: Border.all(),
                     ),
                     child: TabBar(
                       controller: _tabController,

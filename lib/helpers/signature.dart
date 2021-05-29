@@ -29,8 +29,7 @@ class _SignatureHelperState extends State<SignatureHelper> {
         children: <Widget>[
           //SIGNATURE CANVAS
           Container(
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 5)),
+            decoration: BoxDecoration(border: Border.all(width: 5)),
             child: Signature(
               controller: _controller,
               height: 300,

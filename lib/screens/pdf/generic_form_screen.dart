@@ -141,8 +141,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
       //update default values
       widget.fields.forEach((field) {
-        field.defaultValue =
-            controllersArray.elementAt(widget.fields.indexOf(field)).text;
+        if (controllersArray
+            .elementAt(widget.fields.indexOf(field))
+            .text
+            .isNotEmpty)
+          field.defaultValue =
+              controllersArray.elementAt(widget.fields.indexOf(field)).text;
       });
       //get signature
       Uint8List imagedata = await Navigator.of(context)
@@ -177,8 +181,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     });
     //update default values
     widget.fields.forEach((field) {
-      field.defaultValue =
-          controllersArray.elementAt(widget.fields.indexOf(field)).text;
+      if (controllersArray
+          .elementAt(widget.fields.indexOf(field))
+          .text
+          .isNotEmpty)
+        field.defaultValue =
+            controllersArray.elementAt(widget.fields.indexOf(field)).text;
     });
     //upload fields
     var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(

@@ -44,7 +44,7 @@ class Field {
     }
   }
 
-  Field.basic({this.index, this.page, Offset initialPos}) {
+  Field.basic({this.index, this.page, Offset initialPos, Size size}) {
     this.hint = "";
     this.isText = true;
     this.regexp = "";
@@ -53,7 +53,8 @@ class Field {
     this.suffix = "";
     this.offset =
         Offset(initialPos.dx, initialPos.dy); // center around click point
-    this.size = Size(_defWidth, _defHeight);
+    this.size = Size(size == null ? _defWidth : size.width,
+        size == null ? _defHeight : size.height);
     this.isMandatory = false;
   }
 

@@ -196,8 +196,7 @@ class InfoCube extends StatelessWidget {
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        border:
-            Border.all(color: Colors.black, width: 3, style: BorderStyle.solid),
+        border: Border.all(width: 3),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -219,8 +218,7 @@ class InfoCube extends StatelessWidget {
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color: Colors.black, width: 1, style: BorderStyle.solid),
+                border: Border.all(),
               ),
               child: child,
             ),

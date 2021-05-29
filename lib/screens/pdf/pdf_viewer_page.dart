@@ -71,24 +71,23 @@ class _PDFScreenState extends State<PDFScreen> {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                    width: 1, color: color, style: BorderStyle.solid)),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: color),
+            ),
             child: Text(
               title,
               textAlign: TextAlign.center,
             )),
         feedback: Container(
-            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                    width: 1, color: color, style: BorderStyle.solid)),
-            child: Material(
-                child: Text(
+          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+          decoration: BoxDecoration(border: Border.all(color: color)),
+          child: Material(
+            child: Text(
               title,
               textAlign: TextAlign.center,
-            ))),
+            ),
+          ),
+        ),
       );
 
   @override
@@ -208,6 +207,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                               onClick: (Field field) async {
                                                 await _editField(
                                                     context, field);
+                                                setState(() {});
                                               },
                                               onDrag: (Field field,
                                                   Offset dragDetails) {
@@ -229,37 +229,37 @@ class _PDFScreenState extends State<PDFScreen> {
                             ),
                           ),
                           Container(
-                            decoration: BoxDecoration(
-                                border:
-                                    Border.all(width: 1, color: Colors.black)),
+                            decoration: BoxDecoration(border: Border.all()),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 OutlinedButton.icon(
                                     style: outlinedButtonStyle,
-                                    onPressed: () {
-                                      if (_actualPageNumber == 1) return;
-                                      if (_actualPageNumber > 1) {
-                                        setState(() {
-                                          _actualPageNumber--;
-                                        });
-                                      }
-                                    },
+                                    onPressed: _actualPageNumber == 1
+                                        ? null
+                                        : () {
+                                            if (_actualPageNumber > 1) {
+                                              setState(() {
+                                                _actualPageNumber--;
+                                              });
+                                            }
+                                          },
                                     icon: Icon(Icons.chevron_left),
                                     label: Text('Previous')),
                                 Text(
                                     'Page $_actualPageNumber / ${images.length}'),
                                 OutlinedButton.icon(
                                   style: outlinedButtonStyle,
-                                  onPressed: () {
-                                    if (_actualPageNumber == images.length)
-                                      return;
-                                    if (_actualPageNumber < images.length) {
-                                      setState(() {
-                                        _actualPageNumber++;
-                                      });
-                                    }
-                                  },
+                                  onPressed: _actualPageNumber == images.length
+                                      ? null
+                                      : () {
+                                          if (_actualPageNumber <
+                                              images.length) {
+                                            setState(() {
+                                              _actualPageNumber++;
+                                            });
+                                          }
+                                        },
                                   label: Text('Next'),
                                   icon: Icon(Icons.chevron_right),
                                 )
@@ -269,9 +269,7 @@ class _PDFScreenState extends State<PDFScreen> {
                           if (!widget.viewOnly)
                             Expanded(
                                 child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1, color: Colors.black)),
+                              decoration: BoxDecoration(border: Border.all()),
                               child: DragTarget(builder:
                                   (context, candidateData, rejectedData) {
                                 return GridView.count(
@@ -282,7 +280,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                   mainAxisSpacing: 5,
                                   crossAxisSpacing: 5,
                                   children: [
-                                    _buildDraggable('field', Colors.green),
+                                    _buildDraggable('Field', Colors.green),
                                     _buildDraggable('Technician', Colors.blue),
                                     if (widget.site != null)
                                       _buildDraggable('Site', Colors.orange),
@@ -314,8 +312,9 @@ class _PDFScreenState extends State<PDFScreen> {
       index: _fieldIndex,
       page: _actualPageNumber,
       initialPos: calculateFieldOffset(pos),
-
-      //save offset as ratio
+      size: _fields.isNotEmpty
+          ? _fields.last.size
+          : null, //keep same size from the last field
     );
     if (f != null) {
       setState(() {

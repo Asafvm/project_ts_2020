@@ -21,7 +21,7 @@ class AdminMenuScreen extends StatelessWidget {
       BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(width: 3, color: Colors.black),
+        border: Border.all(width: 3),
         borderRadius: BorderRadius.all(Radius.circular(25)),
         boxShadow: [
           BoxShadow(

@@ -34,17 +34,20 @@ class _CustomFieldState extends State<CustomField> {
     Size rectSize = widget.field.size; // * widget.scale;
 
     var field = Container(
-      height: rectSize.height,
-      width: rectSize.width,
+      height: rectSize.height * widget.scale,
+      width: rectSize.width * widget.scale,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        border: Border.all(width: 1, color: Colors.green),
+        border: Border.all(
+            color: '${widget.field.hint} ${widget.field.defaultValue}'
+                    .trim()
+                    .isNotEmpty
+                ? Colors.green
+                : Colors.deepOrange),
       ),
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Text(
-          '${widget.field.offset}',
-          // '(${widget.field.hint}) ${widget.field.defaultValue}',
+          '${widget.field.hint} ${widget.field.defaultValue}',
           style: TextStyle(
             fontSize: rectSize.height - 6,
           ),
@@ -125,23 +128,6 @@ class _CustomFieldState extends State<CustomField> {
                 data: widget.field.index,
                 onDragEnd: (details) =>
                     widget.onDrag(widget.field, details.offset),
-                //  {
-                //   //subtract the height of the status bar and appbar
-                //   setState(() {
-                //     widget.field.offset = Offset(
-                //         ((details.offset.dx -
-                //                         widget.mqd.viewPadding.topLeft.dx) /
-                //                     widget.scale +
-                //                 widget.centerOffset.dx) /
-                //             widget.pdfSizeOnScreen.width,
-                //         ((details.offset.dy -
-                //                         widget.mqd.padding.top -
-                //                         widget.appbarHeight) /
-                //                     widget.scale +
-                //                 widget.centerOffset.dy) /
-                //             widget.pdfSizeOnScreen.height);
-                //   });
-                // },
                 feedback: field,
                 child: field,
                 childWhenDragging: Container(),

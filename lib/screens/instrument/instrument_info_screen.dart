@@ -58,11 +58,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1,
-                    style: BorderStyle.solid,
-                  ),
+                  border: Border.all(),
                 ),
                 child: Row(
                   children: [
@@ -181,11 +177,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
               flex: _showGraph ? 3 : 7,
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1,
-                    style: BorderStyle.solid,
-                  ),
+                  border: Border.all(),
                 ),
                 child: DefaultTabController(
                   initialIndex: 0,
