@@ -3,22 +3,22 @@ import 'package:teamshare/models/field.dart';
 
 class CustomField extends StatefulWidget {
   final Field field;
-  final MediaQueryData mqd;
   final Function onClick;
   final Function onDrag;
   final Size pdfSizeOnScreen;
   final double appbarHeight;
   final Offset centerOffset;
   final double scale;
+  final Color color;
   CustomField(
       {this.field,
-      this.mqd,
       this.onClick,
       this.pdfSizeOnScreen,
       this.appbarHeight,
       this.centerOffset,
       this.scale,
-      this.onDrag});
+      this.onDrag,
+      this.color});
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -28,6 +28,7 @@ const ballDiameter = 8.0;
 
 class _CustomFieldState extends State<CustomField> {
   bool _selected = false;
+  Offset before;
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +38,12 @@ class _CustomFieldState extends State<CustomField> {
       height: rectSize.height * widget.scale,
       width: rectSize.width * widget.scale,
       decoration: BoxDecoration(
+        color: widget.color.withAlpha(50),
         border: Border.all(
             color: '${widget.field.hint} ${widget.field.defaultValue}'
                     .trim()
                     .isNotEmpty
-                ? Colors.green
+                ? widget.color
                 : Colors.deepOrange),
       ),
       child: Padding(
@@ -125,6 +127,11 @@ class _CustomFieldState extends State<CustomField> {
                 ),
               ])
             : Draggable(
+                onDraggableCanceled: (velocity, offset) {
+                  widget.field.offset = before;
+                },
+                onDragStarted: () => before = widget.field.offset,
+                dragAnchor: DragAnchor.pointer,
                 data: widget.field.index,
                 onDragEnd: (details) =>
                     widget.onDrag(widget.field, details.offset),

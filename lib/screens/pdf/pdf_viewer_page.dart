@@ -49,10 +49,6 @@ class _PDFScreenState extends State<PDFScreen> {
   static final int _initialPage = 1;
   int _actualPageNumber = _initialPage;
 
-  final appbar = AppBar(
-    title: Text('Creating Form'),
-  );
-
   double _viewScaleRecorder = 1.0;
   double _viewScale = 1.0;
 
@@ -61,18 +57,22 @@ class _PDFScreenState extends State<PDFScreen> {
 
   var _transformController = TransformationController();
 
-  Widget _buildDraggable(String title, Color color) => Draggable(
+  double _maxScale = 3.0;
+  double _minScale = 1.0;
+
+  Widget _buildDraggable(String title, FieldType type) => Draggable(
         data: 'field',
         dragAnchor: DragAnchor.pointer,
-        onDragEnd: (details) => _addField(details.offset),
+        onDragEnd: (details) => _addField(details.offset, type),
         feedbackOffset: Offset(50, 50),
         child: Container(
             margin: const EdgeInsets.all(8),
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
             decoration: BoxDecoration(
+              color: _getColor(type).withAlpha(50),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: color),
+              border: Border.all(color: _getColor(type)),
             ),
             child: Text(
               title,
@@ -80,7 +80,7 @@ class _PDFScreenState extends State<PDFScreen> {
             )),
         feedback: Container(
           padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-          decoration: BoxDecoration(border: Border.all(color: color)),
+          decoration: BoxDecoration(border: Border.all(color: _getColor(type))),
           child: Material(
             child: Text(
               title,
@@ -117,16 +117,15 @@ class _PDFScreenState extends State<PDFScreen> {
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: appbar,
-        floatingActionButton: Visibility(
-          visible: !widget.viewOnly,
-          child: FloatingActionButton(
-            onPressed: _savePDF,
-            child: Icon(
-              Icons.save,
-              color: Colors.white,
-            ),
-          ),
+        appBar: AppBar(
+          actions: [
+            if (!widget.viewOnly)
+              IconButton(
+                icon: Icon(Icons.save),
+                onPressed: _savePDF,
+              ),
+          ],
+          title: Text('Creating Form'),
         ),
         body: _uploading
             ? Center(
@@ -161,16 +160,19 @@ class _PDFScreenState extends State<PDFScreen> {
                                     border: Border.all(
                                         width: 1, color: Colors.black)),
                                 child: InteractiveViewer(
-                                  maxScale: 3,
-                                  minScale: 1,
+                                  maxScale: _maxScale,
+                                  minScale: _minScale,
                                   onInteractionUpdate: (details) {
+                                    //get the lastest scale
                                     _viewScaleRecorder = details.scale;
                                   },
                                   onInteractionEnd: (details) {
+                                    //calcualte relative scale
                                     _viewScale =
                                         (_viewScale * _viewScaleRecorder)
-                                            .clamp(1.0, 3.0)
+                                            .clamp(_minScale, _maxScale)
                                             .toDouble();
+                                    //find the offset
                                     var vector3 = _transformController.value
                                         .getTranslation();
                                     setState(() {
@@ -181,48 +183,56 @@ class _PDFScreenState extends State<PDFScreen> {
                                   },
                                   transformationController:
                                       _transformController,
-                                  child: Stack(
-                                    clipBehavior: Clip.hardEdge,
-                                    children: <Widget>[
-                                      Image.memory(
-                                        snapshot.data
-                                            .elementAt(_actualPageNumber - 1)
-                                            .data,
-                                        key: _keyPDF,
-                                      ),
-                                      if (pdfBox != null)
-                                        for (Field field in _fields.where((field) =>
-                                            field.page ==
-                                            _actualPageNumber)) //put each field in a customfield wrapper
-                                          CustomField(
-                                            field: field,
-                                            centerOffset: _centerOffset,
-                                            scale: _viewScale,
-                                            mqd: MediaQuery.of(context),
-                                            onClick: (Field field) async {
-                                              await _editField(context, field);
-                                              setState(() {});
-                                            },
-                                            onDrag: (Field field,
-                                                Offset dragDetails) {
-                                              setState(() {
-                                                field.offset =
-                                                    calculateFieldOffset(
-                                                        dragDetails);
-                                              });
-                                            },
-                                            pdfSizeOnScreen: pdfBox.size,
-                                            appbarHeight:
-                                                appbar.preferredSize.height,
-                                          ),
-                                    ],
+                                  child: DragTarget(
+                                    builder: (context, candidateData,
+                                            rejectedData) =>
+                                        Stack(
+                                      clipBehavior: Clip.hardEdge,
+                                      children: <Widget>[
+                                        Image.memory(
+                                          snapshot.data
+                                              .elementAt(_actualPageNumber - 1)
+                                              .data,
+                                          key: _keyPDF,
+                                        ),
+                                        if (pdfBox != null)
+                                          for (Field field in _fields.where(
+                                              (field) =>
+                                                  field.page ==
+                                                  _actualPageNumber)) //put each field in a customfield wrapper
+                                            CustomField(
+                                                color: _getColor(field.type),
+                                                field: field,
+                                                centerOffset: _centerOffset,
+                                                scale: _viewScale,
+                                                onClick: (Field field) async {
+                                                  await _editField(
+                                                      context, field);
+                                                  setState(() {});
+                                                },
+                                                onDrag: (Field field,
+                                                    Offset dragDetails) {
+                                                  setState(() {
+                                                    field.offset =
+                                                        calculateFieldOffset(
+                                                            dragDetails);
+                                                  });
+                                                },
+                                                pdfSizeOnScreen: pdfBox.size,
+                                                appbarHeight: AppBar()
+                                                    .preferredSize
+                                                    .height),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                           Container(
-                            decoration: BoxDecoration(border: Border.all()),
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    left: BorderSide(), right: BorderSide())),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -268,17 +278,23 @@ class _PDFScreenState extends State<PDFScreen> {
                                 return GridView.count(
                                   crossAxisCount: 3,
                                   physics: BouncingScrollPhysics(),
-                                  childAspectRatio: 5 / 3,
+                                  childAspectRatio: 1 / 1,
                                   shrinkWrap: true,
-                                  mainAxisSpacing: 5,
-                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 3,
+                                  crossAxisSpacing: 15,
                                   children: [
-                                    _buildDraggable('Field', Colors.green),
-                                    _buildDraggable('Technician', Colors.blue),
+                                    _buildDraggable('Text', FieldType.Text),
+                                    _buildDraggable('123', FieldType.Num),
+                                    _buildDraggable('Date', FieldType.Date),
+                                    _buildDraggable(
+                                        'Signature', FieldType.Signature),
+                                    _buildDraggable(
+                                        'Checkbox', FieldType.Check),
                                     if (widget.site != null)
-                                      _buildDraggable('Site', Colors.orange),
+                                      _buildDraggable('Site', FieldType.Text),
                                     if (widget.instrument != null)
-                                      _buildDraggable('Instrument', Colors.grey)
+                                      _buildDraggable(
+                                          'Instrument', FieldType.Text)
                                   ],
                                 );
                               }),
@@ -300,8 +316,9 @@ class _PDFScreenState extends State<PDFScreen> {
     );
   }
 
-  Future<void> _addField(Offset pos) async {
+  Future<void> _addField(Offset pos, FieldType type) async {
     final Field f = Field.basic(
+      type: type,
       index: _fieldIndex,
       page: _actualPageNumber,
       initialPos: calculateFieldOffset(pos),
@@ -327,7 +344,7 @@ class _PDFScreenState extends State<PDFScreen> {
         ((pos.dy -
                         mqd.viewInsets.top -
                         mqd.viewPadding.top -
-                        appbar.preferredSize.height) /
+                        AppBar().preferredSize.height) /
                     _viewScale +
                 _centerOffset.dy) /
             pdfBox.size.height);
@@ -410,5 +427,28 @@ class _PDFScreenState extends State<PDFScreen> {
     await showDialog(
             context: context, builder: (_) => _buildAlertDialog(messege))
         .then((value) => Navigator.of(context).pop());
+  }
+
+  _getColor(FieldType type) {
+    switch (type) {
+      case FieldType.Text:
+        return Colors.green;
+        break;
+      case FieldType.Num:
+        return Colors.green;
+        break;
+      case FieldType.Date:
+        return Colors.green;
+        break;
+      case FieldType.Check:
+        return Colors.yellow;
+        break;
+      case FieldType.Signature:
+        return Colors.blue;
+        break;
+
+      default:
+        return Colors.green;
+    }
   }
 }

@@ -107,3 +107,5 @@ const String entries = "entries";
 const String reports = "reports";
 const String report_templates = "report_templates";
 const String images = "images";
+
+enum FieldType { Text, Num, Date, Check, Signature }

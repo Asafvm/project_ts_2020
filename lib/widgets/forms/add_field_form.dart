@@ -14,12 +14,33 @@ class AddFieldForm extends StatefulWidget {
 }
 
 class _AddFieldFormState extends State<AddFieldForm> {
-  String _typeValue = 'Text';
-  String _mandatoryValue = 'No';
   final _fieldForm = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    switch (widget.field.type) {
+      case FieldType.Text:
+        return _buildGeneralField(context);
+        break;
+      case FieldType.Num:
+        return _buildGeneralField(context);
+        break;
+      case FieldType.Date:
+        return _buildDateField(context);
+        break;
+      case FieldType.Check:
+        return _buildCheckboxField(context);
+        break;
+      case FieldType.Signature:
+        return _buildSignatureField(context);
+        break;
+      default:
+        return _buildGeneralField(context);
+        break;
+    }
+  }
+
+  SingleChildScrollView _buildGeneralField(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.only(
           left: 10,
@@ -32,17 +53,37 @@ class _AddFieldFormState extends State<AddFieldForm> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            TextFormField(
-              initialValue: widget.field.hint,
-              decoration: InputDecoration(labelText: 'Description'),
-              keyboardType: TextInputType.text,
-              onSaved: (val) {
-                widget.field.hint = val ?? '';
-              },
-              validator: (value) {
-                if (value.isEmpty) return "Enter field's name";
-                return null;
-              },
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: TextFormField(
+                    initialValue: widget.field.hint,
+                    decoration: InputDecoration(labelText: 'Description'),
+                    keyboardType: TextInputType.text,
+                    onSaved: (val) {
+                      widget.field.hint = val ?? '';
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) return "Enter field's name";
+                      return null;
+                    },
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text("Mandatory?"),
+                    Switch.adaptive(
+                      value: widget.field.isMandatory,
+                      onChanged: (value) {
+                        setState(() {
+                          widget.field.isMandatory = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
             Row(
               children: <Widget>[
@@ -63,16 +104,14 @@ class _AddFieldFormState extends State<AddFieldForm> {
                   child: TextFormField(
                     initialValue: widget.field.defaultValue,
                     decoration: InputDecoration(labelText: 'Default Value'),
-                    keyboardType: TextInputType.number,
+                    keyboardType: widget.field.type == FieldType.Text
+                        ? TextInputType.text
+                        : TextInputType.number,
                     onSaved: (val) {
                       widget.field.defaultValue = val;
                     },
                     validator: (value) {
-                      if (widget.field.isText) {
-                        try {} catch (e) {
-                          return "Text only";
-                        }
-                      } else {
+                      if (widget.field.type == FieldType.Num) {
                         try {
                           int.parse(value);
                         } catch (e) {
@@ -93,57 +132,6 @@ class _AddFieldFormState extends State<AddFieldForm> {
                     onSaved: (val) {
                       widget.field.suffix = val;
                     },
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Flexible(
-                  flex: 3,
-                  child: DropdownButtonFormField(
-                    value: _typeValue,
-                    decoration: InputDecoration(labelText: 'Input Type'),
-                    onSaved: (val) {
-                      widget.field.isText = (val == 'Text');
-                    },
-                    onChanged: (String newValue) {
-                      setState(() {
-                        widget.field.isText = (newValue == 'Text');
-                        _typeValue = newValue ?? 'Text';
-                      });
-                    },
-                    items: <String>['Text', 'Number', 'Decimal']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Spacer(),
-                Flexible(
-                  flex: 3,
-                  child: DropdownButtonFormField(
-                    value: _mandatoryValue,
-                    decoration: InputDecoration(labelText: 'Mandatory?'),
-                    onSaved: (val) {
-                      widget.field.isMandatory = (val == 'Yes');
-                    },
-                    onChanged: (String newValue) {
-                      setState(() {
-                        _mandatoryValue = newValue ?? 'No';
-                        widget.field.isMandatory = (newValue == 'No');
-                      });
-                    },
-                    items: <String>['Yes', 'No']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
                   ),
                 ),
               ],
@@ -174,6 +162,138 @@ class _AddFieldFormState extends State<AddFieldForm> {
               ),
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckboxField(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+          left: 10,
+          top: 10,
+          right: 10,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+      child: Form(
+        key: _fieldForm,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Check by default?"),
+                Switch.adaptive(
+                  value: widget.field.isMandatory,
+                  onChanged: (value) {
+                    setState(() {
+                      widget.field.isMandatory = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: TextButton(
+                onPressed: () async {
+                  FormState formState = _fieldForm.currentState;
+                  if (formState != null) {
+                    if (formState.validate()) {
+                      formState.save();
+                      Navigator.of(context)
+                          .pop(widget.field); //retuen the new Field object}
+                    }
+                  } else {
+                    Applogger.consoleLog(
+                        MessegeType.error, 'Error saving form');
+                  }
+                },
+                child: Text(
+                  'Save Field',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith(getColor),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateField(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+          left: 10,
+          top: 10,
+          right: 10,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+      child: Form(
+        key: _fieldForm,
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 20),
+          child: TextButton(
+            onPressed: () async {
+              FormState formState = _fieldForm.currentState;
+              if (formState != null) {
+                if (formState.validate()) {
+                  formState.save();
+                  Navigator.of(context)
+                      .pop(widget.field); //retuen the new Field object}
+                }
+              } else {
+                Applogger.consoleLog(MessegeType.error, 'Error saving form');
+              }
+            },
+            child: Text(
+              'Save Field',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith(getColor),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignatureField(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+          left: 10,
+          top: 10,
+          right: 10,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+      child: Form(
+        key: _fieldForm,
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 20),
+          child: TextButton(
+            onPressed: () async {
+              FormState formState = _fieldForm.currentState;
+              if (formState != null) {
+                if (formState.validate()) {
+                  formState.save();
+                  Navigator.of(context)
+                      .pop(widget.field); //retuen the new Field object}
+                }
+              } else {
+                Applogger.consoleLog(MessegeType.error, 'Error saving form');
+              }
+            },
+            child: Text(
+              'Save Field',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith(getColor),
+            ),
+          ),
         ),
       ),
     );

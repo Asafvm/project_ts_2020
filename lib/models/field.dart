@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:teamshare/providers/consts.dart';
 
 class Field {
+  final FieldType type;
   final double _minWidth = 10;
   final double _minHeight = 10;
   final double _defWidth = 40;
@@ -14,16 +16,15 @@ class Field {
   final int page;
   Offset offset;
   Size size;
-  bool isText;
+
   String regexp;
   String prefix;
   String suffix;
   bool isMandatory;
 
-  Field(
+  Field(this.type,
       {this.index,
       this.hint,
-      this.isText,
       this.regexp = '',
       this.prefix,
       this.defaultValue = '',
@@ -44,9 +45,10 @@ class Field {
     }
   }
 
-  Field.basic({this.index, this.page, Offset initialPos, Size size}) {
+  Field.basic(
+      {this.type, this.index, this.page, Offset initialPos, Size size}) {
     this.hint = "";
-    this.isText = true;
+
     this.regexp = "";
     this.prefix = "";
     this.defaultValue = "";
@@ -59,19 +61,20 @@ class Field {
   }
 
   Field.fromJson(Map<String, dynamic> data)
-      : defaultValue = data['defaultValue'],
+      : type = FieldType.values[data["type"]] ?? FieldType.Text,
+        defaultValue = data['defaultValue'],
         index = data['index'],
         hint = data['hint'] ?? '',
         page = data['page'],
         offset = Offset(data['offsetX'], data['offsetY']),
         size = Size(data['sizeW'].toDouble(), data['sizeH'].toDouble()),
-        isText = data['isText'],
         regexp = data['regexp'] ?? '',
         prefix = data['prefix'] ?? '',
         suffix = data['suffix'] ?? '',
         isMandatory = data['isMandatory'];
 
   Map<String, dynamic> toJson() => {
+        'type': type.index,
         'defaultValue': defaultValue,
         'index': index,
         'hint': hint,
@@ -80,7 +83,6 @@ class Field {
         'offsetY': offset.dy,
         'sizeW': size.width,
         'sizeH': size.height,
-        'isText': isText,
         'regexp': regexp,
         'prefix': prefix,
         'suffix': suffix,

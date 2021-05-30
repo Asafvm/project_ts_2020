@@ -357,7 +357,7 @@ class ReportGraph extends StatelessWidget {
 
             //list graphable fields (feature titles)
             List<String> titles = reports.first.fields
-                    .where((field) => !field.isText)
+                    .where((field) => field.type == FieldType.Num)
                     .map((field) => field.hint)
                     .toList() ??
                 [];
