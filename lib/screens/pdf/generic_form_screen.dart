@@ -82,7 +82,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     switch (field.type) {
       case FieldType.Text:
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -132,7 +132,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         break;
       case FieldType.Num:
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -185,7 +185,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         break;
       case FieldType.Check:
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

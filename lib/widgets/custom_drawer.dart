@@ -110,11 +110,6 @@ class CustomDrawer extends StatelessWidget {
                     )
                   : Container(),
             ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {},
-            ),
             Divider(),
             ListTile(
               leading: Icon(Icons.loop),

@@ -48,7 +48,7 @@ class PdfHelper {
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
             child: pdfWidgets.Padding(
-              padding: const pdfWidgets.EdgeInsets.all(5),
+              padding: const pdfWidgets.EdgeInsets.all(3),
               child: pdfWidgets.Text(
                 formatter.format(DateTime.fromMillisecondsSinceEpoch(
                     DateTime.now().millisecondsSinceEpoch)),
@@ -64,13 +64,10 @@ class PdfHelper {
           item: pdfWidgets.Positioned(
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
-            child: pdfWidgets.Padding(
-              padding: const pdfWidgets.EdgeInsets.all(5),
-              child: pdfWidgets.Text(
-                field.isMandatory ? 'X' : '',
-                style: pdfWidgets.TextStyle(
-                  fontSize: field.size.height,
-                ),
+            child: pdfWidgets.Text(
+              field.isMandatory ? 'X' : '',
+              style: pdfWidgets.TextStyle(
+                fontSize: field.size.height,
               ),
             ),
           ),

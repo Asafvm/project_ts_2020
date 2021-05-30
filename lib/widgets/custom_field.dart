@@ -50,7 +50,9 @@ class _CustomFieldState extends State<CustomField> {
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Text(
-          '${widget.field.hint} ${widget.field.defaultValue}',
+          widget.field.type == FieldType.Date
+              ? 'DD-MM-YYYY'
+              : '${widget.field.hint} ${widget.field.defaultValue}',
           style: TextStyle(
             fontSize: rectSize.height - 6,
           ),

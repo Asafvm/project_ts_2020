@@ -4,8 +4,6 @@ import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/consts.dart';
 
-//TODO: finish form
-
 class AddFieldForm extends StatefulWidget {
   final Field field;
   AddFieldForm(this.field);
@@ -190,6 +188,7 @@ class _AddFieldFormState extends State<AddFieldForm> {
               initialValue: widget.field.prefix,
               decoration: InputDecoration(labelText: 'Prefix'),
               keyboardType: TextInputType.text,
+              validator: (value) => value.isEmpty ? 'Must not be empty' : null,
               onSaved: (val) {
                 widget.field.prefix = val ?? '';
               },
