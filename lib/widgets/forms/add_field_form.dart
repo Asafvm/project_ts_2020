@@ -53,6 +53,12 @@ class _AddFieldFormState extends State<AddFieldForm> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
+            Text(
+              widget.field.type == FieldType.Text
+                  ? 'Text Field'
+                  : 'Numeric Field',
+              textAlign: TextAlign.center,
+            ),
             Row(
               children: [
                 Expanded(
@@ -180,6 +186,14 @@ class _AddFieldFormState extends State<AddFieldForm> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
+            TextFormField(
+              initialValue: widget.field.prefix,
+              decoration: InputDecoration(labelText: 'Prefix'),
+              keyboardType: TextInputType.text,
+              onSaved: (val) {
+                widget.field.prefix = val ?? '';
+              },
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

@@ -7,6 +7,7 @@ import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/helpers/signature.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
@@ -78,54 +79,141 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   }
 
   _buildGenericField(Field field) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (field.prefix.isNotEmpty)
-            Flexible(
-                flex: 3,
+    switch (field.type) {
+      case FieldType.Text:
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (field.prefix.isNotEmpty)
+                Flexible(
+                    flex: 3,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      field.prefix,
+                      textAlign: TextAlign.start,
+                    )),
+              Flexible(
+                flex: 2,
                 fit: FlexFit.tight,
-                child: Text(
-                  field.prefix,
-                  textAlign: TextAlign.start,
-                )),
-          Flexible(
-            flex: 2,
-            fit: FlexFit.tight,
-            child: TextFormField(
-              enabled: !_loading,
-              controller: controllersArray[widget.fields.indexOf(field)],
-              maxLength: (field.size.width / (field.size.height / 2.50))
-                  .round(), //width of field / width of character
-              decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.grey),
-                hintText: field.defaultValue,
-                labelText: field.hint,
-                labelStyle: TextStyle(color: Colors.black),
+                child: TextFormField(
+                  enabled: !_loading,
+                  controller: controllersArray[widget.fields.indexOf(field)],
+                  maxLength: (field.size.width / (field.size.height / 2.50))
+                      .round(), //width of field / width of character
+                  decoration: InputDecoration(
+                    hintStyle: TextStyle(color: Colors.grey),
+                    hintText: field.defaultValue,
+                    labelText: field.hint,
+                    labelStyle: TextStyle(color: Colors.black),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty && field.isMandatory)
+                      return 'Cannot be empty';
+                    return null;
+                  },
+                ),
               ),
-              validator: (value) {
-                if (value.isEmpty && field.isMandatory)
-                  return 'Cannot be empty';
-                return null;
-              },
-            ),
+              if (field.suffix.isNotEmpty)
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: Text(
+                    field.suffix,
+                    textAlign: TextAlign.start,
+                  ),
+                )
+              else
+                Flexible(flex: 1, fit: FlexFit.tight, child: SizedBox()),
+            ],
           ),
-          if (field.suffix.isNotEmpty)
-            Flexible(
-              flex: 1,
-              fit: FlexFit.tight,
-              child: Text(
-                field.suffix,
-                textAlign: TextAlign.start,
+        );
+        break;
+      case FieldType.Num:
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (field.prefix.isNotEmpty)
+                Flexible(
+                    flex: 3,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      field.prefix,
+                      textAlign: TextAlign.start,
+                    )),
+              Flexible(
+                flex: 2,
+                fit: FlexFit.tight,
+                child: TextFormField(
+                  enabled: !_loading,
+                  controller: controllersArray[widget.fields.indexOf(field)],
+                  maxLength: (field.size.width / (field.size.height / 2.50))
+                      .round(), //width of field / width of character
+                  decoration: InputDecoration(
+                    hintStyle: TextStyle(color: Colors.grey),
+                    hintText: field.defaultValue,
+                    labelText: field.hint,
+                    labelStyle: TextStyle(color: Colors.black),
+                  ),
+                  validator: (value) {
+                    if (value.isEmpty && field.isMandatory)
+                      return 'Cannot be empty';
+                    return null;
+                  },
+                ),
               ),
-            )
-          else
-            Flexible(flex: 1, fit: FlexFit.tight, child: SizedBox()),
-        ],
-      ),
-    );
+              if (field.suffix.isNotEmpty)
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: Text(
+                    field.suffix,
+                    textAlign: TextAlign.start,
+                  ),
+                )
+              else
+                Flexible(flex: 1, fit: FlexFit.tight, child: SizedBox()),
+            ],
+          ),
+        );
+        break;
+      case FieldType.Date:
+        return Container();
+        break;
+      case FieldType.Check:
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (field.prefix.isNotEmpty)
+                Expanded(
+                    flex: 3,
+                    child: Text(
+                      field.prefix,
+                      textAlign: TextAlign.start,
+                    )),
+              Expanded(
+                flex: 1,
+                child: Checkbox(
+                    value: field.isMandatory,
+                    onChanged: (value) {
+                      setState(() {
+                        field.isMandatory = value;
+                      });
+                    }),
+              ),
+            ],
+          ),
+        );
+        break;
+      case FieldType.Signature:
+        return Container();
+        break;
+    }
   }
 
   Future<void> _preview(BuildContext context) async {
@@ -140,7 +228,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       }
 
       //update default values
-      widget.fields.forEach((field) {
+      widget.fields
+          .where((field) =>
+              field.type == FieldType.Text || field.type == FieldType.Num)
+          .forEach((field) {
         if (controllersArray
             .elementAt(widget.fields.indexOf(field))
             .text
@@ -148,9 +239,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           field.defaultValue =
               controllersArray.elementAt(widget.fields.indexOf(field)).text;
       });
-      //get signature
-      Uint8List imagedata = await Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
+      //get signature if needed
+      Uint8List imagedata;
+      if (widget.fields
+          .where((element) => element.type == FieldType.Signature)
+          .isNotEmpty)
+        imagedata = await Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
       //compose pdf
       String resultPath = await PdfHelper.createPdf(
         fields: widget.fields,
@@ -180,7 +275,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       _loading = true;
     });
     //update default values
-    widget.fields.forEach((field) {
+    widget.fields
+        .where((field) =>
+            field.type == FieldType.Text || field.type == FieldType.Num)
+        .forEach((field) {
       if (controllersArray
           .elementAt(widget.fields.indexOf(field))
           .text

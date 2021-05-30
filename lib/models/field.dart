@@ -59,6 +59,20 @@ class Field {
         size == null ? _defHeight : size.height);
     this.isMandatory = false;
   }
+  Field.checkbox(
+      {this.type, this.index, this.page, Offset initialPos, Size size}) {
+    this.hint = "";
+
+    this.regexp = "";
+    this.prefix = "";
+    this.defaultValue = "";
+    this.suffix = "";
+    this.offset =
+        Offset(initialPos.dx, initialPos.dy); // center around click point
+    this.size = Size(size == null ? _defHeight : size.height,
+        size == null ? _defHeight : size.height);
+    this.isMandatory = false;
+  }
 
   Field.fromJson(Map<String, dynamic> data)
       : type = FieldType.values[data["type"]] ?? FieldType.Text,

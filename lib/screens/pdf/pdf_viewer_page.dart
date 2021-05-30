@@ -41,11 +41,8 @@ class _PDFScreenState extends State<PDFScreen> {
   AlwaysStoppedAnimation<Color> _progressColor;
   int _fieldIndex = 0;
   List<Field> _fields = [];
-  // List<Field> _fieldsInPage = [];
   GlobalKey _keyPDF = GlobalKey();
   RenderBox pdfBox;
-  // Size pdfSize;
-  // PdfController _pdfController;
   static final int _initialPage = 1;
   int _actualPageNumber = _initialPage;
 
@@ -278,7 +275,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                 return GridView.count(
                                   crossAxisCount: 3,
                                   physics: BouncingScrollPhysics(),
-                                  childAspectRatio: 1 / 1,
+                                  childAspectRatio: 2 / 1,
                                   shrinkWrap: true,
                                   mainAxisSpacing: 3,
                                   crossAxisSpacing: 15,
@@ -290,11 +287,11 @@ class _PDFScreenState extends State<PDFScreen> {
                                         'Signature', FieldType.Signature),
                                     _buildDraggable(
                                         'Checkbox', FieldType.Check),
-                                    if (widget.site != null)
-                                      _buildDraggable('Site', FieldType.Text),
-                                    if (widget.instrument != null)
-                                      _buildDraggable(
-                                          'Instrument', FieldType.Text)
+                                    // if (widget.site != null)
+                                    //   _buildDraggable('Site', FieldType.Text),
+                                    // if (widget.instrument != null)
+                                    //   _buildDraggable(
+                                    //       'Instrument', FieldType.Text)
                                   ],
                                 );
                               }),
@@ -317,15 +314,25 @@ class _PDFScreenState extends State<PDFScreen> {
   }
 
   Future<void> _addField(Offset pos, FieldType type) async {
-    final Field f = Field.basic(
-      type: type,
-      index: _fieldIndex,
-      page: _actualPageNumber,
-      initialPos: calculateFieldOffset(pos),
-      size: _fields.isNotEmpty
-          ? _fields.last.size
-          : null, //keep same size from the last field
-    );
+    final Field f = type == FieldType.Check
+        ? Field.checkbox(
+            type: type,
+            index: _fieldIndex,
+            page: _actualPageNumber,
+            initialPos: calculateFieldOffset(pos),
+            size: _fields.isNotEmpty
+                ? _fields.last.size
+                : null, //keep same size from the last field
+          )
+        : Field.basic(
+            type: type,
+            index: _fieldIndex,
+            page: _actualPageNumber,
+            initialPos: calculateFieldOffset(pos),
+            size: _fields.isNotEmpty
+                ? _fields.last.size
+                : null, //keep same size from the last field
+          );
     if (f != null) {
       setState(() {
         _fields.add(f);
@@ -438,7 +445,7 @@ class _PDFScreenState extends State<PDFScreen> {
         return Colors.green;
         break;
       case FieldType.Date:
-        return Colors.green;
+        return Colors.orange;
         break;
       case FieldType.Check:
         return Colors.yellow;

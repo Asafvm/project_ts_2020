@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/providers/consts.dart';
 
 class CustomField extends StatefulWidget {
   final Field field;
@@ -145,7 +146,10 @@ class _CustomFieldState extends State<CustomField> {
 
   void _resize(Offset offset) {
     setState(() {
-      widget.field.setSize = offset;
+      if (widget.field.type == FieldType.Check)
+        widget.field.setSize = Offset(offset.dx, offset.dx);
+      else
+        widget.field.setSize = offset;
     });
   }
 }
