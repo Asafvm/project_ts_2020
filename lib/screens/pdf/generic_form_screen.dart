@@ -37,7 +37,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   @override
   void initState() {
     super.initState();
-
+    widget.fields.sort((f1, f2) => f1.index < f2.index ? -1 : 1);
     controllersArray = List<TextEditingController>.generate(
         widget.fields.length, (index) => TextEditingController());
   }

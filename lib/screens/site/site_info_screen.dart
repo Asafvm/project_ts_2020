@@ -93,31 +93,31 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                             fit: BoxFit.fill,
                           ),
                         ),
-                        if (widget.site.imgUrl == null)
-                          Positioned(
-                            top: 20,
-                            right: 20,
-                            child: IconButton(
-                              splashColor: Theme.of(context).accentColor,
-                              splashRadius: 20,
-                              iconSize: 35,
-                              color: Theme.of(context).primaryColor,
-                              icon: Icon(Icons.camera_alt_rounded),
-                              tooltip: 'Take a picture',
-                              onPressed: () async => {
-                                widget.site.imgUrl =
-                                    await PickerHelper.takePicture(
-                                        context: context,
-                                        uploadPath: FirebasePaths.siteImagePath(
-                                            widget.site.id),
-                                        fileName: 'siteImg'),
-                                await FirebaseFirestoreCloudFunctions
-                                        .uploadSite(
-                                            widget.site, Operation.UPDATE)
-                                    .then((value) => print(value.data))
-                              },
-                            ),
-                          ),
+                        // if (widget.site.imgUrl == null)
+                        //   Positioned(
+                        //     top: 20,
+                        //     right: 20,
+                        //     child: IconButton(
+                        //       splashColor: Theme.of(context).accentColor,
+                        //       splashRadius: 20,
+                        //       iconSize: 35,
+                        //       color: Theme.of(context).primaryColor,
+                        //       icon: Icon(Icons.camera_alt_rounded),
+                        //       tooltip: 'Take a picture',
+                        //       onPressed: () async => {
+                        //         widget.site.imgUrl =
+                        //             await PickerHelper.takePicture(
+                        //                 context: context,
+                        //                 uploadPath: FirebasePaths.siteImagePath(
+                        //                     widget.site.id),
+                        //                 fileName: 'siteImg'),
+                        //         await FirebaseFirestoreCloudFunctions
+                        //                 .uploadSite(
+                        //                     widget.site, Operation.UPDATE)
+                        //             .then((value) => print(value.data))
+                        //       },
+                        //     ),
+                        //   ),
                         Positioned(
                           bottom: 20,
                           right: 20,
@@ -162,29 +162,29 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                       ],
                     ),
                   ),
-                  if (widget.site.imgUrl != null)
-                    Expanded(
-                      child: InkWell(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: widget.site.imgUrl == null
-                                    ? AssetImage('assets/pics/unknown.jpg')
-                                    : NetworkImage(widget.site.imgUrl),
-                                fit: BoxFit.fitHeight),
-                          ),
-                        ),
-                        onTap: () async => {
-                          widget.site.imgUrl = await PickerHelper.takePicture(
-                              context: context,
-                              uploadPath:
-                                  FirebasePaths.siteImagePath(widget.site.id),
-                              fileName: 'siteImg'),
-                          FirebaseFirestoreCloudFunctions.uploadSite(
-                              widget.site, Operation.UPDATE)
-                        },
-                      ),
-                    ),
+                  // if (widget.site.imgUrl != null)
+                  //   Expanded(
+                  //     child: InkWell(
+                  //       child: Container(
+                  //         decoration: BoxDecoration(
+                  //           image: DecorationImage(
+                  //               image: widget.site.imgUrl == null
+                  //                   ? AssetImage('assets/pics/unknown.jpg')
+                  //                   : NetworkImage(widget.site.imgUrl),
+                  //               fit: BoxFit.fitHeight),
+                  //         ),
+                  //       ),
+                  //       onTap: () async => {
+                  //         widget.site.imgUrl = await PickerHelper.takePicture(
+                  //             context: context,
+                  //             uploadPath:
+                  //                 FirebasePaths.siteImagePath(widget.site.id),
+                  //             fileName: 'siteImg'),
+                  //         FirebaseFirestoreCloudFunctions.uploadSite(
+                  //             widget.site, Operation.UPDATE)
+                  //       },
+                  //     ),
+                  //   ),
                 ],
               ),
               Padding(
@@ -237,12 +237,14 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                               icon: Icon(
                                                 Icons.contact_phone_sharp,
                                               ),
+                                              tooltip: 'Register Contacts',
                                               onPressed: () => _registeContact(
                                                   roomList[index].id)),
                                           IconButton(
                                               icon: Icon(
                                                 Icons.computer,
                                               ),
+                                              tooltip: 'Register Instruments',
                                               onPressed: () =>
                                                   _registerInstrument(
                                                       roomList[index].id)),
@@ -289,11 +291,13 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                 itemBuilder: (context, index) {
                                   return InstrumentInstanceListItem(
                                     instance: list[index],
-                                    instrument: instrumentList
-                                        .where((element) =>
-                                            element.codeName ==
-                                            list[index].instrumentId)
-                                        .first,
+                                    instrument: instrumentList.isNotEmpty
+                                        ? instrumentList
+                                            .where((element) =>
+                                                element.codeName ==
+                                                list[index].instrumentId)
+                                            .first
+                                        : null,
                                   );
                                 },
                               );

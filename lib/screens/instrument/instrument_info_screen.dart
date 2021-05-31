@@ -73,11 +73,18 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
                                       image: widget.instance.imgUrl == null
-                                          ? AssetImage(
-                                              'assets/pics/unknown.jpg')
-                                          : NetworkImage(
-                                              widget.instance.imgUrl),
-                                      fit: BoxFit.fitHeight),
+                                          ? widget.instrument.imgUrl == null
+                                              ? AssetImage(
+                                                  'assets/pics/unknown.jpg')
+                                              : Image.network(
+                                                  widget.instrument.imgUrl,
+                                                  width: 70,
+                                                ).image
+                                          : Image.network(
+                                              widget.instance.imgUrl,
+                                              width: 70,
+                                            ).image,
+                                      fit: BoxFit.fitWidth),
                                 ),
                               ),
                         onTap: () async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/screens/instrument/instrument_info_screen.dart';
@@ -30,7 +31,12 @@ class InstrumentInstanceListItem extends StatelessWidget {
           ),
         ),
         leading: instance.imgUrl == null
-            ? CircleAvatar(child: Icon(Icons.computer))
+            ? instrument.imgUrl == null
+                ? CircleAvatar(child: Icon(Icons.computer))
+                : Image.network(
+                    instrument.imgUrl,
+                    width: 70,
+                  )
             : Image.network(
                 instance.imgUrl,
                 width: 70,
