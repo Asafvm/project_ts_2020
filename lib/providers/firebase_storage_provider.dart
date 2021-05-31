@@ -47,8 +47,9 @@ class FirebaseStorageProvider {
         .create();
 
     if (tempFile.existsSync()) {
-      final DownloadTask task = ref.writeToFile(tempFile);
-      await task.whenComplete(() => null);
+      tempFile.writeAsBytes((await ref.getData()));
+      // final DownloadTask task = ref.writeToFile(tempFile);
+      // await task.whenComplete(() => null);
       return tempFile.path;
     }
     return null;

@@ -66,11 +66,12 @@ final logoText = Container(
 
 const double a4Width = 1240; //150dpi
 const double a4Height = 1754; //150dpi
-final RegExp emailRegExp =
-    RegExp(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",
-        //r'^[a-zA-Z0-9._]+@.[a-zA-Z0-9]+.[a-zA-Z]+',
-        caseSensitive: false,
-        multiLine: false);
+final RegExp emailRegExp = RegExp(
+    r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)",
+    caseSensitive: false,
+    multiLine: false);
+final RegExp fileNameRegExp =
+    RegExp(r"(^[a-zA-Z0-9_]*$)", caseSensitive: false, multiLine: false);
 
 //Button colors
 Color getColor(Set<MaterialState> states) {

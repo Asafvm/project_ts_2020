@@ -22,6 +22,8 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
   Team curTeam;
   final scaffoldState = GlobalKey<ScaffoldState>();
 
+  bool _loading = false;
+
   @override
   void initState() {
     curTeam = TeamProvider().getCurrentTeam;
@@ -57,7 +59,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
     showModalBottomSheet(
         context: ctx,
         builder: (_) {
-          return AddInstrumentInstanceForm(widget.instrument.getCodeName());
+          return AddInstrumentInstanceForm(widget.instrument.id);
         }).whenComplete(() => setState(() {}));
   }
 
@@ -70,23 +72,36 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
           fit: StackFit.expand,
           children: [
             InkWell(
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: widget.instrument.imgUrl == null
-                          ? AssetImage('assets/pics/unknown.jpg')
-                          : NetworkImage(widget.instrument.imgUrl),
-                      fit: BoxFit.fitHeight),
-                ),
-              ),
-              onTap: () async => {
-                widget.instrument.imgUrl = await PickerHelper.takePicture(
+              child: _loading
+                  ? Center(child: CircularProgressIndicator())
+                  : Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: widget.instrument.imgUrl == null
+                                ? AssetImage('assets/pics/unknown.jpg')
+                                : NetworkImage(widget.instrument.imgUrl),
+                            fit: BoxFit.fitHeight),
+                      ),
+                    ),
+              onTap: () async {
+                String pic = await PickerHelper.takePicture(
                     context: context,
                     uploadPath:
                         FirebasePaths.instrumentImagePath(widget.instrument.id),
-                    fileName: 'instrumentImg'),
-                FirebaseFirestoreCloudFunctions.uploadInstrument(
-                    instrument: widget.instrument, operation: Operation.UPDATE)
+                    fileName: 'instrumentImg');
+                if (pic != null || pic.isNotEmpty) {
+                  setState(() {
+                    _loading = true;
+                    widget.instrument.imgUrl = pic;
+                  });
+
+                  await FirebaseFirestoreCloudFunctions.uploadInstrument(
+                      instrument: widget.instrument,
+                      operation: Operation.UPDATE);
+                  setState(() {
+                    _loading = false;
+                  });
+                }
               },
             ),
             Positioned(
@@ -107,7 +122,7 @@ class _InstrumentListScreenState extends State<InstrumentListScreen> {
       flex: 5,
       child: StreamBuilder<List<InstrumentInstance>>(
         stream: FirebaseFirestoreProvider.getInstrumentsInstances(
-            widget.instrument.getCodeName()),
+            widget.instrument.id),
         builder: (context, snapshot) {
           if (snapshot == null || snapshot.data == null) {
             return Container();

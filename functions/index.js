@@ -168,7 +168,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
         var snapshot = await instruments.get();
         snapshot.forEach((doc) => {
           //check for duplicates
-          if (doc.id === data["instrument"]["codeName"])
+          if (doc.data["codeName"] === data["instrument"]["codeName"])
             //throw error message if found
             throw new functions.https.HttpsError(
               "already-exists",
@@ -178,9 +178,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
         });
         console.log(data["No duplicate found"]);
 
-        await instruments
-          .doc(data["instrument"]["codeName"])
-          .set(data["instrument"]);
+        await instruments.add(data["instrument"]);
 
         break;
 
@@ -397,9 +395,12 @@ exports.addInstrumentReport = functions.https.onCall(async (data, context) => {
     .collection("instruments")
     .doc(data["instrumentId"])
     .collection("reports")
-    .doc(data["file"]);
+    
   try {
-    await instrumentreports.set(Object.assign({}, data["fields"]));
+    if(data["reportId"]===null)
+      await instrumentreports.add({'reportName':data["file"], 'fields': Object.assign({}, data["fields"]),});
+      else
+      await instrumentreports.doc(data["reportId"]).update({'reportName':data["file"], 'fields': Object.assign({}, data["fields"]),});
   } catch (e) {
     console.log("Error Creating Report :: " + e);
     return { status: "failed", messege: e };

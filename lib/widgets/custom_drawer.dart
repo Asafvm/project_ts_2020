@@ -32,6 +32,8 @@ class CustomDrawer extends StatelessWidget {
               leading: Icon(Icons.edit),
               title: Text('Reports'),
               onTap: () {
+                Navigator.of(context).pop();
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => MultiProvider(providers: [
@@ -49,6 +51,8 @@ class CustomDrawer extends StatelessWidget {
               leading: Icon(Icons.store),
               title: Text('Inventory'),
               onTap: () {
+                Navigator.of(context).pop();
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => MultiProvider(providers: [
@@ -76,6 +80,8 @@ class CustomDrawer extends StatelessWidget {
                 leading: Icon(Icons.library_books),
                 title: Text('Files'),
                 onTap: () async {
+                  Navigator.of(context).pop();
+
                   Future<Directory> dir =
                       Directory('${await FirebasePaths.rootTeamFolder()}')
                           .create(recursive: true);
@@ -92,6 +98,8 @@ class CustomDrawer extends StatelessWidget {
               leading: Icon(Icons.map),
               title: Text('Map'),
               onTap: () {
+                Navigator.of(context).pop();
+
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => MapScreen()));
               },
@@ -103,6 +111,8 @@ class CustomDrawer extends StatelessWidget {
                       leading: Icon(Icons.person),
                       title: Text('Admin'),
                       onTap: () {
+                        Navigator.of(context).pop();
+
                         Navigator.of(context).pushNamed(
                           AdminMenuScreen.routeName,
                         );
@@ -134,6 +144,8 @@ class CustomDrawer extends StatelessWidget {
               leading: Icon(Icons.info),
               title: Text('About'),
               onTap: () {
+                Navigator.of(context).pop();
+
                 showAboutDialog(
                     context: context,
                     applicationIcon: Icon(Icons.group),

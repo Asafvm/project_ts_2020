@@ -36,12 +36,14 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
 
   String _selectedReport = '';
 
+  bool _loading = false;
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mqd = MediaQuery.of(context);
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
-    var textStyleTitle = TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold);
+    var textStyleTitle = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
     var textStyleContent = TextStyle(fontSize: 20.0);
     return StreamProvider<List<Site>>.value(
       value: FirebaseFirestoreProvider.getSites(),
@@ -66,26 +68,39 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                       fit: FlexFit.tight,
                       flex: 2,
                       child: InkWell(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: widget.instance.imgUrl == null
-                                    ? AssetImage('assets/pics/unknown.jpg')
-                                    : NetworkImage(widget.instance.imgUrl),
-                                fit: BoxFit.fitHeight),
-                          ),
-                        ),
-                        onTap: () async => {
-                          widget.instance.imgUrl =
-                              await PickerHelper.takePicture(
-                                  context: context,
-                                  uploadPath: FirebasePaths.instanceImagePath(
-                                      widget.instance.instrumentCode,
-                                      widget.instance.serial),
-                                  fileName: 'instrumentImg'),
-                          FirebaseFirestoreCloudFunctions
-                              .uploadInstrumentInstance(
-                                  widget.instance, Operation.CREATE)
+                        child: _loading
+                            ? Center(child: CircularProgressIndicator())
+                            : Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: widget.instance.imgUrl == null
+                                          ? AssetImage(
+                                              'assets/pics/unknown.jpg')
+                                          : NetworkImage(
+                                              widget.instance.imgUrl),
+                                      fit: BoxFit.fitHeight),
+                                ),
+                              ),
+                        onTap: () async {
+                          String pic = await PickerHelper.takePicture(
+                              context: context,
+                              uploadPath: FirebasePaths.instanceImagePath(
+                                  widget.instance.instrumentId,
+                                  widget.instance.serial),
+                              fileName: 'instrumentImg');
+
+                          if (pic != null && pic.isNotEmpty) {
+                            setState(() {
+                              _loading = true;
+                              widget.instance.imgUrl = pic;
+                            });
+                            await FirebaseFirestoreCloudFunctions
+                                .uploadInstrumentInstance(
+                                    widget.instance, Operation.UPDATE);
+                            setState(() {
+                              _loading = false;
+                            });
+                          }
                         },
                       ),
                     ),
@@ -99,70 +114,72 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                             Text(
                               widget.instrument.getCodeName(),
                               style: textStyleTitle,
+                              maxLines: 1,
                             ),
-                            Table(
-                              border: TableBorder(
-                                  horizontalInside:
-                                      BorderSide(color: Colors.grey, width: 1)),
-                              defaultVerticalAlignment:
-                                  TableCellVerticalAlignment.middle,
-                              children: [
-                                TableRow(children: [
-                                  Text(
-                                    "Model",
-                                    style: textStyleContent,
-                                  ),
-                                  Text(
-                                    widget.instrument.getModel(),
-                                    style: textStyleContent,
-                                  ),
-                                ]),
-                                TableRow(children: [
-                                  Text(
-                                    "Serial",
-                                    style: textStyleContent,
-                                  ),
-                                  Text(
-                                    widget.instance.serial,
-                                    style: textStyleContent,
-                                  ),
-                                ]),
-                                TableRow(children: [
-                                  Text(
-                                    'Site',
-                                    style: textStyleContent,
-                                  ),
-                                  Consumer<List<Site>>(
-                                    builder: (context, value, child) {
-                                      String site =
-                                          '${widget.instance.currentSiteId}';
-                                      value.forEach((element) {
-                                        if (element.id == site)
-                                          site = element.name;
-                                      });
+                            SingleChildScrollView(
+                              child: Table(
+                                border: TableBorder(
+                                    horizontalInside: BorderSide(
+                                        color: Colors.grey, width: 1)),
+                                defaultVerticalAlignment:
+                                    TableCellVerticalAlignment.middle,
+                                children: [
+                                  TableRow(children: [
+                                    Text(
+                                      "Model",
+                                      style: textStyleContent,
+                                    ),
+                                    Text(
+                                      widget.instrument.getModel(),
+                                      style: textStyleContent,
+                                    ),
+                                  ]),
+                                  TableRow(children: [
+                                    Text(
+                                      "Serial",
+                                      style: textStyleContent,
+                                    ),
+                                    Text(
+                                      widget.instance.serial,
+                                      style: textStyleContent,
+                                    ),
+                                  ]),
+                                  TableRow(children: [
+                                    Text(
+                                      'Site',
+                                      style: textStyleContent,
+                                    ),
+                                    Consumer<List<Site>>(
+                                      builder: (context, value, child) {
+                                        String site =
+                                            '${widget.instance.currentSiteId}';
+                                        value.forEach((element) {
+                                          if (element.id == site)
+                                            site = element.name;
+                                        });
 
-                                      return Text(
-                                        '$site',
-                                        style: textStyleContent,
-                                      );
-                                    },
-                                  ),
-                                ]),
-                                TableRow(children: [
-                                  Text(
-                                    "Maintenance",
-                                  ),
-                                  Text(
-                                    widget.instance.nextMaintenance == null
-                                        ? ""
-                                        : formatter.format(
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                                widget
-                                                    .instance.nextMaintenance)),
-                                    style: textStyleContent,
-                                  ),
-                                ]),
-                              ],
+                                        return Text(
+                                          '$site',
+                                          style: textStyleContent,
+                                        );
+                                      },
+                                    ),
+                                  ]),
+                                  TableRow(children: [
+                                    Text(
+                                      "Maintenance",
+                                    ),
+                                    Text(
+                                      widget.instance.nextMaintenance == null
+                                          ? ""
+                                          : formatter.format(DateTime
+                                              .fromMillisecondsSinceEpoch(widget
+                                                  .instance.nextMaintenance)),
+                                      style: textStyleContent,
+                                    ),
+                                  ]),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -217,14 +234,16 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                     .getInstrumentReports(widget.instrument.id),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
-                                    List<DocumentSnapshot> reportList =
-                                        snapshot.data;
+                                    List<Report> reportList = snapshot.data
+                                        .map((e) => Report.fromFirestore(e))
+                                        .toList();
 
                                     return ListView.builder(
                                       shrinkWrap: true,
                                       itemBuilder: (ctx, index) => ListTile(
                                         leading: Icon(Icons.picture_as_pdf),
-                                        title: Text(reportList[index].id),
+                                        title:
+                                            Text(reportList[index].reportName),
                                         trailing: SizedBox(
                                           width: 150,
                                           child: Row(
@@ -239,7 +258,8 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                   onPressed: () => setState(() {
                                                     _showGraph = !_showGraph;
                                                     _selectedReport =
-                                                        reportList[index].id;
+                                                        reportList[index]
+                                                            .reportName;
                                                   }),
                                                 ),
                                               ),
@@ -254,22 +274,17 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                       MaterialPageRoute(
                                                         builder: (context) =>
                                                             GenericFormScreen(
-                                                          fields: reportList[
-                                                                  index]
-                                                              .data()
-                                                              .values
-                                                              .map((field) =>
-                                                                  Field.fromJson(
-                                                                      field))
-                                                              .toList(),
+                                                          fields:
+                                                              reportList[index]
+                                                                  .fields,
                                                           pdfId:
                                                               reportList[index]
-                                                                  .id,
+                                                                  .reportName,
                                                           instanceId: widget
                                                               .instance.serial,
                                                           instrumentId: widget
                                                               .instance
-                                                              .instrumentCode,
+                                                              .instrumentId,
                                                           siteName: widget
                                                               .instance
                                                               .currentSiteId,
@@ -338,7 +353,7 @@ class ReportGraph extends StatelessWidget {
       child: StreamBuilder<List<Report>>(
         stream: FirebaseFirestoreProvider.getAllReportFields(
             instanceId: widget.instance.serial,
-            instrumentId: widget.instance.instrumentCode),
+            instrumentId: widget.instance.instrumentId),
         initialData: [],
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data.isNotEmpty) {

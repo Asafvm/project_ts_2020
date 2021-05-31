@@ -5,8 +5,8 @@ import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 
 class AddInstrumentInstanceForm extends StatefulWidget {
-  final String instrumentCodeName;
-  AddInstrumentInstanceForm(this.instrumentCodeName);
+  final String instrumentId;
+  AddInstrumentInstanceForm(this.instrumentId);
 
   @override
   _AddInstrumentInstanceFormState createState() =>
@@ -25,7 +25,7 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
       keyboardType: TextInputType.text,
       onSaved: (val) {
         _newInstInstrument = InstrumentInstance.newInstrument(
-            instrumentCode: widget.instrumentCodeName, serial: val);
+            instrumentId: widget.instrumentId, serial: val);
       },
     );
   }

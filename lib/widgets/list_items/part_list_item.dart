@@ -51,14 +51,6 @@ class _PartListItemState extends State<PartListItem> {
           widget.part.getreference(),
           maxLines: 1,
         ),
-        // trailing: SizedBox(
-        //   width: 50,
-        //   child: widget.inventoryMode
-        //       ? IconButton(
-        //           icon: Icon(Icons.import_export),
-        //           onPressed: () => _inventoryChange(_partCount))
-        //       : Container(),
-        // ),
       ),
     );
   }

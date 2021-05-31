@@ -292,7 +292,7 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                     instrument: instrumentList
                                         .where((element) =>
                                             element.codeName ==
-                                            list[index].instrumentCode)
+                                            list[index].instrumentId)
                                         .first,
                                   );
                                 },
@@ -391,6 +391,9 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
             StreamProvider<List<InstrumentInstance>>(
                 create: (context) =>
                     FirebaseFirestoreProvider.getAllInstrumentsInstances(),
+                initialData: []),
+            StreamProvider<List<Site>>(
+                create: (context) => FirebaseFirestoreProvider.getSites(),
                 initialData: []),
           ],
           child: InstrumentSelectionScreen(

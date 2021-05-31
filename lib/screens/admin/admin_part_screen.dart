@@ -17,6 +17,7 @@ class AdminPartScreen extends StatefulWidget {
 
 class _AdminPartScreenState extends State<AdminPartScreen> {
   bool _loading = false;
+  bool _stockTaking = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +27,16 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
       initialData: [],
       child: Scaffold(
         appBar: AppBar(
+          actions: [
+            IconButton(
+              icon: Icon(_stockTaking ? Icons.lock_open : Icons.lock_outline),
+              onPressed: () {
+                setState(() {
+                  _stockTaking = !_stockTaking;
+                });
+              },
+            )
+          ],
           title: Text("Manage Parts"),
         ),
         floatingActionButton: FloatingActionButton(
@@ -65,82 +76,92 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                   Map<String, dynamic> storageParts =
                                       Map<String, dynamic>.fromEntries(value);
 
-                                  return GestureDetector(
-                                    onTap: () {
-                                      final controller =
-                                          TextEditingController();
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => StatefulBuilder(
-                                            builder: (context, setState) {
-                                          return AlertDialog(
-                                            title: Text(
-                                                'Set amount\n${catalogPart.description}'),
-                                            content: TextField(
-                                              controller: controller,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: DecorationLibrary
-                                                  .inputDecoration(
-                                                      'Amount', context),
-                                            ),
-                                            actions: [
-                                              OutlinedButton(
-                                                  style: outlinedButtonStyle,
-                                                  onPressed: () async {
-                                                    setState(() {
-                                                      _loading = true;
-                                                    });
-                                                    await FirebaseFirestoreCloudFunctions
-                                                        .transferParts(
-                                                            null,
-                                                            '$storage',
-                                                            catalogPart,
-                                                            int.parse(controller
-                                                                .text));
-                                                    setState(() {
-                                                      _loading = false;
-                                                    });
+                                  return OutlinedButton(
+                                    style: outlinedButtonStyle,
+                                    onPressed: _stockTaking
+                                        ? () {
+                                            final controller =
+                                                TextEditingController();
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  StatefulBuilder(builder:
+                                                      (context, setState) {
+                                                return AlertDialog(
+                                                  title: Text(
+                                                      'Set amount\n${catalogPart.description}'),
+                                                  content: TextField(
+                                                    controller: controller,
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration:
+                                                        DecorationLibrary
+                                                            .inputDecoration(
+                                                                'Amount',
+                                                                context),
+                                                  ),
+                                                  actions: [
+                                                    OutlinedButton(
+                                                        style:
+                                                            outlinedButtonStyle,
+                                                        onPressed: () async {
+                                                          setState(() {
+                                                            _loading = true;
+                                                          });
+                                                          await FirebaseFirestoreCloudFunctions
+                                                              .transferParts(
+                                                                  null,
+                                                                  '$storage',
+                                                                  catalogPart,
+                                                                  int.parse(
+                                                                      controller
+                                                                          .text));
+                                                          setState(() {
+                                                            _loading = false;
+                                                          });
 
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: _loading
-                                                      ? CircularProgressIndicator()
-                                                      : Text('OK')),
-                                              OutlinedButton(
-                                                  style: outlinedButtonStyle,
-                                                  onPressed: _loading
-                                                      ? null
-                                                      : () {
                                                           Navigator.of(context)
                                                               .pop();
                                                         },
-                                                  child: Text('Cancel'))
-                                            ],
-                                          );
-                                        }),
-                                      );
-                                    },
+                                                        child: _loading
+                                                            ? CircularProgressIndicator()
+                                                            : Text('OK')),
+                                                    OutlinedButton(
+                                                        style:
+                                                            outlinedButtonStyle,
+                                                        onPressed: _loading
+                                                            ? null
+                                                            : () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                        child: Text('Cancel'))
+                                                  ],
+                                                );
+                                              }),
+                                            );
+                                          }
+                                        : null,
                                     child: Container(
-                                      child: Center(
-                                        child: Text(
-                                          storageParts[catalogPart.id] == null
-                                              ? "0"
-                                              : storageParts[catalogPart.id]
-                                                  .toString(),
-                                          style: TextStyle(
-                                            color: catalogPart.mainStockMin > 0
-                                                ? storageParts[
-                                                            catalogPart.id] ==
-                                                        null
-                                                    ? Colors.red
-                                                    : catalogPart.mainStockMin >
-                                                            storageParts[
-                                                                catalogPart.id]
-                                                        ? Colors.red
-                                                        : Colors.black
-                                                : Colors.black,
-                                          ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 25),
+                                      child: Text(
+                                        storageParts[catalogPart.id] == null
+                                            ? "0"
+                                            : storageParts[catalogPart.id]
+                                                .toString(),
+                                        style: TextStyle(
+                                          color: catalogPart.mainStockMin > 0
+                                              ? storageParts[catalogPart.id] ==
+                                                      null
+                                                  ? Colors.red
+                                                  : catalogPart.mainStockMin >
+                                                          storageParts[
+                                                              catalogPart.id]
+                                                      ? Colors.red
+                                                      : Colors.black
+                                              : Colors.black,
                                         ),
                                       ),
                                     ),

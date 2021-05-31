@@ -113,7 +113,7 @@ class FirebaseFirestoreCloudFunctions {
         .call(<String, dynamic>{
       "operation": operation.index,
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
-      "instrumentId": _newInstrument.instrumentCode,
+      "instrumentId": _newInstrument.instrumentId,
       "instrument": _newInstrument.toJson(),
     });
   }
@@ -132,8 +132,8 @@ class FirebaseFirestoreCloudFunctions {
 
   //Cloud Storage
 
-  static Future<HttpsCallableResult> uploadFields(
-      List<Field> fields, String fileName, String instrumentId) async {
+  static Future<HttpsCallableResult> uploadFields(List<Field> fields,
+      String fileName, String instrumentId, String reportId) async {
     String teamId = TeamProvider().getCurrentTeam.getTeamId;
 
     return await FirebaseFunctions.instance
@@ -141,6 +141,7 @@ class FirebaseFirestoreCloudFunctions {
         .call(<String, dynamic>{
       "teamId": teamId,
       "instrumentId": instrumentId,
+      "reportId": reportId,
       "file": fileName,
       "fields": fields.map((field) => field.toJson()).toList(),
     });
@@ -201,7 +202,7 @@ class FirebaseFirestoreCloudFunctions {
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "instruments": selected
           .map((e) =>
-              {"instrumentCode": e.instrumentCode, "instanceSerial": e.serial})
+              {"instrumentCode": e.instrumentId, "instanceSerial": e.serial})
           .toList(),
       "siteId": siteId,
       "roomId": roomId,

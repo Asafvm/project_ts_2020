@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -59,11 +60,12 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                   fit: StackFit.expand,
                   children: [
                     Image(
-                      fit: BoxFit.fitWidth,
-                      image: widget.team.logoUrl == null
-                          ? AssetImage('assets/pics/unknown.jpg')
-                          : NetworkImage(widget.team.logoUrl),
-                    ),
+                        fit: BoxFit.fitWidth,
+                        image: widget.team.logoUrl == null
+                            ? AssetImage('assets/pics/unknown.jpg')
+                            : widget.team.logoUrl.contains('http')
+                                ? NetworkImage(widget.team.logoUrl)
+                                : Image.file(File(widget.team.logoUrl)).image),
                     Positioned.fill(
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
@@ -75,11 +77,13 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                     Hero(
                       tag: widget.team.getTeamId,
                       child: Image(
-                        fit: BoxFit.fitHeight,
-                        image: widget.team.logoUrl == null
-                            ? AssetImage('assets/pics/unknown.jpg')
-                            : NetworkImage(widget.team.logoUrl),
-                      ),
+                          fit: BoxFit.fitHeight,
+                          image: widget.team.logoUrl == null
+                              ? AssetImage('assets/pics/unknown.jpg')
+                              : widget.team.logoUrl.contains('http')
+                                  ? NetworkImage(widget.team.logoUrl)
+                                  : Image.file(File(widget.team.logoUrl))
+                                      .image),
                     ),
                   ],
                 ),

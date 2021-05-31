@@ -31,6 +31,8 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
 
   bool _init = true;
 
+  bool _editing = false;
+
   @override
   Widget build(BuildContext context) {
     if (members.isEmpty)
@@ -38,155 +40,166 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
           Provider.of<Iterable<MapEntry<String, bool>>>(context,
               listen: _init)); //stop listening if data recieved
 
-    return Scaffold(
-      key: scaffoldState,
-      appBar: AppBar(
-        title: Text("Team Managment"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.save),
-              onPressed: _changedDetails ||
-                      _changedLogo ||
-                      _changedMembers ||
-                      membersToRemove.isNotEmpty
-                  ? () async {
-                      await _updateTeam();
-                      setState(() {
-                        _init = false;
-                        _changedDetails = false;
-                        _changedLogo = false;
-                        _changedMembers = false;
-                      });
-                    }
-                  : null)
-        ],
-      ),
-      body: _updating
-          ? Center(
-              child: CircularProgressIndicator(
-                value: _progress,
-              ),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Stack(
-                    children: [
-                      InkWell(
-                        onTap: () async {
-                          String _img = await PickerHelper.takePicture(
-                              context: context,
-                              fileName: 'logoUrl',
-                              uploadPath: null);
-                          if (_img.isNotEmpty)
-                            setState(() {
-                              currentTeam.logoUrl = _img;
-                              _changedLogo = true;
-                            });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: currentTeam.logoUrl == null
-                                    ? AssetImage(
-                                        'assets/pics/unknown.jpg') //no pic
-                                    : currentTeam.logoUrl.contains("http")
-                                        ? NetworkImage(currentTeam
-                                            .logoUrl) //cloud storage pic
-                                        : Image.file(File(currentTeam.logoUrl))
-                                            .image, //local pic
-                                fit: BoxFit.fitHeight),
+    return WillPopScope(
+      onWillPop: () async => _editing ? false : true,
+      child: Scaffold(
+        key: scaffoldState,
+        appBar: AppBar(
+          title: Text("Team Managment"),
+          actions: [
+            if (!_editing)
+              IconButton(
+                  icon: Icon(Icons.save),
+                  onPressed: _changedDetails ||
+                          _changedLogo ||
+                          _changedMembers ||
+                          membersToRemove.isNotEmpty
+                      ? () async {
+                          await _updateTeam();
+                          setState(() {
+                            _init = false;
+                            _changedDetails = false;
+                            _changedLogo = false;
+                            _changedMembers = false;
+                          });
+                        }
+                      : null)
+          ],
+        ),
+        body: _updating
+            ? Center(
+                child: CircularProgressIndicator(
+                  value: _progress,
+                ),
+              )
+            : Column(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Stack(
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            String _img = await PickerHelper.takePicture(
+                                context: context,
+                                fileName: 'logoUrl',
+                                uploadPath: null);
+                            if (_img.isNotEmpty)
+                              setState(() {
+                                currentTeam.logoUrl = _img;
+                                _changedLogo = true;
+                              });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: currentTeam.logoUrl == null
+                                      ? AssetImage(
+                                          'assets/pics/unknown.jpg') //no pic
+                                      : currentTeam.logoUrl.contains("http")
+                                          ? NetworkImage(currentTeam
+                                              .logoUrl) //cloud storage pic
+                                          : Image.file(
+                                                  File(currentTeam.logoUrl))
+                                              .image, //local pic
+                                  fit: BoxFit.fitHeight),
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: IconButton(
-                          icon: Icon(Icons.person_add),
-                          onPressed: () async {
-                            String contact =
-                                await PickerHelper.pickContact(context);
-                            if (contact != null && contact.isNotEmpty) {
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: IconButton(
+                            icon: Icon(Icons.person_add),
+                            onPressed: () async {
+                              String contact =
+                                  await PickerHelper.pickContact(context);
+                              if (contact != null && contact.isNotEmpty) {
+                                setState(() {
+                                  members
+                                      .addEntries([MapEntry(contact, false)]);
+                                  _changedMembers = true;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 10,
+                          right: 10,
+                          child: IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () async {
                               setState(() {
-                                members.addEntries([MapEntry(contact, false)]);
-                                _changedMembers = true;
+                                _editing = true;
                               });
-                            }
-                          },
+                              await _editTeamName(context);
+                            },
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        bottom: 10,
-                        right: 10,
-                        child: IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () => _editTeamName(context),
+                        Positioned(
+                          bottom: 10,
+                          left: 10,
+                          child: Text(
+                            currentTeam.name,
+                            style: TextStyle(fontSize: 26),
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        bottom: 10,
-                        left: 10,
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      color: Colors.black12,
+                      padding: const EdgeInsets.all(15),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          currentTeam.name,
-                          style: TextStyle(fontSize: 26),
+                          currentTeam.description,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: _isExpanded ? null : _maxLines,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Colors.black12,
-                    padding: const EdgeInsets.all(15),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        currentTeam.description,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: _isExpanded ? null : _maxLines,
+                  Expanded(
+                    flex: 6,
+                    child: Container(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: members.keys.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return MemberListItem(
+                            key: UniqueKey(),
+                            name: members.keys.elementAt(index),
+                            isSelected: members[members.keys.elementAt(index)],
+                            onSwitch: (String name, bool value) {
+                              members[name] = value;
+                              _changedMembers = true;
+                            },
+                            onRemove: members.keys.elementAt(index) ==
+                                    currentTeam.creatorEmail
+                                ? null
+                                : (String name) {
+                                    setState(() {
+                                      members.remove(name);
+                                      membersToRemove.add(name);
+                                    });
+                                  },
+                          );
+                        },
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 6,
-                  child: Container(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: members.keys.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return MemberListItem(
-                          key: UniqueKey(),
-                          name: members.keys.elementAt(index),
-                          isSelected: members[members.keys.elementAt(index)],
-                          onSwitch: (String name, bool value) {
-                            members[name] = value;
-                            _changedMembers = true;
-                          },
-                          onRemove: members.keys.elementAt(index) ==
-                                  currentTeam.creatorEmail
-                              ? null
-                              : (String name) {
-                                  setState(() {
-                                    members.remove(name);
-                                    membersToRemove.add(name);
-                                  });
-                                },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 
   _editTeamName(BuildContext context) {
-    scaffoldState.currentState.showBottomSheet((context) {
+    return scaffoldState.currentState.showBottomSheet((context) {
       final teamText = TextEditingController();
       final descText = TextEditingController();
 
@@ -215,6 +228,7 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
                     style: outlinedButtonStyle,
                     onPressed: () {
                       setState(() {
+                        _editing = false;
                         currentTeam.name = teamText.text;
                         currentTeam.description = descText.text;
                         _changedDetails = true;
@@ -225,6 +239,9 @@ class _AdminTeamManagmentScreenState extends State<AdminTeamManagmentScreen> {
                 OutlinedButton(
                     style: outlinedButtonStyle,
                     onPressed: () {
+                      setState(() {
+                        _editing = false;
+                      });
                       Navigator.of(context).pop();
                     },
                     child: Text("Cancel"))

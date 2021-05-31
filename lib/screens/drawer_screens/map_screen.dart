@@ -112,7 +112,6 @@ class _MapScreenState extends State<MapScreen> {
           _customInfoWindowController.hideInfoWindow();
         },
         onCameraMove: (position) {
-          print(position.target);
           _customInfoWindowController.onCameraMove();
         },
         onMapCreated: (GoogleMapController controller) async {

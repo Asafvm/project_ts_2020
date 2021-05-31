@@ -232,13 +232,18 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           .where((field) =>
               field.type == FieldType.Text || field.type == FieldType.Num)
           .forEach((field) {
-        if (controllersArray
-            .elementAt(widget.fields.indexOf(field))
-            .text
-            .isNotEmpty)
+        String userValue =
+            controllersArray.elementAt(widget.fields.indexOf(field)).text;
+        if (userValue.isNotEmpty)
           field.defaultValue =
               controllersArray.elementAt(widget.fields.indexOf(field)).text;
+        // else if (userValue.isEmpty &&
+        //     field.isMandatory &&
+        //     field.defaultValue.isEmpty)
+        //   controllersArray.elementAt(widget.fields.indexOf(field)).text =
+        //       'Error';
       });
+
       //get signature if needed
       Uint8List imagedata;
       if (widget.fields
@@ -265,7 +270,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       ));
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
-      Navigator.of(context).pop(false); //formFilled = false
+      // Navigator.of(context).pop(false); //formFilled = false
 
     }
   }

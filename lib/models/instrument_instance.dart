@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InstrumentInstance {
-  final String instrumentCode;
+  final String instrumentId;
   final String serial;
   String currentSiteId = 'Main';
   String currentRoomId = '';
@@ -9,12 +9,12 @@ class InstrumentInstance {
   int warranty; //timestamp - millisecondsSinceEpoch
   String imgUrl;
 
-  InstrumentInstance({this.instrumentCode, this.serial});
+  InstrumentInstance({this.instrumentId, this.serial});
 
-  InstrumentInstance.newInstrument({this.instrumentCode, this.serial});
+  InstrumentInstance.newInstrument({this.instrumentId, this.serial});
 
   Map<String, dynamic> toJson() => {
-        'instrumentCode': instrumentCode,
+        'instrumentId': instrumentId,
         'currentSiteId': currentSiteId,
         'currentRoomId': currentRoomId,
         'nextMaintenance': nextMaintenance,
@@ -24,7 +24,7 @@ class InstrumentInstance {
       };
 
   InstrumentInstance.fromJson(Map<String, dynamic> data)
-      : instrumentCode = data['instrumentCode'],
+      : instrumentId = data['instrumentId'],
         currentSiteId = data['currentSiteId'],
         currentRoomId = data['currentRoomId'],
         nextMaintenance = data['nextMaintenance'],

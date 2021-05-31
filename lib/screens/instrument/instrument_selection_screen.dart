@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
+import 'package:teamshare/models/site.dart';
 
 class InstrumentSelectionScreen extends StatefulWidget {
   final String siteId;
@@ -16,12 +17,12 @@ class InstrumentSelectionScreen extends StatefulWidget {
 class _InstrumentSelectionScreenState extends State<InstrumentSelectionScreen> {
   List<InstrumentInstance> _selectedInstruments = [];
   List<bool> _expandedItem;
-  List<Instrument> _instrumentsList;
+
   int _oldInstrumentListLength = 0;
-  List<InstrumentInstance> _instanceList;
   List<bool> _selectableList;
   int _oldSelectableListLength = 0;
-
+  List<InstrumentInstance> _instanceList = [];
+  List<Instrument> _instrumentsList = [];
   @override
   void initState() {
     super.initState();
@@ -32,6 +33,7 @@ class _InstrumentSelectionScreenState extends State<InstrumentSelectionScreen> {
     _instrumentsList = Provider.of<List<Instrument>>(context, listen: true);
     _instanceList =
         Provider.of<List<InstrumentInstance>>(context, listen: true);
+    List<Site> _siteList = Provider.of<List<Site>>(context, listen: true);
     _initExpanded();
     _initSelectableList();
     return Scaffold(
@@ -69,12 +71,17 @@ class _InstrumentSelectionScreenState extends State<InstrumentSelectionScreen> {
                       shrinkWrap: true,
                       children: _instanceList
                           .where((instance) =>
-                              instance.instrumentCode ==
-                              instrument.getCodeName())
+                              instance.instrumentId == instrument.id)
                           .map(
                             (instance) => CheckboxListTile(
                               value: _selectableList[
                                   _instanceList.indexOf(instance)],
+                              subtitle: _siteList.isNotEmpty &&
+                                      instance.currentRoomId.isNotEmpty
+                                  ? Text(
+                                      '${_siteList.firstWhere((element) => element.id == instance.currentSiteId).name}' ??
+                                          '')
+                                  : Container(),
                               onChanged: (instance.currentSiteId ==
                                           widget.siteId &&
                                       instance.currentRoomId == widget.roomId)

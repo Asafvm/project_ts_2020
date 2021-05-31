@@ -3,8 +3,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/models/report.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
+import 'package:teamshare/providers/consts.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/instrument/instrument_list_screen.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
@@ -50,7 +53,10 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
             child: ListTile(
               leading: widget.instrument.imgUrl == null
                   ? CircleAvatar(child: Icon(widget.icon))
-                  : Image.network(widget.instrument.imgUrl),
+                  : Image.network(
+                      widget.instrument.imgUrl,
+                      width: 70,
+                    ),
               title: Text(widget.instrument.getCodeName()),
               subtitle: Text(widget.instrument.getReference()),
               trailing: FittedBox(
@@ -106,25 +112,23 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
         if (Authentication().isAuth)
           StreamBuilder<List<DocumentSnapshot>>(
             //list of files related to instrument
-            stream: FirebaseFirestore.instance
-                .collection(
-                    FirebasePaths.instrumentReportRef(widget.instrument.id))
-                .snapshots()
-                .map((list) => list.docs),
+            stream: FirebaseFirestoreProvider.getInstrumentReports(
+                widget.instrument.id),
+
             builder: (context, snapshot) {
-              if (snapshot == null || snapshot.data == null) {
-                return Container();
-              } else {
-                int items = snapshot.data.length; //for height calculation
+              if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                List<Report> reports =
+                    snapshot.data.map((e) => Report.fromFirestore(e)).toList();
                 return AnimatedContainer(
-                  height:
-                      _selected ? items * 50.0 : 0, //50 = height of listtile
+                  height: _selected
+                      ? reports.length * 50.0
+                      : 0, //50 = height of listtile
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemBuilder: (ctx, index) => ListTile(
                       leading: Icon(Icons.picture_as_pdf),
                       title: Text(
-                        snapshot.data[index].id,
+                        reports[index].reportName,
                         maxLines: 2,
                       ),
                       trailing: FittedBox(
@@ -133,31 +137,27 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                             IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () => _openPDF(
-                                snapshot.data[index].id,
-                                snapshot.data[index]
-                                    .data()
-                                    .entries
-                                    .map((e) => Field.fromJson(
-                                        e.value.cast<String, dynamic>()))
-                                    .toList(),
-                              ),
+                                  reports[index].reportName,
+                                  reports[index].fields,
+                                  reports[index].id),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    itemCount: items,
+                    itemCount: reports.length,
                   ),
                   duration: Duration(milliseconds: 300),
                 );
-              }
+              } else
+                return Container();
             },
           ),
       ],
     );
   }
 
-  _openPDF(String pdf, List<Field> fields) async {
+  _openPDF(String pdf, List<Field> fields, String reportId) async {
     String path = await FirebaseStorageProvider.downloadFile(
         '${FirebasePaths.instrumentReportTemplatePath(widget.instrument.id)}/$pdf');
     Navigator.push(
@@ -167,7 +167,7 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
             pathPDF: path,
             fields: fields,
             instrument: widget.instrument,
-            onlyFields: true,
+            reportId: reportId,
           ),
         ));
   }

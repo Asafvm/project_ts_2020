@@ -147,7 +147,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   .where((element) =>
                                       (element.currentRoomId == _roomFilter) &&
                                       (element.currentSiteId == _siteFilter) &&
-                                      (element.instrumentCode ==
+                                      (element.instrumentId ==
                                           _instrumentFilter))
                                   .map((e) => DropdownMenuItem<String>(
                                         value: e.serial,
@@ -176,7 +176,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                         .where((element) =>
                                             element.codeName ==
                                             filteredInstances[index]
-                                                .instrumentCode)
+                                                .instrumentId)
                                         .first,
                                   );
                                 },
@@ -206,7 +206,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     }
     if (_instrumentFilter != '') {
       filteredInstances = filteredInstances
-          .where((element) => element.instrumentCode == _instrumentFilter)
+          .where((element) => element.instrumentId == _instrumentFilter)
           .toList();
     }
     _statistics = '${filteredInstances.length} Matches Found';

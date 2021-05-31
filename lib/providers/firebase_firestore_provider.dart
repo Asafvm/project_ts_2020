@@ -53,6 +53,7 @@ class FirebaseFirestoreProvider {
   static Stream<List<Instrument>> getInstruments() {
     return FirebaseFirestore.instance
         .collection(FirebasePaths.instrumentRef)
+        .orderBy("codeName", descending: true)
         .snapshots()
         .map(
           (query) => query.docs
@@ -72,9 +73,9 @@ class FirebaseFirestoreProvider {
   }
 
   static Stream<List<InstrumentInstance>> getInstrumentsInstances(
-      String instrumentCode) {
+      String instrumentId) {
     return FirebaseFirestore.instance
-        .collection("${FirebasePaths.instanceRef(instrumentCode)}")
+        .collection("${FirebasePaths.instanceRef(instrumentId)}")
         .snapshots()
         .map(
           (query) => query.docs
@@ -203,7 +204,7 @@ class FirebaseFirestoreProvider {
       [bool descending = true]) {
     return FirebaseFirestore.instance
         .collection(
-            "${FirebasePaths.instanceEntriesRef(instance.instrumentCode, instance.serial)}")
+            "${FirebasePaths.instanceEntriesRef(instance.instrumentId, instance.serial)}")
         .orderBy("timestamp", descending: descending) //newest first
         .snapshots()
         .map(
@@ -236,7 +237,11 @@ class FirebaseFirestoreProvider {
             "${FirebasePaths.instanceReportRef(instrumentId, instanceId, reportId)}")
         .get();
 
-    return result.data().values.map((field) => Field.fromJson(field)).toList();
+    return result
+        .data()
+        .values
+        .map((values) => Field.fromJson(values["fields"]))
+        .toList();
   }
 
   static Stream<List<Report>> getAllReportFields(

@@ -22,12 +22,12 @@ class PDFScreen extends StatefulWidget {
   final String pathPDF;
   final Instrument instrument;
   final Site site;
-  final bool onlyFields; // upload field data only (update exisiting report)
+  final String reportId; // upload field data only (update exisiting report)
   PDFScreen(
       {this.pathPDF,
       this.instrument,
       this.fields = const [],
-      this.onlyFields = false,
+      this.reportId,
       this.viewOnly = false,
       this.site});
 
@@ -387,22 +387,61 @@ class _PDFScreenState extends State<PDFScreen> {
         _uploading = true;
       });
       File file = File(widget.pathPDF);
-
       if (file != null && Authentication().isAuth) {
-        if (!widget.onlyFields) {
+        String fileName = path.basenameWithoutExtension(file.path);
+
+        // if (!fileNameRegExp.hasMatch(fileName)) {
+        //   bool validInput = false;
+        //   final textedit = TextEditingController();
+        //   textedit.text = path.basenameWithoutExtension(file.path);
+        //   fileName = await showDialog<String>(
+        //     barrierDismissible: false,
+        //     context: context,
+        //     builder: (context) => StatefulBuilder(
+        //       builder: (context, setState) => AlertDialog(
+        //         title: Text('Illegal file name'),
+        //         content: Column(
+        //           mainAxisSize: MainAxisSize.min,
+        //           children: [
+        //             Text(
+        //                 'File name must contain letters and numbers only\nPlease corrent the file name'),
+        //             TextField(
+        //               controller: textedit,
+        //               maxLines: 2,
+        //               onChanged: (value) {
+        //                 setState(() {
+        //                   validInput = fileNameRegExp.hasMatch(value);
+        //                 });
+        //               },
+        //             ),
+        //           ],
+        //         ),
+        //         actions: [
+        //           OutlinedButton(
+        //               onPressed: validInput
+        //                   ? () => Navigator.of(context).pop(textedit.text)
+        //                   : null,
+        //               child: Text('OK'))
+        //         ],
+        //       ),
+        //     ),
+        //   );
+        // }
+
+        if (widget.reportId == null) {
           Applogger.consoleLog(MessegeType.info, "Saving File");
           await FirebaseStorageProvider.uploadFile(
-            file,
-            FirebasePaths.instrumentReportTemplatePath(widget.instrument.id),
-          ).catchError((e) => e.toString());
+                  file,
+                  FirebasePaths.instrumentReportTemplatePath(
+                      widget.instrument.id),
+                  fileName)
+              .catchError((e) => e.toString());
         }
 
         _updateProgress(50);
         Applogger.consoleLog(MessegeType.info, "Saving Fields");
         await FirebaseFirestoreCloudFunctions.uploadFields(
-            _fields,
-            path.basenameWithoutExtension(widget.pathPDF),
-            widget.instrument.id);
+            _fields, fileName, widget.instrument.id, widget.reportId);
 
         _updateProgress(100);
         Applogger.consoleLog(MessegeType.info, "Saving Operation Finished");

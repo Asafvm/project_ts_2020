@@ -12,33 +12,32 @@ class InstrumentInstanceListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => {
-        Navigator.of(context).push(
+    return Card(
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.white, width: 3),
+        borderRadius: BorderRadius.all(
+          Radius.circular(10),
+        ),
+      ),
+      color: Colors.white,
+      child: ListTile(
+        onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context) => InstrumentInfoScreen(
               instrument: instrument,
               instance: instance,
             ),
           ),
-        )
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(color: Colors.white, width: 3),
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
         ),
-        color: Colors.white,
-        child: ListTile(
-          leading: CircleAvatar(
-            child: Icon(Icons.computer),
-          ),
-          title: Text(instance.serial),
-          subtitle: Text(
-              '${instance.nextMaintenance == null ? "Maintenance needed" : "Next maintenance = " + formatter.format(DateTime.fromMillisecondsSinceEpoch(instance.nextMaintenance))}'),
-        ),
+        leading: instance.imgUrl == null
+            ? CircleAvatar(child: Icon(Icons.computer))
+            : Image.network(
+                instance.imgUrl,
+                width: 70,
+              ),
+        title: Text(instance.serial),
+        subtitle: Text(
+            '${instance.nextMaintenance == null ? "Maintenance needed" : "Next maintenance = " + formatter.format(DateTime.fromMillisecondsSinceEpoch(instance.nextMaintenance))}'),
       ),
     );
   }

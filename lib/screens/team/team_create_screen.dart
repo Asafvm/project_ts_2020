@@ -23,7 +23,6 @@ class TeamCreateScreen extends StatefulWidget {
 
 class _TeamCreateScreenState extends State<TeamCreateScreen> {
   Map<String, bool> members = Map<String, bool>();
-  bool _imgPicked = false;
   String _picUrl;
   bool _loading = false;
   @override
@@ -100,10 +99,11 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                             fit: BoxFit.fitHeight),
                       ),
                     ),
-                    onTap: () async => {
+                    onTap: () async {
                       _picUrl = await PickerHelper.takePicture(
                         context: context,
-                      ),
+                      );
+                      setState(() {});
                     },
                   ),
                   TextFormField(
@@ -314,7 +314,7 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
 
       HttpsCallableResult result =
           await FirebaseFirestoreCloudFunctions.addTeam(
-              _name, _description, members, _imgPicked ? _picUrl : null);
+              _name, _description, members, _picUrl);
 
       if (result.data["status"] == "success") {
         ScaffoldMessenger.of(context).showSnackBar(
