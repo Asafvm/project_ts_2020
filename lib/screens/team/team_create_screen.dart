@@ -89,14 +89,15 @@ class _TeamCreateScreenState extends State<TeamCreateScreen> {
                 children: [
                   InkWell(
                     child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
                       constraints:
-                          BoxConstraints(maxHeight: 100, maxWidth: 100),
+                          BoxConstraints(maxHeight: 100, maxWidth: 200),
                       decoration: BoxDecoration(
                         image: DecorationImage(
                             image: _picUrl == null
                                 ? AssetImage('assets/pics/unknown.jpg')
                                 : Image.file(File(_picUrl)).image,
-                            fit: BoxFit.fitHeight),
+                            fit: BoxFit.fitWidth),
                       ),
                     ),
                     onTap: () async {

@@ -174,8 +174,9 @@ class _PDFScreenState extends State<PDFScreen> {
                                         .getTranslation();
                                     setState(() {
                                       _centerOffset =
-                                          -Offset(vector3[0], vector3[1]) /
-                                              _viewScale;
+                                          -Offset(vector3[0], vector3[1]) +
+                                              details.velocity.pixelsPerSecond /
+                                                  _viewScale;
                                     });
                                   },
                                   transformationController:
@@ -390,43 +391,43 @@ class _PDFScreenState extends State<PDFScreen> {
       if (file != null && Authentication().isAuth) {
         String fileName = path.basenameWithoutExtension(file.path);
 
-        // if (!fileNameRegExp.hasMatch(fileName)) {
-        //   bool validInput = false;
-        //   final textedit = TextEditingController();
-        //   textedit.text = path.basenameWithoutExtension(file.path);
-        //   fileName = await showDialog<String>(
-        //     barrierDismissible: false,
-        //     context: context,
-        //     builder: (context) => StatefulBuilder(
-        //       builder: (context, setState) => AlertDialog(
-        //         title: Text('Illegal file name'),
-        //         content: Column(
-        //           mainAxisSize: MainAxisSize.min,
-        //           children: [
-        //             Text(
-        //                 'File name must contain letters and numbers only\nPlease corrent the file name'),
-        //             TextField(
-        //               controller: textedit,
-        //               maxLines: 2,
-        //               onChanged: (value) {
-        //                 setState(() {
-        //                   validInput = fileNameRegExp.hasMatch(value);
-        //                 });
-        //               },
-        //             ),
-        //           ],
-        //         ),
-        //         actions: [
-        //           OutlinedButton(
-        //               onPressed: validInput
-        //                   ? () => Navigator.of(context).pop(textedit.text)
-        //                   : null,
-        //               child: Text('OK'))
-        //         ],
-        //       ),
-        //     ),
-        //   );
-        // }
+        if (!fileNameRegExp.hasMatch(fileName)) {
+          bool validInput = false;
+          final textedit = TextEditingController();
+          textedit.text = path.basenameWithoutExtension(file.path);
+          fileName = await showDialog<String>(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => StatefulBuilder(
+              builder: (context, setState) => AlertDialog(
+                title: Text('Illegal file name'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                        'File name must contain letters and numbers only\nPlease corrent the file name'),
+                    TextField(
+                      controller: textedit,
+                      maxLines: 2,
+                      onChanged: (value) {
+                        setState(() {
+                          validInput = fileNameRegExp.hasMatch(value);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                actions: [
+                  OutlinedButton(
+                      onPressed: validInput
+                          ? () => Navigator.of(context).pop(textedit.text)
+                          : null,
+                      child: Text('OK'))
+                ],
+              ),
+            ),
+          );
+        }
 
         if (widget.reportId == null) {
           Applogger.consoleLog(MessegeType.info, "Saving File");

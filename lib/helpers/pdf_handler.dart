@@ -31,9 +31,6 @@ class PdfFileHandler {
 
   static Future<List<PdfRawImage>> loadPdf(String path) async {
     var file = await pdfRender.PdfDocument.openFile(path);
-    // var file = pdfRender.PdfImageRendererPdf(path: path);
-    // await file.open();
-    // var count = await file.getPageCount();
     int count = file.pagesCount;
     var images = List<PdfRawImage>.empty(growable: true);
 

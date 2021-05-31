@@ -64,10 +64,14 @@ class PdfHelper {
           item: pdfWidgets.Positioned(
             left: field.offset.dx * page.size.width,
             top: field.offset.dy * page.size.height,
-            child: pdfWidgets.Text(
-              field.isMandatory ? 'X' : '',
-              style: pdfWidgets.TextStyle(
-                fontSize: field.size.height,
+            child: pdfWidgets.Center(
+              child: pdfWidgets.Text(
+                field.isMandatory ? 'X' : '',
+                overflow: pdfWidgets.TextOverflow.visible,
+                textAlign: pdfWidgets.TextAlign.center,
+                style: pdfWidgets.TextStyle(
+                  fontSize: field.size.height + 2,
+                ),
               ),
             ),
           ),

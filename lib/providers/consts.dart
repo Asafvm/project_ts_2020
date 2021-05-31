@@ -54,11 +54,11 @@ final logoText = Container(
           style: const TextStyle(
               fontSize: 52, fontWeight: FontWeight.bold, color: Colors.cyan),
         ),
-        TextSpan(
-          text: 'Insert a slogan here',
-          style: const TextStyle(
-              fontSize: 20, fontWeight: FontWeight.normal, color: Colors.white),
-        )
+        // TextSpan(
+        //   text: 'Insert a slogan here',
+        //   style: const TextStyle(
+        //       fontSize: 20, fontWeight: FontWeight.normal, color: Colors.white),
+        // )
       ],
     ),
   ),
@@ -71,7 +71,7 @@ final RegExp emailRegExp = RegExp(
     caseSensitive: false,
     multiLine: false);
 final RegExp fileNameRegExp =
-    RegExp(r"(^[a-zA-Z0-9_]*$)", caseSensitive: false, multiLine: false);
+    RegExp(r"(^[a-zA-Z0-9_]+$)", caseSensitive: false, multiLine: false);
 
 //Button colors
 Color getColor(Set<MaterialState> states) {
