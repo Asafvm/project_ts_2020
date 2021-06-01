@@ -174,9 +174,8 @@ class _PDFScreenState extends State<PDFScreen> {
                                         .getTranslation();
                                     setState(() {
                                       _centerOffset =
-                                          -Offset(vector3[0], vector3[1]) +
-                                              details.velocity.pixelsPerSecond /
-                                                  _viewScale;
+                                          -Offset(vector3[0], vector3[1]) /
+                                              _viewScale;
                                     });
                                   },
                                   transformationController:
