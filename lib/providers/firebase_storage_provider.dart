@@ -54,4 +54,22 @@ class FirebaseStorageProvider {
     }
     return null;
   }
+
+  static Future<String> downloadFileFromUrl(String url) async {
+    Reference ref = FirebaseStorage.instance.refFromURL(url);
+    Future<Directory> dir = Directory(
+            '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}')
+        .create(recursive: true);
+    final Directory systemTempDir = await dir;
+
+    final File tempFile =
+        await File('${systemTempDir.path}/${basenameWithoutExtension(url)}.pdf')
+            .create();
+
+    if (tempFile.existsSync()) {
+      tempFile.writeAsBytes((await ref.getData()));
+      return tempFile.path;
+    }
+    return null;
+  }
 }

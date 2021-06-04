@@ -394,13 +394,21 @@ exports.addInstrumentReport = functions.https.onCall(async (data, context) => {
     .doc(data["teamId"])
     .collection("instruments")
     .doc(data["instrumentId"])
-    .collection("reports")
-    
+    .collection("reports");
+
   try {
-    if(data["reportId"]===null)
-      await instrumentreports.add({'reportName':data["file"], 'fields': Object.assign({}, data["fields"]),});
-      else
-      await instrumentreports.doc(data["reportId"]).update({'reportName':data["file"], 'fields': Object.assign({}, data["fields"]),});
+    if (data["reportId"] === null)
+      await instrumentreports.add({
+        reportName: data["file"],
+        fields: Object.assign({}, data["fields"]),
+      });
+    else
+      await instrumentreports
+        .doc(data["reportId"])
+        .update({
+          reportName: data["file"],
+          fields: Object.assign({}, data["fields"]),
+        });
   } catch (e) {
     console.log("Error Creating Report :: " + e);
     return { status: "failed", messege: e };
@@ -408,7 +416,42 @@ exports.addInstrumentReport = functions.https.onCall(async (data, context) => {
   return { status: "success" };
 });
 
+exports.reserveReportId = functions.https.onCall(async (data, context) => {
+  const teamRef = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"]);
+  const instanceRef = admin
+    .firestore()
+    .collection("teams")
+    .doc(data["teamId"])
+    .collection("instruments")
+    .doc(data["instrumentId"])
+    .collection("instances")
+    .doc(data["instanceId"]);
+
+  try {
+    var currentIndex = ((await teamRef.get()).data()["reportIndex"] +1);
+    var reportIndex = currentIndex.toString();
+    while (reportIndex.length < 6) reportIndex = "0" + reportIndex; //6-digit report id
+    console.log("id=" + reportIndex);
+    var report = await instanceRef.collection("reports").add({
+      timestamp: Date.now(),
+      reportName: data["reportName"],
+      reportIndex: reportIndex,
+      reportStatus: "Open",
+    });
+  } catch (e) {
+    console.log("Error Creating Report :: " + e);
+    return { status: "failed", messege: e.toString() };
+  }
+  teamRef.update({ reportIndex: currentIndex }); //update the global index
+
+  return { status: "success", reportId: report.id, reportIndex:reportIndex };
+});
+
 exports.addInstanceReport = functions.https.onCall(async (data, context) => {
+  const reportData = data["reportData"];
   const instanceRef = admin
     .firestore()
     .collection("teams")
@@ -420,36 +463,39 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
 
   const promises = [];
   try {
-    var reportid = (
-      (await instanceRef.collection("reports").get()).docs.length + 1
-    ).toString();
-    while (reportid.length < 6) reportid = "0" + reportid; //6-digit report id
-    console.log("id=" + reportid);
-    const fields = instanceRef.collection("reports").add({
-      timestamp: Date.now(),
-      reportName: data["reportName"],
-      reportid: reportid,
-      fields: Object.assign({}, data["fields"]),
-    });
+    var reportid = reportData["reportId"];
 
-    var oneYearFromNow = new Date();
-    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    if (reportData["reportStatus"] === "Complete") {
+      const fields = instanceRef
+        .collection("reports")
+        .doc(reportid)
+        .update({
+          fields: Object.assign({}, data["fields"]),
+          reportFilePath: reportData["reportFilePath"],
+          reportStatus: reportData["reportStatus"],
+        });
+      //set next maintenance date
+      var oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
-    instanceRef.update({ nextMaintenance: oneYearFromNow.getTime() });
+      instanceRef.update({ nextMaintenance: oneYearFromNow.getTime() });
+      promises.push(fields);
+    }
 
     const log = instanceRef.collection("entries").add({
       type: 2,
       timestamp: Date.now(),
       details: {
-        title: "Report Created",
-        reportName: data["reportName"],
+        title: "Report " + reportData["reportIndex"] + " Created",
+        reportName: reportData["reportName"],
         reportid: reportid,
         instrumentId: data["instrumentId"],
         instanceId: data["instanceId"],
+        reportStatus: reportData["reportStatus"],
+        link: reportData["reportFilePath"],
       },
     });
 
-    promises.push(fields);
     promises.push(log);
 
     await Promise.all(promises);
@@ -458,10 +504,6 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     return { status: "failed", messege: e };
   }
   return { status: "success", reportId: reportid };
-
-  // return instrumentreports.set(
-  //   Object.assign({}, data["fields"]) //map every list item to index number
-  // );
 });
 
 exports.addSite = functions.https.onCall(async (data, context) => {

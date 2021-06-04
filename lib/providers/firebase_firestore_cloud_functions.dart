@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
+import 'package:teamshare/models/report.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
@@ -17,12 +19,7 @@ import 'authentication.dart';
 enum Operation { CREATE, UPDATE, DELETE }
 
 class FirebaseFirestoreCloudFunctions {
-  static const String instruments = "instruments";
-  static const String teams = "teams";
-  static const String sites = "sites";
-  static const String rooms = "rooms";
-
-//Get from Firebase
+  //Get from Firebase
 
   static Future<HttpsCallableResult> addTeam(String name, String description,
       [Map<String, bool> members, String picUrl]) async {
@@ -34,6 +31,7 @@ class FirebaseFirestoreCloudFunctions {
         "name": name,
         "description": description,
         "creatorEmail": Authentication().userEmail.toLowerCase(),
+        "reportIndex": 0,
       },
       "members": members,
     });
@@ -134,12 +132,10 @@ class FirebaseFirestoreCloudFunctions {
 
   static Future<HttpsCallableResult> uploadFields(List<Field> fields,
       String fileName, String instrumentId, String reportId) async {
-    String teamId = TeamProvider().getCurrentTeam.getTeamId;
-
     return await FirebaseFunctions.instance
         .httpsCallable("addInstrumentReport")
         .call(<String, dynamic>{
-      "teamId": teamId,
+      "teamId": FirebasePaths.teamId,
       "instrumentId": instrumentId,
       "reportId": reportId,
       "file": fileName,
@@ -147,17 +143,41 @@ class FirebaseFirestoreCloudFunctions {
     });
   }
 
-  static Future<HttpsCallableResult> uploadInstanceReport(List<Field> fields,
-      String instrumentId, String instanceId, String reportName) async {
-    String teamId = TeamProvider().getCurrentTeam.getTeamId;
+  static Future<Map<String, dynamic>> reserveReportId(
+      InstrumentInstance instance, String title) async {
+    var result = await FirebaseFunctions.instance
+        .httpsCallable("reserveReportId")
+        .call(<String, dynamic>{
+      "teamId": FirebasePaths.teamId,
+      "instrumentId": instance.instrumentId,
+      "instanceId": instance.serial,
+      "reportName": title,
+    });
+    return result.data;
+  }
 
+  static Future<HttpsCallableResult> uploadInstanceReport(
+      {String reportFilePath,
+      List<Field> fields,
+      String instrumentId,
+      String instanceId,
+      String reportName,
+      String reportIndex,
+      String reportStatus,
+      String reportId}) async {
     return await FirebaseFunctions.instance
         .httpsCallable("addInstanceReport")
         .call(<String, dynamic>{
-      "teamId": teamId,
+      "teamId": FirebasePaths.teamId,
       "instrumentId": instrumentId,
       "instanceId": instanceId,
-      "reportName": reportName,
+      "reportData": {
+        "reportFilePath": reportFilePath,
+        "reportName": reportName,
+        "reportId": reportId,
+        "reportStatus": reportStatus,
+        "reportIndex": reportIndex,
+      },
       "fields": fields.map((field) => field.toJson()).toList(),
     });
   }

@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -6,6 +8,7 @@ import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/helpers/signature.dart';
 import 'package:teamshare/models/field.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
@@ -15,15 +18,17 @@ import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 class GenericFormScreen extends StatefulWidget {
   final String pdfId;
   final List<Field> fields;
-  final String instrumentId;
-  final String instanceId;
+  final InstrumentInstance instance;
   final String siteName;
+  final String reportId;
+  final String reportIndex;
   const GenericFormScreen(
       {this.fields,
       this.pdfId,
       this.siteName,
-      this.instrumentId,
-      this.instanceId});
+      this.instance,
+      this.reportId,
+      this.reportIndex});
 
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
@@ -45,37 +50,40 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Insert Form Name here"),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              for (Field field in widget.fields) _buildGenericField(field),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      appBar: AppBar(
+        title: Text("Insert Form Name here"),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  if (!kIsWeb)
-                    TextButton.icon(
-                      icon: Icon(Icons.preview),
-                      onPressed: () => _preview(context),
-                      label: Text("Preview"),
-                    ),
-                  TextButton.icon(
-                    icon: _loading
-                        ? CircularProgressIndicator()
-                        : Icon(Icons.send),
-                    onPressed: () => _submit(context),
-                    label: Text("Submit"),
-                  )
+                  for (Field field in widget.fields) _buildGenericField(field),
                 ],
               ),
-            ],
+            ),
           ),
-        ));
+          SizedBox(
+            height: 10,
+          ),
+          kIsWeb
+              ? TextButton.icon(
+                  icon:
+                      _loading ? CircularProgressIndicator() : Icon(Icons.send),
+                  onPressed: _loading ? null : () => _submit(context),
+                  label: Text("Submit"),
+                )
+              : TextButton.icon(
+                  icon: _loading
+                      ? CircularProgressIndicator()
+                      : Icon(Icons.preview),
+                  onPressed: _loading ? null : () => _preview(context),
+                  label: Text("Preview"),
+                )
+        ],
+      ),
+    );
   }
 
   _buildGenericField(Field field) {
@@ -200,11 +208,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 flex: 1,
                 child: Checkbox(
                     value: field.isMandatory,
-                    onChanged: (value) {
-                      setState(() {
-                        field.isMandatory = value;
-                      });
-                    }),
+                    onChanged: _loading
+                        ? null
+                        : (value) {
+                            setState(() {
+                              field.isMandatory = value;
+                            });
+                          }),
               ),
             ],
           ),
@@ -218,8 +228,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
   Future<void> _preview(BuildContext context) async {
     try {
+      setState(() {
+        _loading = true;
+      });
+
+      //download report template
       String downloadedPdfPath = await FirebaseStorageProvider.downloadFile(
-          '${FirebasePaths.instrumentReportTemplatePath(widget.instrumentId)}/${widget.pdfId}');
+          '${FirebasePaths.instrumentReportTemplatePath(widget.instance.instrumentId)}/${widget.pdfId}');
       if (downloadedPdfPath == null) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
@@ -252,22 +267,54 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         imagedata = await Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
       //compose pdf
-      String resultPath = await PdfHelper.createPdf(
+      String reportPath = await PdfHelper.createPdf(
         fields: widget.fields,
-        instanceId: widget.instanceId,
-        instrumentId: widget.instrumentId,
+        instanceId: widget.instance.serial,
+        instrumentId: widget.instance.instrumentId,
         pdfPath: downloadedPdfPath,
         siteName: widget.siteName,
         signature: imagedata,
       );
 
       //display result
-      Navigator.of(context).push(MaterialPageRoute(
+      bool approved = await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => PDFScreen(
           viewOnly: true,
-          pathPDF: resultPath,
+          approveMode: true,
+          pathPDF: reportPath,
         ),
       ));
+
+      if (approved) {
+        //submit file
+        String uploadedReport = await FirebaseStorageProvider.uploadFile(
+            File(reportPath),
+            FirebasePaths.instanceReportPath(
+                widget.instance.instrumentId, widget.instance.serial));
+
+        //upload fields
+        var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
+            reportFilePath: uploadedReport,
+            fields: widget.fields,
+            instrumentId: widget.instance.instrumentId,
+            instanceId: widget.instance.serial,
+            reportName: basenameWithoutExtension(widget.pdfId),
+            reportStatus: 'Complete',
+            reportId: widget.reportId,
+            reportIndex: widget.reportIndex);
+        setState(() {
+          _loading = false;
+        });
+        if (result.data["status"] == "success") {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Uploaded seccessfuly')));
+        }
+        Navigator.of(context).pop();
+      } else {
+        setState(() {
+          _loading = false;
+        });
+      }
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
       // Navigator.of(context).pop(false); //formFilled = false
@@ -279,6 +326,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     setState(() {
       _loading = true;
     });
+
     //update default values
     widget.fields
         .where((field) =>
@@ -293,10 +341,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     });
     //upload fields
     var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
-        widget.fields,
-        widget.instrumentId,
-        widget.instanceId,
-        basenameWithoutExtension(widget.pdfId));
+        fields: widget.fields,
+        instrumentId: widget.instance.instrumentId,
+        instanceId: widget.instance.serial,
+        reportName: basenameWithoutExtension(widget.pdfId),
+        reportStatus: 'Complete',
+        reportId: widget.reportId,
+        reportIndex: widget.reportIndex);
     setState(() {
       _loading = false;
     });

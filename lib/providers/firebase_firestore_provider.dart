@@ -16,8 +16,12 @@ import '../helpers/firebase_paths.dart';
 ///*** class changed to static ***///
 
 class FirebaseFirestoreProvider {
-//Get from Firebase
+  static List<Instrument> _instrumentImage = [];
+  static List<InstrumentInstance> _instanceImage = [];
+  static List<Site> _siteImage = [];
+  static List<Part> _partImage = [];
 
+  //Get from Firebase
   static Stream<List<String>> getUserTeamList() {
     return FirebaseFirestore.instance
         .collection(FirebasePaths.teamsRef)
@@ -32,12 +36,15 @@ class FirebaseFirestoreProvider {
         .collection(FirebasePaths.partsStorageCatalogRef)
         .snapshots()
         .map(
-          (query) => query.docs
-              .map(
-                (doc) => Part.fromFirestore(doc),
-              )
-              .toList(),
-        );
+      (query) {
+        _partImage = query.docs
+            .map(
+              (doc) => Part.fromFirestore(doc),
+            )
+            .toList();
+        return _partImage;
+      },
+    );
   }
 
   static Stream<List<MapEntry<String, dynamic>>> getInventoryParts(
@@ -56,12 +63,15 @@ class FirebaseFirestoreProvider {
         .orderBy("codeName", descending: true)
         .snapshots()
         .map(
-          (query) => query.docs
-              .map(
-                (doc) => Instrument.fromFirestore(doc),
-              )
-              .toList(),
-        );
+      (query) {
+        _instrumentImage = query.docs
+            .map(
+              (doc) => Instrument.fromFirestore(doc),
+            )
+            .toList();
+        return _instrumentImage;
+      },
+    );
   }
 
   static Stream<List<DocumentSnapshot>> getInstrumentReports(
@@ -78,26 +88,16 @@ class FirebaseFirestoreProvider {
         .collection("${FirebasePaths.instanceRef(instrumentId)}")
         .snapshots()
         .map(
-          (query) => query.docs
-              .map(
-                (doc) => InstrumentInstance.fromFirestore(doc),
-              )
-              .toList(),
-        );
+      (query) {
+        _instanceImage = query.docs
+            .map(
+              (doc) => InstrumentInstance.fromFirestore(doc),
+            )
+            .toList();
+        return _instanceImage;
+      },
+    );
   }
-
-  // static Stream<List<InstrumentInstance>> getSiteInstances(String siteId) {
-  //   return FirebaseFirestore.instance
-  //       .collection('${FirebasePaths.roomRef(siteId)}}')
-  //       .snapshots()
-  //       .map(
-  //         (query) => query.docs
-  //             .map(
-  //               (room) => room.id,
-  //             )
-  //             .toList(),
-  //       );
-  // }
 
   static Future<InstrumentInstance> getInstanceInfo(
       String instrumentId, String instanceId) async {
@@ -131,12 +131,15 @@ class FirebaseFirestoreProvider {
         .collection(FirebasePaths.sitesRef)
         .snapshots()
         .map(
-          (query) => query.docs
-              .map(
-                (doc) => Site.fromFirestore(doc),
-              )
-              .toList(),
-        );
+      (query) {
+        _siteImage = query.docs
+            .map(
+              (doc) => Site.fromFirestore(doc),
+            )
+            .toList();
+        return _siteImage;
+      },
+    );
   }
 
   static Future<Site> getSiteInfo(String siteId) async {
@@ -253,5 +256,21 @@ class FirebaseFirestoreProvider {
         .snapshots()
         .map((query) =>
             query.docs.map((doc) => Report.fromFirestore(doc)).toList());
+  }
+
+  static Instrument getInstrumentById(String instrumentId) {
+    return _instrumentImage.firstWhere((element) => element.id == instrumentId);
+  }
+
+  static InstrumentInstance getInstanceById(String instanceId) {
+    return _instanceImage.firstWhere((element) => element.serial == instanceId);
+  }
+
+  static Site getSiteById(String siteId) {
+    return _siteImage.firstWhere((element) => element.id == siteId);
+  }
+
+  static Part getPartById(String partId) {
+    return _partImage.firstWhere((element) => element.id == partId);
   }
 }

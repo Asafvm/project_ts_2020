@@ -1,0 +1,1231 @@
+@startuml
+set namespaceSeparator ::
+
+class "teamshare::helpers::custom_route.dart::CustomRoute" {
+  +Widget* buildTransitions()
+}
+
+class "teamshare::helpers::custom_route.dart::CustomPageTransitionBuilder" {
+  +Widget* buildTransitions()
+}
+
+class "teamshare::helpers::decoration_library.dart::DecorationLibrary" {
+  {static} +InputDecoration* inputDecoration()
+  {static} +InputDecoration* searchDecoration()
+}
+
+class "teamshare::helpers::firebase_paths.dart::FirebasePaths" {
+  {static} +String* teamId
+  {static} +String* teamsRef
+  {static} +String* membersRef
+  {static} +String* instrumentRef
+  {static} +String* teamEntriesRef
+  {static} +String* partsStorageCatalogRef
+  {static} +String* sitesRef
+  {static} +String* contactRef
+  {static} +String* instanceRef()
+  {static} +String* instanceEntriesRef()
+  {static} +String* instrumentReportRef()
+  {static} +dynamic instanceReportRef()
+  {static} +String* partsInventoryRef()
+  {static} +String* roomRef()
+  {static} +String* siteContactRef()
+  {static} +String* instrumentReportTemplatePath()
+  {static} +String* instanceReportPath()
+  {static} +String* instanceReportImagePath()
+  {static} +String* instrumentImagePath()
+  {static} +String* instanceImagePath()
+  {static} +String* partImagePath()
+  {static} +String* siteImagePath()
+  {static} +Future<String*>* rootTeamFolder()
+}
+
+class "teamshare::helpers::location_helper.dart::LocationHelper" {
+  {static} +String* generateLocationPreviewImage()
+  {static} +Future<String*>* getPlaceAddress()
+}
+
+class "teamshare::helpers::pdf_handler.dart::PdfRawImage" {
+  +Uint8List* data
+  +Size* size
+}
+
+"teamshare::helpers::pdf_handler.dart::PdfRawImage" o-- "dart::typed_data::Uint8List"
+"teamshare::helpers::pdf_handler.dart::PdfRawImage" o-- "dart::ui::Size"
+
+class "teamshare::helpers::pdf_handler.dart::PdfFileHandler" {
+  {static} +Future<File*>* getFileFromAssets()
+  {static} +Future<List<PdfRawImage*>*>* loadPdf()
+  {static} +Future<File*>* save()
+}
+
+class "teamshare::helpers::pdf_handler.dart::PdfMutablePage" {
+  -PdfRawImage* _background
+  -List<Widget*>* _stackedItems
+  +Size* size
+  +void add()
+  +Page* build()
+}
+
+"teamshare::helpers::pdf_handler.dart::PdfMutablePage" o-- "teamshare::helpers::pdf_handler.dart::PdfRawImage"
+"teamshare::helpers::pdf_handler.dart::PdfMutablePage" o-- "dart::ui::Size"
+
+class "teamshare::helpers::pdf_handler.dart::PdfMutableDocument" {
+  -String* _filePath
+  -List<PdfMutablePage*>* _pages
+  {static} +Future<PdfMutableDocument*>* asset()
+  {static} +Future<PdfMutableDocument*>* path()
+  +void addPage()
+  +PdfMutablePage* getPage()
+  +Document* build()
+  +Future<File*>* save()
+}
+
+class "teamshare::helpers::pdf_helper.dart::PdfHelper" {
+  {static} +Future<String*>* createPdf()
+}
+
+class "teamshare::helpers::picker_helper.dart::PickerHelper" {
+  {static} +Future<String*>* takePicture()
+  {static} -Future<dynamic>* _pickFromGallery()
+  {static} -Future<dynamic>* _pickFromCamera()
+  {static} +Future<String*>* pickContact()
+  {static} -Future<dynamic>* _pickFromContacts()
+  {static} -Future<dynamic>* _writeManualy()
+}
+
+class "teamshare::helpers::route_generator.dart::RouteGenerator" {
+  {static} +Route<dynamic>* generateRoute()
+  {static} -Route<dynamic>* _errorRoute()
+}
+
+class "teamshare::helpers::signature.dart::SignatureHelper" {
+  +_SignatureHelperState* createState()
+}
+
+class "teamshare::helpers::signature.dart::_SignatureHelperState" {
+  -SignatureController* _controller
+  +void initState()
+  +Widget* build()
+}
+
+"teamshare::helpers::signature.dart::_SignatureHelperState" o-- "signature::signature.dart::SignatureController"
+
+class "teamshare::main.dart::TeamShare" {
+  -Future<FirebaseApp*>* _initialization
+  +Widget* build()
+}
+
+class "teamshare::models::contact.dart::Contact" {
+  +String* id
+  +String* firstName
+  +String* lastName
+  +String* email
+  +String* phone
+  +String* getFullName()
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::entry.dart::ENTRY_TYPE" {
+  +int* index
+  {static} +List<ENTRY_TYPE*>* values
+  {static} +ENTRY_TYPE* INFO
+  {static} +ENTRY_TYPE* TRANSPORT
+  {static} +ENTRY_TYPE* REPORT
+}
+
+"teamshare::models::entry.dart::ENTRY_TYPE" o-- "teamshare::models::entry.dart::ENTRY_TYPE"
+
+class "teamshare::models::entry.dart::Entry" {
+  +int* timestamp
+  +int* type
+  +Map<String*, String*>* details
+  +int* getTimestamp
+  +int* getType
+  +Map<String*, String*>* getDetails
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::field.dart::Field" {
+  +FieldType* type
+  -double* _minWidth
+  -double* _minHeight
+  -double* _defWidth
+  -double* _defHeight
+  +String* defaultValue
+  +int* index
+  +String* hint
+  +int* page
+  +Offset* offset
+  +Size* size
+  +String* regexp
+  +String* prefix
+  +String* suffix
+  +bool* isMandatory
+  +Offset* setSize
+  +Map<String*, dynamic>* toJson()
+  {static} +Field* fromFirestore()
+}
+
+"teamshare::models::field.dart::Field" o-- "teamshare::providers::consts.dart::FieldType"
+"teamshare::models::field.dart::Field" o-- "dart::ui::Offset"
+"teamshare::models::field.dart::Field" o-- "dart::ui::Size"
+
+class "teamshare::models::instrument.dart::Instrument" {
+  +String* id
+  +String* manifacturer
+  +String* reference
+  +String* codeName
+  +String* model
+  +double* price
+  +String* imgUrl
+  +String* getManifacturer()
+  +void setManifacturer()
+  +String* getReference()
+  +void setReference()
+  +String* getCodeName()
+  +void setCodeName()
+  +String* getModel()
+  +void setModel()
+  +double* getPrice()
+  +void setPrice()
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::instrument_instance.dart::InstrumentInstance" {
+  +String* instrumentId
+  +String* serial
+  +String* currentSiteId
+  +String* currentRoomId
+  +int* nextMaintenance
+  +int* warranty
+  +String* imgUrl
+  +String* getCurrentLocation
+  +bool* isUnderWarranty
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::part.dart::Part" {
+  +String* id
+  +String* manifacturer
+  +String* reference
+  +String* altreference
+  +String* description
+  +String* model
+  +double* price
+  +int* mainStockMin
+  +int* personalStockMin
+  +List<String*>* instrumentId
+  +bool* serialTracking
+  +bool* active
+  +String* imgUrl
+  +String* getManifacturer()
+  +void setManifacturer()
+  +String* getreference()
+  +void setReference()
+  +String* getAltreference()
+  +void setAltreference()
+  +String* getDescription()
+  +void setDescription()
+  +String* getModel()
+  +void setModel()
+  +double* getPrice()
+  +void setPrice()
+  +int* getmainStockMin()
+  +void setmainStockMin()
+  +int* getpersonalStockMin()
+  +void setpersonalStockMin()
+  +List<String*>* getInstrumentId()
+  +void setInstrumentId()
+  +bool* getSerialTracking()
+  +void setSerialTracking()
+  +bool* isActive()
+  +void setActive()
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::report.dart::Report" {
+  +String* id
+  +int* timestamp
+  +String* reportId
+  +String* reportName
+  +List<Field*>* fields
+}
+
+class "teamshare::models::site.dart::Site" {
+  +String* id
+  +String* name
+  +Address* address
+  +List<Contact*>* contacts
+  +String* imgUrl
+  +Map<String*, dynamic>* toJson()
+}
+
+"teamshare::models::site.dart::Site" o-- "teamshare::models::site.dart::Address"
+
+class "teamshare::models::site.dart::Room" {
+  +String* id
+  +String* building
+  +String* floor
+  +String* roomNumber
+  +String* roomTitle
+  +String* decription
+  +String* toString()
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::site.dart::Address" {
+  +double* latitude
+  +double* longtitude
+  +String* country
+  +String* area
+  +String* city
+  +String* street
+  +String* houseNumber
+  +double* lat
+  +double* lng
+  +String* toString()
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::models::team.dart::Team" {
+  +String* id
+  +String* name
+  +String* description
+  +String* logoUrl
+  +String* creatorEmail
+  +String* getTeamId
+  +String* getTeamName
+  +Map<String*, dynamic>* toJson()
+}
+
+class "teamshare::providers::applogger.dart::MessegeType" {
+  +int* index
+  {static} +List<MessegeType*>* values
+  {static} +MessegeType* info
+  {static} +MessegeType* warning
+  {static} +MessegeType* error
+}
+
+"teamshare::providers::applogger.dart::MessegeType" o-- "teamshare::providers::applogger.dart::MessegeType"
+
+class "teamshare::providers::applogger.dart::Applogger" {
+  {static} -Applogger* _instance
+  {static} +void consoleLog()
+}
+
+"teamshare::providers::applogger.dart::Applogger" o-- "teamshare::providers::applogger.dart::Applogger"
+
+class "teamshare::providers::authentication.dart::Authentication" {
+  {static} -Authentication* _instance
+  -String* _authToken
+  -String* _authUserId
+  -String* _authUserEmail
+  -DateTime* _authTokenExpiry
+  -User* _user
+  -IdTokenResult* _usertoken
+  -Timer* _authTimer
+  +FirebaseAuth* firebaseAuth
+  +bool* isAuth
+  +String* userId
+  +String* userEmail
+  +String* userName
+  +String* token
+  +Future<void>* authenticate()
+  +Future<bool*>* tryAutoLogin()
+  +Future<void>* logout()
+  +void autoLogout()
+  +void forgotPassword()
+}
+
+"teamshare::providers::authentication.dart::Authentication" o-- "teamshare::providers::authentication.dart::Authentication"
+"teamshare::providers::authentication.dart::Authentication" o-- "firebase_auth::firebase_auth.dart::User"
+"teamshare::providers::authentication.dart::Authentication" o-- "firebase_auth_platform_interface::src::id_token_result.dart::IdTokenResult"
+"teamshare::providers::authentication.dart::Authentication" o-- "dart::async::Timer"
+"teamshare::providers::authentication.dart::Authentication" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth"
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "teamshare::providers::authentication.dart::Authentication"
+
+class "teamshare::providers::consts.dart::FieldType" {
+  +int* index
+  {static} +List<FieldType*>* values
+  {static} +FieldType* Text
+  {static} +FieldType* Num
+  {static} +FieldType* Date
+  {static} +FieldType* Check
+  {static} +FieldType* Signature
+}
+
+"teamshare::providers::consts.dart::FieldType" o-- "teamshare::providers::consts.dart::FieldType"
+
+class "teamshare::providers::consts.dart::Strings" {
+  {static} +String* randomString()
+}
+
+class "teamshare::providers::firebase_firestore_cloud_functions.dart::Operation" {
+  +int* index
+  {static} +List<Operation*>* values
+  {static} +Operation* CREATE
+  {static} +Operation* UPDATE
+  {static} +Operation* DELETE
+}
+
+"teamshare::providers::firebase_firestore_cloud_functions.dart::Operation" o-- "teamshare::providers::firebase_firestore_cloud_functions.dart::Operation"
+
+class "teamshare::providers::firebase_firestore_cloud_functions.dart::FirebaseFirestoreCloudFunctions" {
+  {static} +String* instruments
+  {static} +String* teams
+  {static} +String* sites
+  {static} +String* rooms
+  {static} +Future<HttpsCallableResult<dynamic>*>* addTeam()
+  {static} +Future<HttpsCallableResult<dynamic>*>* addTeamMember()
+  {static} +Future<HttpsCallableResult<dynamic>*>* removeTeamMember()
+  {static} +Future<HttpsCallableResult<dynamic>*>* updateTeamLogo()
+  {static} +Future<HttpsCallableResult<dynamic>*>* updateTeam()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadPart()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadInstrumentInstance()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadInstrument()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadFields()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadInstanceReport()
+  {static} +Future<HttpsCallableResult<dynamic>*>* removeTeam()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadSite()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadRoom()
+  {static} +Future<HttpsCallableResult<dynamic>*>* linkInstruments()
+  {static} +Future<HttpsCallableResult<dynamic>*>* uploadContact()
+  {static} +Future<HttpsCallableResult<dynamic>*>* linkContacts()
+  {static} +Future<HttpsCallableResult<dynamic>*>* transferParts()
+}
+
+class "teamshare::providers::firebase_firestore_provider.dart::FirebaseFirestoreProvider" {
+  {static} +Stream<List<String*>*>* getUserTeamList()
+  {static} +Stream<List<Part*>*>* getCatalogParts()
+  {static} +Stream<List<MapEntry<String*, dynamic>*>*>* getInventoryParts()
+  {static} +Stream<List<Instrument*>*>* getInstruments()
+  {static} +Stream<List<DocumentSnapshot*>*>* getInstrumentReports()
+  {static} +Stream<List<InstrumentInstance*>*>* getInstrumentsInstances()
+  {static} +Future<InstrumentInstance*>* getInstanceInfo()
+  {static} +Stream<List<InstrumentInstance*>*>* getAllInstrumentsInstances()
+  {static} +Future<Team*>* getTeamInfo()
+  {static} +Stream<List<Site*>*>* getSites()
+  {static} +Future<Site*>* getSiteInfo()
+  {static} +Stream<List<Room*>*>* getRooms()
+  {static} +Stream<List<Contact*>*>* getContacts()
+  {static} +Stream<List<String*>*>* getContactsAtSite()
+  {static} +Stream<Iterable<MapEntry<String*, bool*>*>*>* getTeamMembers()
+  {static} +Future<bool*>* getPermissions()
+  {static} +Stream<List<Entry*>*>* getEntries()
+  {static} +Stream<List<Entry*>*>* getTeamEntries()
+  {static} +Future<List<Field*>*>* getReportFields()
+  {static} +Stream<List<Report*>*>* getAllReportFields()
+}
+
+class "teamshare::providers::firebase_storage_provider.dart::FirebaseStorageProvider" {
+  {static} +Future<String*>* uploadFile()
+  {static} +Future<String*>* downloadFile()
+}
+
+class "teamshare::providers::http_exception.dart::HttpException" {
+  +String* messege
+  +String* toString()
+}
+
+"dart::core::Exception" <|-- "teamshare::providers::http_exception.dart::HttpException"
+
+class "teamshare::providers::team_provider.dart::TeamProvider" {
+  {static} -Team* _currentTeam
+  {static} -Set<Team*>* _teams
+  {static} -TeamProvider* _instance
+  +Team* getCurrentTeam
+  +void addTeam()
+  +void setCurrentTeam()
+  +void clearCurrentTeam()
+  +List<Team*>* getTeams()
+  {static} +Stream<Set<Team*>*>* getTeamStream()
+}
+
+"teamshare::providers::team_provider.dart::TeamProvider" o-- "teamshare::models::team.dart::Team"
+"teamshare::providers::team_provider.dart::TeamProvider" o-- "teamshare::providers::team_provider.dart::TeamProvider"
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "teamshare::providers::team_provider.dart::TeamProvider"
+
+class "teamshare::screens::admin::admin_contact_screen.dart::AdminContactScreen" {
+  +String* siteId
+  +_AdminContactScreenState* createState()
+}
+
+class "teamshare::screens::admin::admin_contact_screen.dart::_AdminContactScreenState" {
+  -bool* _sortByFirstName
+  +Widget* build()
+  -dynamic _openAddContactForm()
+}
+
+class "teamshare::screens::admin::admin_instrument_screen.dart::AdminInstrumentScreen" {
+  +_AdminInstrumentScreenState* createState()
+}
+
+class "teamshare::screens::admin::admin_instrument_screen.dart::_AdminInstrumentScreenState" {
+  +Widget* build()
+  -void _openAddInstrument()
+}
+
+class "teamshare::screens::admin::admin_part_screen.dart::AdminPartScreen" {
+  +_AdminPartScreenState* createState()
+}
+
+class "teamshare::screens::admin::admin_part_screen.dart::_AdminPartScreenState" {
+  -bool* _loading
+  -bool* _stockTaking
+  +Widget* build()
+  -dynamic _openAddParts()
+}
+
+class "teamshare::screens::admin::admin_site_screen.dart::AdminSiteScreen" {
+  +_AdminSiteScreenState* createState()
+}
+
+class "teamshare::screens::admin::admin_site_screen.dart::_AdminSiteScreenState" {
+  +Widget* build()
+  -void _openAddSite()
+}
+
+class "teamshare::screens::admin::admin_team_managment_screen.dart::AdminTeamManagmentScreen" {
+  +_AdminTeamManagmentScreenState* createState()
+}
+
+class "teamshare::screens::admin::admin_team_managment_screen.dart::_AdminTeamManagmentScreenState" {
+  +Team* currentTeam
+  +Map<String*, bool*>* members
+  +List<String*>* membersToRemove
+  +GlobalKey<ScaffoldState*>* scaffoldState
+  -bool* _isExpanded
+  -int* _maxLines
+  -bool* _changedMembers
+  -bool* _changedDetails
+  -bool* _changedLogo
+  -double* _progress
+  -bool* _updating
+  -bool* _init
+  -bool* _editing
+  +Widget* build()
+  -dynamic _editTeamName()
+  -Future<void>* _updateTeam()
+}
+
+"teamshare::screens::admin::admin_team_managment_screen.dart::_AdminTeamManagmentScreenState" o-- "teamshare::models::team.dart::Team"
+"teamshare::screens::admin::admin_team_managment_screen.dart::_AdminTeamManagmentScreenState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+
+class "teamshare::screens::contact::contact_selection_screen.dart::ContactSelectionScreen" {
+  +String* siteId
+  +String* roomId
+  +_ContactSelectionScreenState* createState()
+}
+
+class "teamshare::screens::contact::contact_selection_screen.dart::_ContactSelectionScreenState" {
+  -List<Contact*>* _selectedContacts
+  -List<Contact*>* _contactList
+  -List<bool*>* _selectableList
+  -int* _oldSelectableListLength
+  +void initState()
+  +Widget* build()
+  -void _initSelectableList()
+}
+
+class "teamshare::screens::drawer_screens::admin_menu_screen.dart::AdminMenuScreen" {
+  {static} +String* routeName
+  +String* siteId
+  +Widget* createButton()
+  +Widget* build()
+}
+
+class "teamshare::screens::drawer_screens::file_explorer.dart::FileExplorer" {
+  +Future<Directory*>* path
+  +_FileExplorerState* createState()
+}
+
+class "teamshare::screens::drawer_screens::file_explorer.dart::_FileExplorerState" {
+  +Future<Directory*>* currentPath
+  -bool* _multiSelect
+  -List<bool*>* _selectedList
+  {static} +List<FileSystemEntity*>* files
+  +List<FileSystemEntity*>* filteredFiles
+  -String* _textFilter
+  +void initState()
+  +Widget* build()
+  -void _initSelectedList()
+  +dynamic onChangedItem()
+  -Future<bool*>* _handleBackButton()
+}
+
+class "teamshare::screens::drawer_screens::inventory_screen.dart::InventoryScreen" {
+  +_InventoryScreenState* createState()
+}
+
+class "teamshare::screens::drawer_screens::inventory_screen.dart::_InventoryScreenState" {
+  -String* _searchText
+  -bool* _transfer
+  -bool* _missing
+  -String* _transferTarget
+  -int* _bottomNavIndex
+  +Widget* build()
+  -String* _chooseTarget()
+}
+
+class "teamshare::screens::drawer_screens::inventory_screen.dart::MissingPartWindow" {
+  +List<Part*>* catalog
+  +Widget* build()
+}
+
+class "teamshare::screens::drawer_screens::inventory_screen.dart::InventoryWindow" {
+  +String* title
+  +Stream<dynamic>* partStream
+  +String* target
+  +String* filter
+  +_InventoryWindowState* createState()
+}
+
+"teamshare::screens::drawer_screens::inventory_screen.dart::InventoryWindow" o-- "dart::async::Stream<dynamic>"
+
+class "teamshare::screens::drawer_screens::inventory_screen.dart::_InventoryWindowState" {
+  -bool* _loading
+  +Widget* build()
+  -void _inventoryChange()
+}
+
+class "teamshare::screens::drawer_screens::map_screen.dart::MapScreen" {
+  +Site* initialLocation
+  +bool* isSelecting
+  +_MapScreenState* createState()
+}
+
+"teamshare::screens::drawer_screens::map_screen.dart::MapScreen" o-- "teamshare::models::site.dart::Site"
+
+class "teamshare::screens::drawer_screens::map_screen.dart::_MapScreenState" {
+  +double* latMax
+  +double* lngMax
+  +double* latMin
+  +double* lngMin
+  -LatLng* _pickedLocation
+  +Set<Marker*>* markers
+  -Completer<GoogleMapController*>* _controller
+  -CustomInfoWindowController* _customInfoWindowController
+  +Widget* build()
+  -Widget* _loadMap()
+  -void _markerTap()
+  -void _addMarker()
+  -void _selectLocation()
+  -Future<void>* _setLocation()
+  -BitmapDescriptor* _colorSelector()
+}
+
+"teamshare::screens::drawer_screens::map_screen.dart::_MapScreenState" o-- "google_maps_flutter_platform_interface::src::types::location.dart::LatLng"
+"teamshare::screens::drawer_screens::map_screen.dart::_MapScreenState" o-- "dart::async::Completer<GoogleMapController>"
+"teamshare::screens::drawer_screens::map_screen.dart::_MapScreenState" o-- "custom_info_window::custom_info_window.dart::CustomInfoWindowController"
+
+class "teamshare::screens::drawer_screens::reports_screen.dart::ReportsScreen" {
+  +_ReportsScreenState* createState()
+}
+
+class "teamshare::screens::drawer_screens::reports_screen.dart::_ReportsScreenState" {
+  -String* _siteFilter
+  -String* _roomFilter
+  -String* _instrumentFilter
+  -List<Room*>* _roomList
+  -String* _selectedSite
+  -String* _selectedRoom
+  -String* _selectedInstrument
+  -String* _statistics
+  +List<InstrumentInstance*>* instances
+  +List<InstrumentInstance*>* filteredInstances
+  +void initState()
+  +Widget* build()
+  -void _filterInstanceList()
+}
+
+class "teamshare::screens::instrument::instrument_info_screen.dart::InstrumentInfoScreen" {
+  +Instrument* instrument
+  +InstrumentInstance* instance
+  +_InstrumentInfoScreenState* createState()
+}
+
+"teamshare::screens::instrument::instrument_info_screen.dart::InstrumentInfoScreen" o-- "teamshare::models::instrument.dart::Instrument"
+"teamshare::screens::instrument::instrument_info_screen.dart::InstrumentInfoScreen" o-- "teamshare::models::instrument_instance.dart::InstrumentInstance"
+
+class "teamshare::screens::instrument::instrument_info_screen.dart::_InstrumentInfoScreenState" {
+  -bool* _showGraph
+  -String* _selectedReport
+  -bool* _loading
+  +Widget* build()
+}
+
+class "teamshare::screens::instrument::instrument_info_screen.dart::ReportGraph" {
+  +InstrumentInfoScreen* widget
+  +MediaQueryData* mqd
+  +String* reportName
+  +Widget* build()
+}
+
+"teamshare::screens::instrument::instrument_info_screen.dart::ReportGraph" o-- "teamshare::screens::instrument::instrument_info_screen.dart::InstrumentInfoScreen"
+"teamshare::screens::instrument::instrument_info_screen.dart::ReportGraph" o-- "flutter::src::widgets::media_query.dart::MediaQueryData"
+
+class "teamshare::screens::instrument::instrument_list_screen.dart::InstrumentListScreen" {
+  +Instrument* instrument
+  +_InstrumentListScreenState* createState()
+}
+
+"teamshare::screens::instrument::instrument_list_screen.dart::InstrumentListScreen" o-- "teamshare::models::instrument.dart::Instrument"
+
+class "teamshare::screens::instrument::instrument_list_screen.dart::_InstrumentListScreenState" {
+  +Team* curTeam
+  +GlobalKey<ScaffoldState*>* scaffoldState
+  -bool* _loading
+  +void initState()
+  +Widget* build()
+  -void _openAddInstrumentInstance()
+  -dynamic _buildHeader()
+  -dynamic _buildInstanceList()
+}
+
+"teamshare::screens::instrument::instrument_list_screen.dart::_InstrumentListScreenState" o-- "teamshare::models::team.dart::Team"
+"teamshare::screens::instrument::instrument_list_screen.dart::_InstrumentListScreenState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+
+class "teamshare::screens::instrument::instrument_selection_screen.dart::InstrumentSelectionScreen" {
+  +String* siteId
+  +String* roomId
+  +_InstrumentSelectionScreenState* createState()
+}
+
+class "teamshare::screens::instrument::instrument_selection_screen.dart::_InstrumentSelectionScreenState" {
+  -List<InstrumentInstance*>* _selectedInstruments
+  -List<bool*>* _expandedItem
+  -int* _oldInstrumentListLength
+  -List<bool*>* _selectableList
+  -int* _oldSelectableListLength
+  -List<InstrumentInstance*>* _instanceList
+  -List<Instrument*>* _instrumentsList
+  +void initState()
+  +Widget* build()
+  -void _initExpanded()
+  -void _initSelectableList()
+}
+
+class "teamshare::screens::login_screen.dart::LoginScreen" {
+  {static} +String* routeName
+  +Widget* build()
+}
+
+class "teamshare::screens::main_screen.dart::MainScreen" {
+  {static} +String* routeName
+  +_MainScreenState* createState()
+}
+
+class "teamshare::screens::main_screen.dart::_MainScreenState" {
+  +Widget* build()
+  +void createTeam()
+}
+
+class "teamshare::screens::part::part_info_screen.dart::PartInfoScreen" {
+  +Part* part
+  +_PartInfoScreenState* createState()
+}
+
+"teamshare::screens::part::part_info_screen.dart::PartInfoScreen" o-- "teamshare::models::part.dart::Part"
+
+class "teamshare::screens::part::part_info_screen.dart::_PartInfoScreenState" {
+  +MediaQueryData* mediaQuery
+  +GlobalKey<ScaffoldState*>* scaffoldState
+  +Widget* build()
+  -dynamic _editPart()
+}
+
+"teamshare::screens::part::part_info_screen.dart::_PartInfoScreenState" o-- "flutter::src::widgets::media_query.dart::MediaQueryData"
+"teamshare::screens::part::part_info_screen.dart::_PartInfoScreenState" o-- "flutter::src::widgets::framework.dart::GlobalKey<ScaffoldState>"
+"flutter::src::widgets::ticker_provider.dart::SingleTickerProviderStateMixin" <|-- "teamshare::screens::part::part_info_screen.dart::_PartInfoScreenState"
+
+class "teamshare::screens::pdf::generic_form_screen.dart::GenericFormScreen" {
+  +String* pdfId
+  +List<Field*>* fields
+  +String* instrumentId
+  +String* instanceId
+  +String* siteName
+  +_GenericFormScreenState* createState()
+}
+
+class "teamshare::screens::pdf::generic_form_screen.dart::_GenericFormScreenState" {
+  +Uint8List* image
+  +List<TextEditingController*>* controllersArray
+  -bool* _loading
+  +void initState()
+  +Widget* build()
+  -dynamic _buildGenericField()
+  -Future<void>* _preview()
+  -Future<void>* _submit()
+  +Size* calcTextSize()
+}
+
+"teamshare::screens::pdf::generic_form_screen.dart::_GenericFormScreenState" o-- "dart::typed_data::Uint8List"
+
+class "teamshare::screens::pdf::pdf_viewer_page.dart::PDFScreen" {
+  +bool* viewOnly
+  +List<Field*>* fields
+  +String* pathPDF
+  +Instrument* instrument
+  +Site* site
+  +String* reportId
+  +_PDFScreenState* createState()
+}
+
+"teamshare::screens::pdf::pdf_viewer_page.dart::PDFScreen" o-- "teamshare::models::instrument.dart::Instrument"
+"teamshare::screens::pdf::pdf_viewer_page.dart::PDFScreen" o-- "teamshare::models::site.dart::Site"
+
+class "teamshare::screens::pdf::pdf_viewer_page.dart::_PDFScreenState" {
+  -bool* _uploading
+  -double* _progressValue
+  -AlwaysStoppedAnimation<Color*>* _progressColor
+  -int* _fieldIndex
+  -List<Field*>* _fields
+  -GlobalKey<State<StatefulWidget*>*>* _keyPDF
+  +RenderBox* pdfBox
+  {static} -int* _initialPage
+  -int* _actualPageNumber
+  -double* _viewScaleRecorder
+  -double* _viewScale
+  -bool* _dataRecieved
+  -Offset* _centerOffset
+  -TransformationController* _transformController
+  -double* _maxScale
+  -double* _minScale
+  -Widget* _buildDraggable()
+  +void initState()
+  +void didChangeDependencies()
+  +Widget* build()
+  -Future<void>* _addField()
+  +Offset* calculateFieldOffset()
+  -Future<Field*>* _editField()
+  -dynamic _buildAlertDialog()
+  -Future<void>* _savePDF()
+  -dynamic _updateProgress()
+  -void _showDialog()
+  -dynamic _getColor()
+}
+
+"teamshare::screens::pdf::pdf_viewer_page.dart::_PDFScreenState" o-- "flutter::src::animation::animations.dart::AlwaysStoppedAnimation<Color>"
+"teamshare::screens::pdf::pdf_viewer_page.dart::_PDFScreenState" o-- "flutter::src::widgets::framework.dart::GlobalKey<State<StatefulWidget>>"
+"teamshare::screens::pdf::pdf_viewer_page.dart::_PDFScreenState" o-- "flutter::src::rendering::box.dart::RenderBox"
+"teamshare::screens::pdf::pdf_viewer_page.dart::_PDFScreenState" o-- "dart::ui::Offset"
+"teamshare::screens::pdf::pdf_viewer_page.dart::_PDFScreenState" o-- "flutter::src::widgets::interactive_viewer.dart::TransformationController"
+
+class "teamshare::screens::site::site_info_screen.dart::SiteInfoScreen" {
+  +Site* site
+  +_SiteInfoScreenState* createState()
+}
+
+"teamshare::screens::site::site_info_screen.dart::SiteInfoScreen" o-- "teamshare::models::site.dart::Site"
+
+class "teamshare::screens::site::site_info_screen.dart::_SiteInfoScreenState" {
+  +MediaQueryData* mediaQuery
+  -String* _previewImageUrl
+  +List<Room*>* rooms
+  -TabController* _tabController
+  -List<Tab*>* _tabList
+  -void _showPreview()
+  +void initState()
+  +Widget* build()
+  +void launchWaze()
+  +void launchGoogleMaps()
+  -Future<void>* _registerInstrument()
+  -void _openAddRoomForm()
+  -dynamic _registeContact()
+}
+
+"teamshare::screens::site::site_info_screen.dart::_SiteInfoScreenState" o-- "flutter::src::widgets::media_query.dart::MediaQueryData"
+"teamshare::screens::site::site_info_screen.dart::_SiteInfoScreenState" o-- "flutter::src::material::tab_controller.dart::TabController"
+"flutter::src::widgets::ticker_provider.dart::SingleTickerProviderStateMixin" <|-- "teamshare::screens::site::site_info_screen.dart::_SiteInfoScreenState"
+
+class "teamshare::screens::splash_screen.dart::SplashScreen" {
+  +_SplashScreenState* createState()
+}
+
+class "teamshare::screens::splash_screen.dart::_SplashScreenState" {
+  +Widget* build()
+}
+
+class "teamshare::screens::team::team_create_screen.dart::STEPS" {
+  +int* index
+  {static} +List<STEPS*>* values
+  {static} +STEPS* INFO
+  {static} +STEPS* INVITE
+  {static} +STEPS* CONFIRM
+}
+
+"teamshare::screens::team::team_create_screen.dart::STEPS" o-- "teamshare::screens::team::team_create_screen.dart::STEPS"
+
+class "teamshare::screens::team::team_create_screen.dart::TeamCreateScreen" {
+  +_TeamCreateScreenState* createState()
+}
+
+class "teamshare::screens::team::team_create_screen.dart::_TeamCreateScreenState" {
+  +Map<String*, bool*>* members
+  -String* _picUrl
+  -bool* _loading
+  +void initState()
+  +Widget* build()
+  -void _changeStep()
+  -void _createTeam()
+  -Future<String*>* _getMailManually()
+  -Future<void>* _uploadTeam()
+}
+
+class "teamshare::screens::team::team_home_screen.dart::TeamHomeScreen" {
+  +Team* team
+  {static} +String* routeName
+  +_TeamHomeScreenState* createState()
+}
+
+"teamshare::screens::team::team_home_screen.dart::TeamHomeScreen" o-- "teamshare::models::team.dart::Team"
+
+class "teamshare::screens::team::team_home_screen.dart::_TeamHomeScreenState" {
+  +void initState()
+  +Widget* build()
+  +void dispose()
+}
+
+class "teamshare::screens::team::team_home_screen.dart::InfoCube" {
+  +String* title
+  +Widget* child
+  +Widget* build()
+}
+
+"teamshare::screens::team::team_home_screen.dart::InfoCube" o-- "flutter::src::widgets::framework.dart::Widget"
+
+class "teamshare::widgets::custom_drawer.dart::CustomDrawer" {
+  +Widget* build()
+}
+
+class "teamshare::widgets::custom_field.dart::CustomField" {
+  +Field* field
+  +Function* onClick
+  +Function* onDrag
+  +Size* pdfSizeOnScreen
+  +double* appbarHeight
+  +Offset* centerOffset
+  +double* scale
+  +Color* color
+  +_CustomFieldState* createState()
+}
+
+"teamshare::widgets::custom_field.dart::CustomField" o-- "teamshare::models::field.dart::Field"
+"teamshare::widgets::custom_field.dart::CustomField" o-- "dart::ui::Size"
+"teamshare::widgets::custom_field.dart::CustomField" o-- "dart::ui::Offset"
+"teamshare::widgets::custom_field.dart::CustomField" o-- "dart::ui::Color"
+
+class "teamshare::widgets::custom_field.dart::_CustomFieldState" {
+  -bool* _selected
+  +Offset* before
+  +Widget* build()
+  -void _resize()
+}
+
+"teamshare::widgets::custom_field.dart::_CustomFieldState" o-- "dart::ui::Offset"
+
+class "teamshare::widgets::forms::add_contact_form.dart::AddContactForm" {
+  +String* siteId
+  +String* roomId
+  +_AddContactFormState* createState()
+}
+
+class "teamshare::widgets::forms::add_contact_form.dart::_AddContactFormState" {
+  -bool* _uploading
+  -Contact* _newContact
+  -GlobalKey<FormState*>* _contactForm
+  +void initState()
+  -Widget* _buildFirstNameField()
+  -Widget* _buildLastNameField()
+  -Widget* _buildPhoneNumberField()
+  -Widget* _buildEmailField()
+  +Widget* build()
+  -Future<void>* _uploadContactDetails()
+  -String* _textvalidator()
+  -String* _phoneValidator()
+  -String* _emailValidator()
+}
+
+"teamshare::widgets::forms::add_contact_form.dart::_AddContactFormState" o-- "teamshare::models::contact.dart::Contact"
+"teamshare::widgets::forms::add_contact_form.dart::_AddContactFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+
+class "teamshare::widgets::forms::add_field_form.dart::AddFieldForm" {
+  +Field* field
+  +_AddFieldFormState* createState()
+}
+
+"teamshare::widgets::forms::add_field_form.dart::AddFieldForm" o-- "teamshare::models::field.dart::Field"
+
+class "teamshare::widgets::forms::add_field_form.dart::_AddFieldFormState" {
+  -GlobalKey<FormState*>* _fieldForm
+  +Widget* build()
+  -SingleChildScrollView* _buildGeneralField()
+  -Widget* _buildCheckboxField()
+  -Widget* _buildDateField()
+  -Widget* _buildSignatureField()
+}
+
+"teamshare::widgets::forms::add_field_form.dart::_AddFieldFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+
+class "teamshare::widgets::forms::add_instrument_form.dart::AddInstrumentForm" {
+  +_AddInstrumentFormState* createState()
+}
+
+class "teamshare::widgets::forms::add_instrument_form.dart::_AddInstrumentFormState" {
+  -bool* _uploading
+  -Instrument* _newInstrument
+  -GlobalKey<FormState*>* _instrumentForm
+  +bool* wantKeepAlive
+  -Widget* _buildNameField()
+  -Widget* _buildCodeField()
+  -Widget* _buildManifacturerField()
+  -Widget* _buildModelField()
+  -Widget* _buildPriceField()
+  +Widget* build()
+  -dynamic _uploadInstrument()
+  +bool* manualValidation()
+}
+
+"teamshare::widgets::forms::add_instrument_form.dart::_AddInstrumentFormState" o-- "teamshare::models::instrument.dart::Instrument"
+"teamshare::widgets::forms::add_instrument_form.dart::_AddInstrumentFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter::src::widgets::automatic_keep_alive.dart::AutomaticKeepAliveClientMixin" <|-- "teamshare::widgets::forms::add_instrument_form.dart::_AddInstrumentFormState"
+
+class "teamshare::widgets::forms::add_instrument_instance_form.dart::AddInstrumentInstanceForm" {
+  +String* instrumentId
+  +_AddInstrumentInstanceFormState* createState()
+}
+
+class "teamshare::widgets::forms::add_instrument_instance_form.dart::_AddInstrumentInstanceFormState" {
+  -bool* _uploading
+  -InstrumentInstance* _newInstInstrument
+  -GlobalKey<FormState*>* _instrumentForm
+  -Widget* _buildSerialField()
+  +Widget* build()
+  -Future<void>* _uploadInstance()
+}
+
+"teamshare::widgets::forms::add_instrument_instance_form.dart::_AddInstrumentInstanceFormState" o-- "teamshare::models::instrument_instance.dart::InstrumentInstance"
+"teamshare::widgets::forms::add_instrument_instance_form.dart::_AddInstrumentInstanceFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+
+class "teamshare::widgets::forms::add_part_form.dart::AddPartForm" {
+  +Part* part
+  +_AddPartFormState* createState()
+}
+
+"teamshare::widgets::forms::add_part_form.dart::AddPartForm" o-- "teamshare::models::part.dart::Part"
+
+class "teamshare::widgets::forms::add_part_form.dart::_AddPartFormState" {
+  -bool* _uploading
+  -Part* _newPart
+  -GlobalKey<FormState*>* _partForm
+  +List<Instrument*>* instrumentList
+  +List<bool*>* instrumentListCheck
+  -int* _selectedInstruments
+  +bool* wantKeepAlive
+  -Widget* _buildDescFormField()
+  -Widget* _buildMinStorageFormField()
+  -Widget* _buildPerStorageFormField()
+  -Widget* _buildRefFormField()
+  -Widget* _buildAltRefFormField()
+  -Widget* _buildManFormField()
+  -Widget* _buildModelFormField()
+  -Widget* _buildPriceFormField()
+  +void initState()
+  +Widget* build()
+  -void _addPart()
+  -void _initInstrumentChecks()
+}
+
+"teamshare::widgets::forms::add_part_form.dart::_AddPartFormState" o-- "teamshare::models::part.dart::Part"
+"teamshare::widgets::forms::add_part_form.dart::_AddPartFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"flutter::src::widgets::automatic_keep_alive.dart::AutomaticKeepAliveClientMixin" <|-- "teamshare::widgets::forms::add_part_form.dart::_AddPartFormState"
+
+class "teamshare::widgets::forms::add_room_form.dart::AddRoomForm" {
+  +String* siteId
+  +_AddRoomFormState* createState()
+}
+
+class "teamshare::widgets::forms::add_room_form.dart::_AddRoomFormState" {
+  -bool* _uploading
+  -Room* _newRoom
+  -GlobalKey<FormState*>* _roomForm
+  +void initState()
+  -Widget* _buildBuildingField()
+  -Widget* _buildfloorField()
+  -Widget* _buildRoomNumberField()
+  -Widget* _buildTitleField()
+  -Widget* _buildDescriptionField()
+  +Widget* build()
+  -Future<void>* _uploadRoomDetails()
+}
+
+"teamshare::widgets::forms::add_room_form.dart::_AddRoomFormState" o-- "teamshare::models::site.dart::Room"
+"teamshare::widgets::forms::add_room_form.dart::_AddRoomFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+
+class "teamshare::widgets::forms::add_site_form.dart::AddSiteForm" {
+  +_AddSiteFormState* createState()
+}
+
+class "teamshare::widgets::forms::add_site_form.dart::_AddSiteFormState" {
+  -String* _previewImageUrl
+  -Address* _selectedAddress
+  -bool* _uploading
+  -Site* _newSite
+  -GlobalKey<FormState*>* _siteForm
+  +StreamSubscription<List<Instrument*>*>* subscription
+  -TextEditingController* _controllerAddressText
+  -Future<void>* _getCurrentLocation()
+  -Future<void>* _showPreview()
+  -Future<void>* _selectOnMap()
+  -Widget* _buildNameField()
+  -Widget* _buildAddressField()
+  +void dispose()
+  +Widget* build()
+  -void _addSite()
+}
+
+"teamshare::widgets::forms::add_site_form.dart::_AddSiteFormState" o-- "teamshare::models::site.dart::Address"
+"teamshare::widgets::forms::add_site_form.dart::_AddSiteFormState" o-- "teamshare::models::site.dart::Site"
+"teamshare::widgets::forms::add_site_form.dart::_AddSiteFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"teamshare::widgets::forms::add_site_form.dart::_AddSiteFormState" o-- "dart::async::StreamSubscription<List<Instrument>>"
+"teamshare::widgets::forms::add_site_form.dart::_AddSiteFormState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+
+class "teamshare::widgets::forms::auth_form.dart::AuthState" {
+  +int* index
+  {static} +List<AuthState*>* values
+  {static} +AuthState* signin
+  {static} +AuthState* signup
+}
+
+"teamshare::widgets::forms::auth_form.dart::AuthState" o-- "teamshare::widgets::forms::auth_form.dart::AuthState"
+
+class "teamshare::widgets::forms::auth_form.dart::AuthForm" {
+  +_AuthFormState* createState()
+}
+
+class "teamshare::widgets::forms::auth_form.dart::_AuthFormState" {
+  -GlobalKey<FormState*>* _loginKey
+  -AnimationController* _animationContainerController
+  -AnimationController* _animationButtonController
+  -Animation<double*>* _opacityAnimation
+  -Animation<double*>* _buttonAnimation
+  +double* screenWidth
+  -Map<String*, String*>* _authData
+  +AuthState* signMode
+  -bool* _logging
+  +void didChangeDependencies()
+  +Widget* build()
+  -dynamic _setSigningMode()
+  -Future<void>* _authUser()
+  +void showMessage()
+  +Widget* getSigninButton()
+  +Widget* getSignupButton()
+  -dynamic _setLogging()
+}
+
+"teamshare::widgets::forms::auth_form.dart::_AuthFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"teamshare::widgets::forms::auth_form.dart::_AuthFormState" o-- "flutter::src::animation::animation_controller.dart::AnimationController"
+"teamshare::widgets::forms::auth_form.dart::_AuthFormState" o-- "flutter::src::animation::animation.dart::Animation<double>"
+"teamshare::widgets::forms::auth_form.dart::_AuthFormState" o-- "teamshare::widgets::forms::auth_form.dart::AuthState"
+"flutter::src::widgets::ticker_provider.dart::TickerProviderStateMixin" <|-- "teamshare::widgets::forms::auth_form.dart::_AuthFormState"
+
+class "teamshare::widgets::list_items::contact_list_tile.dart::ContactListTile" {
+  +Contact* contact
+  +String* siteName
+  +Room* room
+  +Widget* build()
+}
+
+"teamshare::widgets::list_items::contact_list_tile.dart::ContactListTile" o-- "teamshare::models::contact.dart::Contact"
+"teamshare::widgets::list_items::contact_list_tile.dart::ContactListTile" o-- "teamshare::models::site.dart::Room"
+
+class "teamshare::widgets::list_items::entry_list_item.dart::EntryListItem" {
+  +Entry* entry
+  +bool* showSub
+  +Widget* build()
+  -IconData* _getIcon()
+}
+
+"teamshare::widgets::list_items::entry_list_item.dart::EntryListItem" o-- "teamshare::models::entry.dart::Entry"
+
+class "teamshare::widgets::list_items::instrument_instance_list_item.dart::InstrumentInstanceListItem" {
+  +DateFormat* formatter
+  +Instrument* instrument
+  +InstrumentInstance* instance
+  +Widget* build()
+}
+
+"teamshare::widgets::list_items::instrument_instance_list_item.dart::InstrumentInstanceListItem" o-- "intl::src::intl::date_format.dart::DateFormat"
+"teamshare::widgets::list_items::instrument_instance_list_item.dart::InstrumentInstanceListItem" o-- "teamshare::models::instrument.dart::Instrument"
+"teamshare::widgets::list_items::instrument_instance_list_item.dart::InstrumentInstanceListItem" o-- "teamshare::models::instrument_instance.dart::InstrumentInstance"
+
+class "teamshare::widgets::list_items::instrument_list_item.dart::InstrumentListItem" {
+  +IconData* icon
+  +BuildContext* ctx
+  +Instrument* instrument
+  +_InstrumentListItemState* createState()
+}
+
+"teamshare::widgets::list_items::instrument_list_item.dart::InstrumentListItem" o-- "flutter::src::widgets::icon_data.dart::IconData"
+"teamshare::widgets::list_items::instrument_list_item.dart::InstrumentListItem" o-- "flutter::src::widgets::framework.dart::BuildContext"
+"teamshare::widgets::list_items::instrument_list_item.dart::InstrumentListItem" o-- "teamshare::models::instrument.dart::Instrument"
+
+class "teamshare::widgets::list_items::instrument_list_item.dart::_InstrumentListItemState" {
+  -bool* _selected
+  -Color* _bgDefaultColor
+  -void _setSelected()
+  +Widget* build()
+  -dynamic _openPDF()
+}
+
+"teamshare::widgets::list_items::instrument_list_item.dart::_InstrumentListItemState" o-- "dart::ui::Color"
+
+class "teamshare::widgets::list_items::inventory_list_item.dart::PartListItem" {
+  +Part* part
+  +bool* inventoryMode
+  +Widget* build()
+}
+
+"teamshare::widgets::list_items::inventory_list_item.dart::PartListItem" o-- "teamshare::models::part.dart::Part"
+
+class "teamshare::widgets::list_items::member_list_item.dart::MemberListItem" {
+  +String* name
+  +bool* isSelected
+  +Function* onRemove
+  +Function* onSwitch
+  +_MemberListItemState* createState()
+}
+
+class "teamshare::widgets::list_items::member_list_item.dart::_MemberListItemState" {
+  +Widget* build()
+}
+
+class "teamshare::widgets::list_items::part_list_item.dart::PartListItem" {
+  +Part* part
+  +bool* inventoryMode
+  +_PartListItemState* createState()
+}
+
+"teamshare::widgets::list_items::part_list_item.dart::PartListItem" o-- "teamshare::models::part.dart::Part"
+
+class "teamshare::widgets::list_items::part_list_item.dart::_PartListItemState" {
+  +Widget* build()
+}
+
+class "teamshare::widgets::list_items::site_list_item.dart::SiteItemList" {
+  +Site* site
+  +Widget* build()
+}
+
+"teamshare::widgets::list_items::site_list_item.dart::SiteItemList" o-- "teamshare::models::site.dart::Site"
+
+class "teamshare::widgets::team_thumbnail.dart::TeamThumbnail" {
+  +Team* team
+  +Widget* build()
+}
+
+"teamshare::widgets::team_thumbnail.dart::TeamThumbnail" o-- "teamshare::models::team.dart::Team"
+
+
+@enduml

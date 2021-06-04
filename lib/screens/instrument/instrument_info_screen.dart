@@ -36,6 +36,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
   String _selectedReport = '';
 
   bool _loading = false;
+  bool _creatingForm = false;
 
   @override
   Widget build(BuildContext context) {
@@ -271,12 +272,27 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                               ),
                                               Expanded(
                                                 child: OutlinedButton(
-                                                  child: Text(
-                                                    "Create",
-                                                  ),
+                                                  child: _creatingForm
+                                                      ? CircularProgressIndicator()
+                                                      : Text(
+                                                          "Create",
+                                                        ),
                                                   style: outlinedButtonStyle,
                                                   onPressed: () async {
-                                                    Navigator.of(context).push(
+                                                    setState(() {
+                                                      _creatingForm = true;
+                                                    });
+                                                    Map<String, dynamic>
+                                                        reportData =
+                                                        await FirebaseFirestoreCloudFunctions
+                                                            .reserveReportId(
+                                                                widget.instance,
+                                                                reportList[
+                                                                        index]
+                                                                    .reportName);
+
+                                                    await Navigator.of(context)
+                                                        .push(
                                                       MaterialPageRoute(
                                                         builder: (context) =>
                                                             GenericFormScreen(
@@ -286,17 +302,22 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                           pdfId:
                                                               reportList[index]
                                                                   .reportName,
-                                                          instanceId: widget
-                                                              .instance.serial,
-                                                          instrumentId: widget
-                                                              .instance
-                                                              .instrumentId,
+                                                          instance:
+                                                              widget.instance,
                                                           siteName: widget
                                                               .instance
                                                               .currentSiteId,
+                                                          reportId: reportData[
+                                                              "reportId"],
+                                                          reportIndex:
+                                                              reportData[
+                                                                  "reportIndex"],
                                                         ),
                                                       ),
                                                     );
+                                                    setState(() {
+                                                      _creatingForm = false;
+                                                    });
                                                   },
                                                 ),
                                               ),

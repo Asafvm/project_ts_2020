@@ -18,6 +18,7 @@ import 'package:path/path.dart' as path;
 
 class PDFScreen extends StatefulWidget {
   final bool viewOnly;
+  final bool approveMode;
   final List<Field> fields;
   final String pathPDF;
   final Instrument instrument;
@@ -29,7 +30,8 @@ class PDFScreen extends StatefulWidget {
       this.fields = const [],
       this.reportId,
       this.viewOnly = false,
-      this.site});
+      this.site,
+      this.approveMode = false});
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -268,33 +270,63 @@ class _PDFScreenState extends State<PDFScreen> {
                           ),
                           if (!widget.viewOnly)
                             Expanded(
-                                child: Container(
-                              decoration: BoxDecoration(border: Border.all()),
-                              child: DragTarget(builder:
-                                  (context, candidateData, rejectedData) {
-                                return GridView.count(
-                                  crossAxisCount: 3,
-                                  physics: BouncingScrollPhysics(),
-                                  childAspectRatio: 2 / 1,
-                                  shrinkWrap: true,
-                                  mainAxisSpacing: 3,
-                                  crossAxisSpacing: 15,
-                                  children: [
-                                    _buildDraggable('Text', FieldType.Text),
-                                    _buildDraggable('123', FieldType.Num),
-                                    _buildDraggable('Date', FieldType.Date),
-                                    _buildDraggable(
-                                        'Signature', FieldType.Signature),
-                                    _buildDraggable(
-                                        'Checkbox', FieldType.Check),
-                                    // if (widget.site != null)
-                                    //   _buildDraggable('Site', FieldType.Text),
-                                    // if (widget.instrument != null)
-                                    //   _buildDraggable(
-                                    //       'Instrument', FieldType.Text)
-                                  ],
-                                );
-                              }),
+                              child: Container(
+                                decoration: BoxDecoration(border: Border.all()),
+                                child: DragTarget(builder:
+                                    (context, candidateData, rejectedData) {
+                                  return GridView.count(
+                                    crossAxisCount: 3,
+                                    physics: BouncingScrollPhysics(),
+                                    childAspectRatio: 2 / 1,
+                                    shrinkWrap: true,
+                                    mainAxisSpacing: 3,
+                                    crossAxisSpacing: 15,
+                                    children: [
+                                      _buildDraggable('Text', FieldType.Text),
+                                      _buildDraggable('123', FieldType.Num),
+                                      _buildDraggable('Date', FieldType.Date),
+                                      _buildDraggable(
+                                          'Signature', FieldType.Signature),
+                                      _buildDraggable(
+                                          'Checkbox', FieldType.Check),
+                                      // if (widget.site != null)
+                                      //   _buildDraggable('Site', FieldType.Text),
+                                      // if (widget.instrument != null)
+                                      //   _buildDraggable(
+                                      //       'Instrument', FieldType.Text)
+                                    ],
+                                  );
+                                }),
+                              ),
+                            ),
+                          if (widget.approveMode)
+                            Expanded(
+                                child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    color: Colors.lightGreen,
+                                    child: IconButton(
+                                      color: Colors.white,
+                                      icon: Icon(Icons.check_circle_rounded),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    color: Colors.redAccent,
+                                    child: IconButton(
+                                      color: Colors.white,
+                                      icon: Icon(Icons.cancel),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ))
                         ],
                       ),

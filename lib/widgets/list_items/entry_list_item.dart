@@ -53,45 +53,23 @@ class EntryListItem extends StatelessWidget {
           ),
           subtitle: showSub
               ? Text(
-                  '${entryDetails["instrumentId"]} ${entryDetails["instanceId"]}')
+                  '${FirebaseFirestoreProvider.getInstrumentById(entryDetails["instrumentId"]).codeName} ${entryDetails["instanceId"]}')
               : Container(),
           trailing: SizedBox(
             width: 30,
-            child: entry.type == 2 && !kIsWeb
+            child: entry.type == 2 && !kIsWeb && entryDetails["link"] != null
                 ? IconButton(
                     icon: Icon(Icons.file_download),
                     onPressed: () async {
                       //get report
-                      String path = await FirebaseStorageProvider.downloadFile(
-                          '${FirebasePaths.instrumentReportTemplatePath(entryDetails["instrumentId"])}/${entryDetails["reportName"]}');
-                      //get fields
-                      List<Field> fields =
-                          await FirebaseFirestoreProvider.getReportFields(
-                              instrumentId: entryDetails["instrumentId"],
-                              instanceId: entryDetails["instanceId"],
-                              reportId:
-                                  '${entryDetails["reportName"]}_${entryDetails["reportid"]}');
-                      //get site from instance id
-                      InstrumentInstance instance =
-                          await FirebaseFirestoreProvider.getInstanceInfo(
-                              entryDetails["instrumentId"],
-                              entryDetails["instanceId"]);
-                      Site site = await FirebaseFirestoreProvider.getSiteInfo(
-                          instance.currentSiteId);
-
-                      //build report
-                      String pdfPath = await PdfHelper.createPdf(
-                        fields: fields,
-                        instrumentId: entryDetails["instrumentId"],
-                        instanceId: entryDetails["instanceId"],
-                        isNew: false,
-                        pdfPath: path,
-                        siteName: site.name,
-                      );
+                      String path =
+                          await FirebaseStorageProvider.downloadFileFromUrl(
+                              '${entryDetails["link"]}');
 
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => PDFScreen(
-                          pathPDF: pdfPath,
+                          pathPDF: path,
+                          viewOnly: true,
                         ),
                       ));
                     })

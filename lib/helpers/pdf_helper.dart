@@ -34,7 +34,8 @@ class PdfHelper {
             child: pdfWidgets.SizedBox(
               height: field.size.height,
               width: field.size.width,
-              child: pdfWidgets.Center(
+              child: pdfWidgets.FittedBox(
+                fit: pdfWidgets.BoxFit.contain,
                 child: pdfWidgets.Image(
                   pdfWidgets.MemoryImage(signature),
                 ),

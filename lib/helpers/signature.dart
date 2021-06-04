@@ -9,11 +9,9 @@ class SignatureHelper extends StatefulWidget {
 
 class _SignatureHelperState extends State<SignatureHelper> {
   final SignatureController _controller = SignatureController(
-    penStrokeWidth: 4,
+    penStrokeWidth: 5,
     penColor: Colors.blueAccent,
     exportBackgroundColor: Colors.white10,
-    onDrawStart: () => print('onDrawStart called!'),
-    onDrawEnd: () => print('onDrawEnd called!'),
   );
 
   @override
