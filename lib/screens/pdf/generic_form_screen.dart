@@ -9,9 +9,12 @@ import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/helpers/signature.dart';
 import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument_instance.dart';
+import 'package:teamshare/models/report.dart';
 import 'package:teamshare/providers/applogger.dart';
+import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 
@@ -19,13 +22,13 @@ class GenericFormScreen extends StatefulWidget {
   final String pdfId;
   final List<Field> fields;
   final InstrumentInstance instance;
-  final String siteName;
+  final String siteId;
   final String reportId;
   final String reportIndex;
   const GenericFormScreen(
       {this.fields,
       this.pdfId,
-      this.siteName,
+      this.siteId,
       this.instance,
       this.reportId,
       this.reportIndex});
@@ -272,7 +275,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         instanceId: widget.instance.serial,
         instrumentId: widget.instance.instrumentId,
         pdfPath: downloadedPdfPath,
-        siteName: widget.siteName,
+        siteName: FirebaseFirestoreProvider.getSiteById(widget.siteId).name,
         signature: imagedata,
       );
 
@@ -292,16 +295,24 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             FirebasePaths.instanceReportPath(
                 widget.instance.instrumentId, widget.instance.serial));
 
+        Report report = Report(
+          timestampClose: DateTime.now().millisecondsSinceEpoch,
+          index: widget.reportIndex,
+          creatorId: Authentication().userEmail,
+          fields: widget.fields,
+          instanceId: widget.instance.serial,
+          instrumentId: widget.instance.instrumentId,
+          reportId: widget.reportId,
+          reportName: basenameWithoutExtension(widget.pdfId),
+          status: 'Closed',
+          siteId: widget.siteId,
+        );
         //upload fields
         var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
-            reportFilePath: uploadedReport,
-            fields: widget.fields,
-            instrumentId: widget.instance.instrumentId,
-            instanceId: widget.instance.serial,
-            reportName: basenameWithoutExtension(widget.pdfId),
-            reportStatus: 'Complete',
-            reportId: widget.reportId,
-            reportIndex: widget.reportIndex);
+          report: report,
+          reportFilePath: uploadedReport,
+          reportId: widget.reportId,
+        );
         setState(() {
           _loading = false;
         });
@@ -339,15 +350,23 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         field.defaultValue =
             controllersArray.elementAt(widget.fields.indexOf(field)).text;
     });
+
+    Report report = Report(
+        timestampClose: DateTime.now().millisecondsSinceEpoch,
+        index: widget.reportIndex,
+        creatorId: Authentication().userEmail,
+        fields: widget.fields,
+        instanceId: widget.instance.serial,
+        instrumentId: widget.instance.instrumentId,
+        reportId: widget.reportId,
+        reportName: basenameWithoutExtension(widget.pdfId),
+        status: 'Closed',
+        siteId: widget.siteId);
     //upload fields
     var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
-        fields: widget.fields,
-        instrumentId: widget.instance.instrumentId,
-        instanceId: widget.instance.serial,
-        reportName: basenameWithoutExtension(widget.pdfId),
-        reportStatus: 'Complete',
-        reportId: widget.reportId,
-        reportIndex: widget.reportIndex);
+      report: report,
+      reportId: widget.reportId,
+    );
     setState(() {
       _loading = false;
     });

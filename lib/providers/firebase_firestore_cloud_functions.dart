@@ -157,28 +157,16 @@ class FirebaseFirestoreCloudFunctions {
   }
 
   static Future<HttpsCallableResult> uploadInstanceReport(
-      {String reportFilePath,
-      List<Field> fields,
-      String instrumentId,
-      String instanceId,
-      String reportName,
-      String reportIndex,
-      String reportStatus,
-      String reportId}) async {
+      {String reportFilePath, String reportId, Report report}) async {
     return await FirebaseFunctions.instance
         .httpsCallable("addInstanceReport")
         .call(<String, dynamic>{
       "teamId": FirebasePaths.teamId,
-      "instrumentId": instrumentId,
-      "instanceId": instanceId,
       "reportData": {
-        "reportFilePath": reportFilePath,
-        "reportName": reportName,
         "reportId": reportId,
-        "reportStatus": reportStatus,
-        "reportIndex": reportIndex,
+        'reportFilePath': reportFilePath,
+        'report': report.toJson(),
       },
-      "fields": fields.map((field) => field.toJson()).toList(),
     });
   }
 

@@ -19,10 +19,11 @@ class FirebasePaths {
       '$teams/$teamId/$instruments/$instrumentId/$instances/$instanceId/$entries';
   static String get teamEntriesRef => '$teams/$teamId/$entries';
   static String instrumentReportRef(String instrumentId) =>
-      '$teams/$teamId/$instruments/$instrumentId/$reports';
-  static instanceReportRef(
-          String instrumentId, String instanceId, String reportId) =>
-      '$teams/$teamId/$instruments/$instrumentId/$instances/$instanceId/$reports/$reportId';
+      '$teams/$teamId/$instruments/$instrumentId/$report_templates';
+  static get teamReportRef => '$teams/$teamId/$reports';
+  // static instanceReportRef(
+  //         String instrumentId, String instanceId, String reportId) =>
+  //     '$teams/$teamId/$instruments/$instrumentId/$instances/$instanceId/$reports/$reportId';
   static String get partsStorageCatalogRef => '$teams/$teamId/$parts';
   static String partsInventoryRef(String memberId) =>
       '$teams/$teamId/$members/$memberId/$inventory';

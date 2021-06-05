@@ -20,6 +20,7 @@ class FirebaseFirestoreProvider {
   static List<InstrumentInstance> _instanceImage = [];
   static List<Site> _siteImage = [];
   static List<Part> _partImage = [];
+  static List<Report> _teamReportsImage = [];
 
   //Get from Firebase
   static Stream<List<String>> getUserTeamList() {
@@ -233,29 +234,16 @@ class FirebaseFirestoreProvider {
         );
   }
 
-  static Future<List<Field>> getReportFields(
-      {String instrumentId, String instanceId, String reportId}) async {
-    DocumentSnapshot result = await FirebaseFirestore.instance
-        .doc(
-            "${FirebasePaths.instanceReportRef(instrumentId, instanceId, reportId)}")
-        .get();
-
-    return result
-        .data()
-        .values
-        .map((values) => Field.fromJson(values["fields"]))
-        .toList();
-  }
-
-  static Stream<List<Report>> getAllReportFields(
-      {String instrumentId, String instanceId, String reportId}) {
+  static Stream<List<Report>> getTeamReport({bool decending = false}) {
     return FirebaseFirestore.instance
-        .collection(
-            "${FirebasePaths.instanceReportRef(instrumentId, instanceId, "")}")
-        .orderBy('timestamp', descending: false)
+        .collection("${FirebasePaths.teamReportRef}")
+        .orderBy("index", descending: decending)
         .snapshots()
-        .map((query) =>
-            query.docs.map((doc) => Report.fromFirestore(doc)).toList());
+        .map((values) {
+      _teamReportsImage =
+          values.docs.map((e) => Report.fromFirestore(e)).toList();
+      return _teamReportsImage;
+    });
   }
 
   static Instrument getInstrumentById(String instrumentId) {
@@ -267,10 +255,16 @@ class FirebaseFirestoreProvider {
   }
 
   static Site getSiteById(String siteId) {
-    return _siteImage.firstWhere((element) => element.id == siteId);
+    return siteId == "Main"
+        ? Site(name: 'Main')
+        : _siteImage.firstWhere((element) => element.id == siteId);
   }
 
   static Part getPartById(String partId) {
     return _partImage.firstWhere((element) => element.id == partId);
+  }
+
+  static Report getReportById(String reportId) {
+    return _teamReportsImage.firstWhere((element) => element.id == reportId);
   }
 }

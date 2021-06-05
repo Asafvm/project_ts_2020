@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/models/entry.dart';
+import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/report.dart';
@@ -50,9 +51,9 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
       initialData: [],
       child: Scaffold(
         appBar: AppBar(
-            title: Text(widget.instrument.getCodeName() +
-                " " +
-                widget.instance.serial)),
+          title: Text(
+              '${FirebaseFirestoreProvider.getInstrumentById(widget.instance.instrumentId).codeName} ${widget.instance.serial}'),
+        ),
         body: Column(
           children: [
             Flexible(
@@ -241,91 +242,93 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                     .getInstrumentReports(widget.instrument.id),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasData) {
-                                    List<Report> reportList = snapshot.data
-                                        .map((e) => Report.fromFirestore(e))
-                                        .toList();
-
                                     return ListView.builder(
                                       shrinkWrap: true,
-                                      itemBuilder: (ctx, index) => ListTile(
-                                        leading: Icon(Icons.picture_as_pdf),
-                                        title:
-                                            Text(reportList[index].reportName),
-                                        trailing: SizedBox(
-                                          width: 150,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: IconButton(
-                                                  icon: Icon(
-                                                    Icons.bar_chart,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                  ),
-                                                  onPressed: () => setState(() {
-                                                    _showGraph = !_showGraph;
-                                                    _selectedReport =
-                                                        reportList[index]
-                                                            .reportName;
-                                                  }),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: OutlinedButton(
-                                                  child: _creatingForm
-                                                      ? CircularProgressIndicator()
-                                                      : Text(
-                                                          "Create",
-                                                        ),
-                                                  style: outlinedButtonStyle,
-                                                  onPressed: () async {
-                                                    setState(() {
-                                                      _creatingForm = true;
-                                                    });
-                                                    Map<String, dynamic>
-                                                        reportData =
-                                                        await FirebaseFirestoreCloudFunctions
-                                                            .reserveReportId(
-                                                                widget.instance,
-                                                                reportList[
-                                                                        index]
-                                                                    .reportName);
+                                      itemBuilder: (ctx, index) {
+                                        String reportName =
+                                            snapshot.data[index]["reportName"];
+                                        List<Field> reportFields =
+                                            List<Field>.from(snapshot
+                                                .data[index]["fields"].values
+                                                .map((e) => Field.fromJson(e)));
 
-                                                    await Navigator.of(context)
-                                                        .push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            GenericFormScreen(
-                                                          fields:
-                                                              reportList[index]
-                                                                  .fields,
-                                                          pdfId:
-                                                              reportList[index]
-                                                                  .reportName,
-                                                          instance:
-                                                              widget.instance,
-                                                          siteName: widget
-                                                              .instance
-                                                              .currentSiteId,
-                                                          reportId: reportData[
-                                                              "reportId"],
-                                                          reportIndex:
-                                                              reportData[
-                                                                  "reportIndex"],
-                                                        ),
-                                                      ),
-                                                    );
-                                                    setState(() {
-                                                      _creatingForm = false;
-                                                    });
-                                                  },
+                                        return ListTile(
+                                          leading: Icon(Icons.picture_as_pdf),
+                                          title: Text(reportName),
+                                          trailing: SizedBox(
+                                            width: 150,
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: IconButton(
+                                                    icon: Icon(
+                                                      Icons.bar_chart,
+                                                      color: Theme.of(context)
+                                                          .primaryColor,
+                                                    ),
+                                                    onPressed: () =>
+                                                        setState(() {
+                                                      _showGraph = !_showGraph;
+                                                      _selectedReport =
+                                                          reportName;
+                                                    }),
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                                Expanded(
+                                                  child: OutlinedButton(
+                                                    child: _creatingForm
+                                                        ? CircularProgressIndicator()
+                                                        : Text(
+                                                            "Create",
+                                                          ),
+                                                    style: outlinedButtonStyle,
+                                                    onPressed: () async {
+                                                      setState(() {
+                                                        _creatingForm = true;
+                                                      });
+                                                      Map<String, dynamic>
+                                                          reportData =
+                                                          await FirebaseFirestoreCloudFunctions
+                                                              .reserveReportId(
+                                                                  widget
+                                                                      .instance,
+                                                                  reportName);
+
+                                                      await Navigator.of(
+                                                              context)
+                                                          .push(
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              GenericFormScreen(
+                                                            fields:
+                                                                reportFields,
+                                                            pdfId: reportName,
+                                                            instance:
+                                                                widget.instance,
+                                                            siteId: widget
+                                                                .instance
+                                                                .currentSiteId,
+                                                            reportId:
+                                                                reportData[
+                                                                    "reportId"],
+                                                            reportIndex:
+                                                                reportData[
+                                                                    "reportIndex"],
+                                                          ),
+                                                        ),
+                                                      );
+                                                      setState(() {
+                                                        _creatingForm = false;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      itemCount: reportList.length,
+                                        );
+                                      },
+                                      itemCount: snapshot.data.length,
                                     );
                                   } else {
                                     return Container();
@@ -378,20 +381,23 @@ class ReportGraph extends StatelessWidget {
 
     return SingleChildScrollView(
       child: StreamBuilder<List<Report>>(
-        stream: FirebaseFirestoreProvider.getAllReportFields(
-            instanceId: widget.instance.serial,
-            instrumentId: widget.instance.instrumentId),
+        stream: FirebaseFirestoreProvider.getTeamReport(),
         initialData: [],
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data.isNotEmpty) {
             //init
+
+            //get a specific report list
             List<Report> reports = snapshot.data
-                .where((report) => report.reportName == reportName)
+                .where((report) =>
+                    report.reportName == reportName &&
+                    report.instrumentId == widget.instance.instrumentId &&
+                    report.instanceId == widget.instance.serial)
                 .toList();
             List<String> labelX = List<String>.generate(
                 reports.length,
                 (index) =>
-                    '${reports.elementAt(index).reportId}\n${formatter.format(DateTime.fromMillisecondsSinceEpoch(reports.elementAt(index).timestamp))}');
+                    '${reports.elementAt(index).index}\n${formatter.format(DateTime.fromMillisecondsSinceEpoch(reports.elementAt(index).timestampOpen))}');
             labelX = labelX.sublist(
                 labelX.length > _dataLimit ? labelX.length - _dataLimit : 0);
 

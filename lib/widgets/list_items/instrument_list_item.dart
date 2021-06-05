@@ -116,18 +116,18 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
 
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                List<Report> reports =
-                    snapshot.data.map((e) => Report.fromFirestore(e)).toList();
+                // List<Report> reports =
+                //     snapshot.data.map((e) => Report.fromFirestore(e)).toList();
                 return AnimatedContainer(
                   height: _selected
-                      ? reports.length * 50.0
+                      ? snapshot.data.length * 50.0
                       : 0, //50 = height of listtile
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemBuilder: (ctx, index) => ListTile(
                       leading: Icon(Icons.picture_as_pdf),
                       title: Text(
-                        reports[index].reportName,
+                        snapshot.data[index]["reportName"],
                         maxLines: 2,
                       ),
                       trailing: FittedBox(
@@ -136,15 +136,15 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                             IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () => _openPDF(
-                                  reports[index].reportName,
-                                  reports[index].fields,
-                                  reports[index].id),
+                                  snapshot.data[index]["reportName"],
+                                  snapshot.data[index]["fields"],
+                                  snapshot.data[index]["id"]),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    itemCount: reports.length,
+                    itemCount: snapshot.data.length,
                   ),
                   duration: Duration(milliseconds: 300),
                 );

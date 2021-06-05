@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/providers/applogger.dart';
 import 'package:teamshare/providers/team_provider.dart';
 
@@ -38,10 +39,10 @@ class FirebaseStorageProvider {
 
   static Future<String> downloadFile(String path) async {
     Reference ref = FirebaseStorage.instance.ref().child(path);
-    Future<Directory> dir = Directory(
-            '${(await getTemporaryDirectory()).path}/${TeamProvider().getCurrentTeam.name}')
-        .create(recursive: true);
-    final Directory systemTempDir = await dir;
+
+    final Directory systemTempDir =
+        await Directory('${(await FirebasePaths.rootTeamFolder())}')
+            .create(recursive: true);
     final File tempFile = await File(
             '${systemTempDir.path}/${basenameWithoutExtension(path)}.pdf')
         .create();
