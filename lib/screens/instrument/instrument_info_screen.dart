@@ -390,9 +390,10 @@ class ReportGraph extends StatelessWidget {
             //get a specific report list
             List<Report> reports = snapshot.data
                 .where((report) =>
+                    report.status == "Closed" && //ignore open reports
                     report.reportName == reportName &&
                     report.instrumentId == widget.instance.instrumentId &&
-                    report.instanceId == widget.instance.serial)
+                    report.instanceId == widget.instance.id)
                 .toList();
             List<String> labelX = List<String>.generate(
                 reports.length,

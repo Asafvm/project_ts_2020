@@ -168,7 +168,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
         var snapshot = await instruments.get();
         snapshot.forEach((doc) => {
           //check for duplicates
-          if (doc.data["codeName"] === data["instrument"]["codeName"])
+          if (doc.data()["codeName"] === data["instrument"]["codeName"])
             //throw error message if found
             throw new functions.https.HttpsError(
               "already-exists",
@@ -201,9 +201,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
 });
 
 exports.autoEntryCollector = functions.firestore
-  .document(
-    "teams/{teamId}/instruments/{instrumentId}/instances/{instanceId}/entries/{entryId}"
-  )
+  .document("teams/{teamId}/instances/{instanceId}/entries/{entryId}")
   .onWrite(async (change, context) => {
     const entries = admin
       .firestore()
@@ -224,16 +222,23 @@ exports.addInstrumentInstance = functions.https.onCall(
       .firestore()
       .collection("teams")
       .doc(data["teamId"])
-      .collection("instruments")
-      .doc(data["instrumentId"])
-      .collection("instances")
-      .doc(data["instrument"]["serial"]);
-
+      .collection("instances");
     try {
       switch (data["operation"]) {
         case 0: //create
-          await instruments.create(data["instrument"]);
-          await instruments.collection("entries").add({
+          var snapshot = await instruments.get();
+          snapshot.forEach((doc) => {
+            //check for duplicates
+            if (doc.data()["serial"] === data["instrument"]["serial"] && doc.data()["instrumentId"] === data["instrument"]["instrumentId"])
+              //throw error message if found
+              throw new functions.https.HttpsError(
+                "already-exists",
+                "Instrument already exists",
+                "Serial code already in use"
+              );
+          });
+          var doc = await instruments.add(data["instrument"]);
+          await instruments.doc(doc.id).collection("entries").add({
             type: 0,
             timestamp: Date.now(),
             details: {
@@ -445,8 +450,6 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
     .firestore()
     .collection("teams")
     .doc(data["teamId"])
-    .collection("instruments")
-    .doc(report["instrumentId"])
     .collection("instances")
     .doc(report["instanceId"]);
 
@@ -466,7 +469,7 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
       type: 2,
       timestamp: Date.now(),
       details: {
-        title: "Report Created "+report["index"],
+        title: "Report Created " + report["index"],
         reportName: report["reportName"],
         reportid: reportData["reportId"],
         instrumentId: report["instrumentId"],

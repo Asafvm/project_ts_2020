@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/screens/instrument/instrument_info_screen.dart';
@@ -41,7 +40,7 @@ class InstrumentInstanceListItem extends StatelessWidget {
                 instance.imgUrl,
                 width: 70,
               ),
-        title: Text(instance.serial),
+        title: Text('${instrument.codeName} ${instance.serial}'),
         subtitle: Text(
             '${instance.nextMaintenance == null ? "Maintenance needed" : "Next maintenance = " + formatter.format(DateTime.fromMillisecondsSinceEpoch(instance.nextMaintenance))}'),
       ),

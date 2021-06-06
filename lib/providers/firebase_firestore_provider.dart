@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/entry.dart';
-import 'package:teamshare/models/field.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
@@ -86,38 +85,40 @@ class FirebaseFirestoreProvider {
   static Stream<List<InstrumentInstance>> getInstrumentsInstances(
       String instrumentId) {
     return FirebaseFirestore.instance
-        .collection("${FirebasePaths.instanceRef(instrumentId)}")
+        .collection("${FirebasePaths.instanceRef}")
+        .orderBy("serial")
         .snapshots()
         .map(
-      (query) {
-        _instanceImage = query.docs
-            .map(
-              (doc) => InstrumentInstance.fromFirestore(doc),
-            )
-            .toList();
-        return _instanceImage;
-      },
-    );
+          (query) => query.docs
+              .map(
+                (doc) => InstrumentInstance.fromFirestore(doc),
+              )
+              .where((element) => element.instrumentId == instrumentId)
+              .toList(),
+        );
   }
 
   static Future<InstrumentInstance> getInstanceInfo(
       String instrumentId, String instanceId) async {
     return InstrumentInstance.fromFirestore(await FirebaseFirestore.instance
-        .doc("${FirebasePaths.instanceRef(instrumentId)}/$instanceId")
+        .doc("${FirebasePaths.instanceRef}/$instanceId")
         .get());
   }
 
   static Stream<List<InstrumentInstance>> getAllInstrumentsInstances() {
     return FirebaseFirestore.instance
-        .collectionGroup("instances")
+        .collection(FirebasePaths.instanceRef)
         .snapshots()
         .map(
-          (list) => list.docs
-              .map(
-                (item) => InstrumentInstance.fromFirestore(item),
-              )
-              .toList(),
-        );
+      (list) {
+        _instanceImage = list.docs
+            .map(
+              (item) => InstrumentInstance.fromFirestore(item),
+            )
+            .toList();
+        return _instanceImage;
+      },
+    );
   }
 
   static Future<Team> getTeamInfo(String teamDocId) async {
@@ -207,8 +208,7 @@ class FirebaseFirestoreProvider {
   static Stream<List<Entry>> getEntries(InstrumentInstance instance,
       [bool descending = true]) {
     return FirebaseFirestore.instance
-        .collection(
-            "${FirebasePaths.instanceEntriesRef(instance.instrumentId, instance.serial)}")
+        .collection("${FirebasePaths.instanceEntriesRef(instance.id)}")
         .orderBy("timestamp", descending: descending) //newest first
         .snapshots()
         .map(
@@ -251,7 +251,7 @@ class FirebaseFirestoreProvider {
   }
 
   static InstrumentInstance getInstanceById(String instanceId) {
-    return _instanceImage.firstWhere((element) => element.serial == instanceId);
+    return _instanceImage.firstWhere((element) => element.id == instanceId);
   }
 
   static Site getSiteById(String siteId) {

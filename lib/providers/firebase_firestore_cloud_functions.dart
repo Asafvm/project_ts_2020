@@ -105,14 +105,14 @@ class FirebaseFirestoreCloudFunctions {
   }
 
   static Future<HttpsCallableResult> uploadInstrumentInstance(
-      InstrumentInstance _newInstrument, Operation operation) async {
+      InstrumentInstance instance, Operation operation) async {
     return await FirebaseFunctions.instance
         .httpsCallable("addInstrumentInstance")
         .call(<String, dynamic>{
       "operation": operation.index,
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
-      "instrumentId": _newInstrument.instrumentId,
-      "instrument": _newInstrument.toJson(),
+      "instrumentId": instance.instrumentId,
+      "instrument": instance.toJson(),
     });
   }
 

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -272,7 +271,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       //compose pdf
       String reportPath = await PdfHelper.createPdf(
         fields: widget.fields,
-        instanceId: widget.instance.serial,
+        instanceId: widget.instance.id,
         instrumentId: widget.instance.instrumentId,
         pdfPath: downloadedPdfPath,
         siteName: FirebaseFirestoreProvider.getSiteById(widget.siteId).name,
@@ -300,7 +299,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           index: widget.reportIndex,
           creatorId: Authentication().userEmail,
           fields: widget.fields,
-          instanceId: widget.instance.serial,
+          downloadUrl: uploadedReport,
+          instanceId: widget.instance.id,
           instrumentId: widget.instance.instrumentId,
           reportId: widget.reportId,
           reportName: basenameWithoutExtension(widget.pdfId),
@@ -356,7 +356,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         index: widget.reportIndex,
         creatorId: Authentication().userEmail,
         fields: widget.fields,
-        instanceId: widget.instance.serial,
+        instanceId: widget.instance.id,
         instrumentId: widget.instance.instrumentId,
         reportId: widget.reportId,
         reportName: basenameWithoutExtension(widget.pdfId),

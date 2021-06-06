@@ -1,12 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:teamshare/helpers/firebase_paths.dart';
-import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/models/entry.dart';
-import 'package:teamshare/models/field.dart';
-import 'package:teamshare/models/instrument_instance.dart';
-import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';

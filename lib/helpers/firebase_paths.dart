@@ -13,10 +13,11 @@ class FirebasePaths {
   static String get teamsRef => '$users/${Authentication().userEmail}/$teams';
   static String get membersRef => '$teams/$teamId/$members';
   static String get instrumentRef => '$teams/$teamId/$instruments';
-  static String instanceRef(String instrumentId) =>
-      '$teams/$teamId/$instruments/$instrumentId/$instances';
-  static String instanceEntriesRef(String instrumentId, String instanceId) =>
-      '$teams/$teamId/$instruments/$instrumentId/$instances/$instanceId/$entries';
+  static String get instanceRef => '$teams/$teamId/$instances';
+  // static String instanceRef(String instrumentId) =>
+  //     '$teams/$teamId/$instruments/$instrumentId/$instances';
+  static String instanceEntriesRef(String instanceId) =>
+      '$instanceRef/$instanceId/$entries';
   static String get teamEntriesRef => '$teams/$teamId/$entries';
   static String instrumentReportRef(String instrumentId) =>
       '$teams/$teamId/$instruments/$instrumentId/$report_templates';

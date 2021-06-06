@@ -1,7 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/helpers/picker_helper.dart';
 import 'package:teamshare/helpers/location_helper.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/models/instrument.dart';
@@ -9,7 +8,6 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
-import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/screens/contact/contact_selection_screen.dart';
 import 'package:teamshare/screens/instrument/instrument_selection_screen.dart';
 import 'package:teamshare/widgets/forms/add_room_form.dart';

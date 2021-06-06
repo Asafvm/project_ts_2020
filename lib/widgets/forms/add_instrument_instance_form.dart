@@ -73,16 +73,19 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
       });
       //send to server
       try {
-        await FirebaseFirestoreCloudFunctions.uploadInstrumentInstance(
-                _newInstInstrument, Operation.CREATE)
-            .then((_) async => {
-                  Navigator.of(context).pop(),
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('New Instance Added Successfully!'),
-                    ),
-                  ),
-                });
+        var result =
+            await FirebaseFirestoreCloudFunctions.uploadInstrumentInstance(
+                _newInstInstrument, Operation.CREATE);
+        Navigator.of(context).pop();
+
+        if (result.data["status"] == "success")
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Instrument Added Successfully!'),
+            ),
+          );
+        else
+          throw result.data["messege"]["details"];
       } catch (error) {
         showDialog(
             context: context,

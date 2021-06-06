@@ -3,7 +3,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/field.dart';
-import 'package:teamshare/models/report.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';

@@ -33,7 +33,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Entry> entryList = Provider.of<List<Entry>>(context);
+    // List<Entry> entryList = Provider.of<List<Entry>>(context);
     return MultiProvider(
       providers: [
         StreamProvider<List<Site>>.value(
@@ -45,6 +45,8 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
         StreamProvider<List<Part>>.value(
             value: FirebaseFirestoreProvider.getCatalogParts(),
             initialData: []),
+        StreamProvider<List<Entry>>.value(
+            value: FirebaseFirestoreProvider.getTeamEntries(), initialData: []),
       ],
       child: Scaffold(
         drawer: CustomDrawer(),
@@ -147,17 +149,19 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                   ],
                 ),
                 Expanded(
-                  child: InfoCube(
-                    title: 'Recent Activity',
-                    child: MediaQuery.removePadding(
-                      context: context,
-                      removeTop: true,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: entryList.length,
-                        itemBuilder: (context, index) => EntryListItem(
-                          entry: entryList[index],
-                          showSub: true,
+                  child: Consumer<List<Entry>>(
+                    builder: (context, entryList, child) => InfoCube(
+                      title: 'Recent Activity',
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: entryList.length,
+                          itemBuilder: (context, index) => EntryListItem(
+                            entry: entryList[index],
+                            showSub: true,
+                          ),
                         ),
                       ),
                     ),

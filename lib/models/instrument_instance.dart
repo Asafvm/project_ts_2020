@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InstrumentInstance {
+  String id;
   final String instrumentId;
   final String serial;
   String currentSiteId = 'Main';
@@ -23,8 +24,9 @@ class InstrumentInstance {
         'imgUrl': imgUrl,
       };
 
-  InstrumentInstance.fromJson(Map<String, dynamic> data)
-      : instrumentId = data['instrumentId'],
+  InstrumentInstance.fromJson(Map<String, dynamic> data, String id)
+      : id = id,
+        instrumentId = data['instrumentId'],
         currentSiteId = data['currentSiteId'],
         currentRoomId = data['currentRoomId'],
         nextMaintenance = data['nextMaintenance'],
@@ -33,7 +35,8 @@ class InstrumentInstance {
         imgUrl = data['imgUrl'];
 
   factory InstrumentInstance.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return InstrumentInstance.fromJson(documentSnapshot.data());
+    return InstrumentInstance.fromJson(
+        documentSnapshot.data(), documentSnapshot.id);
   }
 
   String get getCurrentLocation {
