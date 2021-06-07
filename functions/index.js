@@ -244,7 +244,7 @@ exports.addInstrumentInstance = functions.https.onCall(
             details: {
               title: "Instrument Created",
               instrumentId: data["instrumentId"],
-              instanceId: data["instrument"]["serial"],
+              instanceId: doc.id,
             },
           });
           break;
@@ -278,6 +278,20 @@ exports.addPart = functions.https.onCall(async (data, context) => {
   try {
     switch (data["operation"]) {
       case 0: //create
+
+      var snapshot = await parts.get();
+      snapshot.forEach((doc) => {
+        //check for duplicates
+        if (doc.data()["reference"] === data["part"]["reference"])
+          //throw error message if found
+          throw new functions.https.HttpsError(
+            "already-exists",
+            "Part already exists",
+            "Referance already in use"
+          );
+      });
+
+
         await parts.add(partdata);
         break;
 
@@ -546,14 +560,13 @@ exports.linkInstruments = functions.https.onCall(async (data, context) => {
     const instruments = data["instruments"];
 
     instruments.forEach((instrument) => {
+      console.log(instrument);
       const instanceRef = admin
         .firestore()
         .collection("teams")
         .doc(data["teamId"])
-        .collection("instruments")
-        .doc(instrument.instrumentCode)
         .collection("instances")
-        .doc(instrument.instanceSerial);
+        .doc(instrument["instanceId"]);
 
       const update = instanceRef.update({
         currentSiteId: data["siteId"],
@@ -566,8 +579,8 @@ exports.linkInstruments = functions.https.onCall(async (data, context) => {
         timestamp: Date.now(),
         details: {
           title: "Intrument Moved",
-          instrumentId: instrument.instrumentCode,
-          instanceId: instrument.instanceSerial,
+          instrumentId: instrument.instrumentId,
+          instanceId: instrument.instanceId,
         },
       });
       promises.push(update);

@@ -48,7 +48,7 @@ class EntryListItem extends StatelessWidget {
           ),
           subtitle: showSub
               ? Text(
-                  '${FirebaseFirestoreProvider.getInstrumentById(entryDetails["instrumentId"]).codeName} ${entryDetails["instanceId"]}')
+                  '${FirebaseFirestoreProvider.getInstrumentById(entryDetails["instrumentId"]).codeName} ${FirebaseFirestoreProvider.getInstanceById(entryDetails["instanceId"]).serial}')
               : Container(),
           trailing: SizedBox(
             width: 30,

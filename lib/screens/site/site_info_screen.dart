@@ -289,13 +289,9 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
                                 itemBuilder: (context, index) {
                                   return InstrumentInstanceListItem(
                                     instance: list[index],
-                                    instrument: instrumentList.isNotEmpty
-                                        ? instrumentList
-                                            .where((element) =>
-                                                element.codeName ==
-                                                list[index].instrumentId)
-                                            .first
-                                        : null,
+                                    instrument: FirebaseFirestoreProvider
+                                        .getInstrumentById(
+                                            list[index].instrumentId),
                                   );
                                 },
                               );

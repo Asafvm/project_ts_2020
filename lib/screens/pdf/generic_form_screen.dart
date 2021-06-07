@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_helper.dart';
@@ -168,6 +169,10 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                     labelText: field.hint,
                     labelStyle: TextStyle(color: Colors.black),
                   ),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^[0-9]+(\.([0-9])+)?'))
+                  ],
                   validator: (value) {
                     if (value.isEmpty && field.isMandatory)
                       return 'Cannot be empty';

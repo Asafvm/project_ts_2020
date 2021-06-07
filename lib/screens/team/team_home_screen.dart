@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/entry.dart';
 import 'package:teamshare/models/instrument.dart';
+import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/models/team.dart';
@@ -42,6 +43,9 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
         ),
         StreamProvider<List<Instrument>>.value(
             value: FirebaseFirestoreProvider.getInstruments(), initialData: []),
+        StreamProvider<List<InstrumentInstance>>.value(
+            value: FirebaseFirestoreProvider.getAllInstrumentsInstances(),
+            initialData: []),
         StreamProvider<List<Part>>.value(
             value: FirebaseFirestoreProvider.getCatalogParts(),
             initialData: []),
@@ -115,7 +119,7 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                       ),
                     ),
                     Expanded(
-                      child: Consumer<List<Instrument>>(
+                      child: Consumer<List<InstrumentInstance>>(
                         builder: (context, value, child) => InfoCube(
                           title: 'Instruments',
                           child: Center(

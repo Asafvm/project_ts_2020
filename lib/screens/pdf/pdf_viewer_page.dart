@@ -239,84 +239,82 @@ class _PDFScreenState extends State<PDFScreen> {
                               ),
                             ),
                           ),
-                          if (!widget.viewOnly)
-                            Expanded(
-                              child: _dragging
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(),
-                                          color: _boxColor),
-                                      child: DragTarget(onAccept: (data) {
-                                        setState(() {
-                                          if (data['index'] != -1)
-                                            _fields.removeWhere((element) =>
-                                                element.index == data['index']);
-                                          _boxColor = null;
-                                        });
-                                      }, onMove: (details) {
-                                        setState(() {
-                                          _boxColor = Colors.orangeAccent;
-                                        });
-                                      }, onLeave: (data) {
-                                        setState(() {
-                                          _boxColor = null;
-                                        });
-                                      }, builder: (context, candidateData,
-                                          rejectedData) {
-                                        return Center(
-                                          child: Icon(Icons.delete),
-                                        );
-                                      }),
-                                    )
-                                  : Column(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              color: _boxColor,
-                                              border: Border(
-                                                  left: BorderSide(),
-                                                  right: BorderSide())),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              OutlinedButton.icon(
-                                                  style: outlinedButtonStyle,
-                                                  onPressed:
-                                                      _actualPageNumber == 1
-                                                          ? null
-                                                          : () {
-                                                              if (_actualPageNumber >
-                                                                  1) {
-                                                                setState(() {
-                                                                  _actualPageNumber--;
-                                                                });
-                                                              }
-                                                            },
-                                                  icon:
-                                                      Icon(Icons.chevron_left),
-                                                  label: Text('Previous')),
-                                              Text(
-                                                  'Page $_actualPageNumber / ${images.length}'),
-                                              OutlinedButton.icon(
+                          Expanded(
+                            child: _dragging
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(), color: _boxColor),
+                                    child: DragTarget(onAccept: (data) {
+                                      setState(() {
+                                        if (data['index'] != -1)
+                                          _fields.removeWhere((element) =>
+                                              element.index == data['index']);
+                                        _boxColor = null;
+                                      });
+                                    }, onMove: (details) {
+                                      setState(() {
+                                        _boxColor = Colors.orangeAccent;
+                                      });
+                                    }, onLeave: (data) {
+                                      setState(() {
+                                        _boxColor = null;
+                                      });
+                                    }, builder:
+                                        (context, candidateData, rejectedData) {
+                                      return Center(
+                                        child: Icon(Icons.delete),
+                                      );
+                                    }),
+                                  )
+                                : Column(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: _boxColor,
+                                            border: Border(
+                                                left: BorderSide(),
+                                                right: BorderSide())),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            OutlinedButton.icon(
                                                 style: outlinedButtonStyle,
-                                                onPressed: _actualPageNumber ==
-                                                        images.length
-                                                    ? null
-                                                    : () {
-                                                        if (_actualPageNumber <
-                                                            images.length) {
-                                                          setState(() {
-                                                            _actualPageNumber++;
-                                                          });
-                                                        }
-                                                      },
-                                                label: Text('Next'),
-                                                icon: Icon(Icons.chevron_right),
-                                              )
-                                            ],
-                                          ),
+                                                onPressed:
+                                                    _actualPageNumber == 1
+                                                        ? null
+                                                        : () {
+                                                            if (_actualPageNumber >
+                                                                1) {
+                                                              setState(() {
+                                                                _actualPageNumber--;
+                                                              });
+                                                            }
+                                                          },
+                                                icon: Icon(Icons.chevron_left),
+                                                label: Text('Previous')),
+                                            Text(
+                                                'Page $_actualPageNumber / ${images.length}'),
+                                            OutlinedButton.icon(
+                                              style: outlinedButtonStyle,
+                                              onPressed: _actualPageNumber ==
+                                                      images.length
+                                                  ? null
+                                                  : () {
+                                                      if (_actualPageNumber <
+                                                          images.length) {
+                                                        setState(() {
+                                                          _actualPageNumber++;
+                                                        });
+                                                      }
+                                                    },
+                                              label: Text('Next'),
+                                              icon: Icon(Icons.chevron_right),
+                                            )
+                                          ],
                                         ),
+                                      ),
+                                      if (!widget.viewOnly)
                                         Expanded(
                                           child: GridView.count(
                                             crossAxisCount: 3,
@@ -344,9 +342,9 @@ class _PDFScreenState extends State<PDFScreen> {
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                            ),
+                                    ],
+                                  ),
+                          ),
                           if (widget.approveMode)
                             Expanded(
                                 child: Row(

@@ -357,28 +357,19 @@ class _AddPartFormState extends State<AddPartForm>
         });
         // send to server
         try {
-          if (widget.part == null)
-            await FirebaseFirestoreCloudFunctions.uploadPart(
-                    _newPart, Operation.CREATE)
-                .then((_) async => {
-                      Navigator.of(context).pop(),
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Part Added Successfully!'),
-                        ),
-                      ),
-                    });
+          var result = await FirebaseFirestoreCloudFunctions.uploadPart(
+              _newPart,
+              widget.part == null ? Operation.CREATE : Operation.UPDATE);
+          Navigator.of(context).pop();
+
+          if (result.data["status"] == "success")
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Part Added Successfully!'),
+              ),
+            );
           else
-            await FirebaseFirestoreCloudFunctions.uploadPart(
-                    _newPart, Operation.UPDATE)
-                .then((_) async => {
-                      Navigator.of(context).pop(),
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Part Updated Successfully!'),
-                        ),
-                      ),
-                    });
+            throw result.data["messege"]["details"];
         } catch (error) {
           showDialog(
               context: context,

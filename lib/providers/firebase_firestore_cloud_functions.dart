@@ -209,8 +209,7 @@ class FirebaseFirestoreCloudFunctions {
         .call(<String, dynamic>{
       "teamId": TeamProvider().getCurrentTeam.getTeamId,
       "instruments": selected
-          .map((e) =>
-              {"instrumentCode": e.instrumentId, "instanceSerial": e.serial})
+          .map((e) => {"instrumentId": e.instrumentId, "instanceId": e.id})
           .toList(),
       "siteId": siteId,
       "roomId": roomId,

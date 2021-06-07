@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument.dart';
@@ -91,6 +92,12 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                                   title: Text(
                                                       'Set amount\n${catalogPart.description}'),
                                                   content: TextField(
+                                                    inputFormatters: <
+                                                        TextInputFormatter>[
+                                                      FilteringTextInputFormatter
+                                                          .allow(RegExp(
+                                                              r'^[0-9]+'))
+                                                    ],
                                                     controller: controller,
                                                     keyboardType:
                                                         TextInputType.number,
@@ -105,6 +112,8 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
                                                         style:
                                                             outlinedButtonStyle,
                                                         onPressed: () async {
+                                                          if (controller.text
+                                                              .isEmpty) return;
                                                           setState(() {
                                                             _loading = true;
                                                           });
