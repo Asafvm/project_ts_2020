@@ -24,6 +24,11 @@
 	<true/>
 	<key>canLaunch </key>
 	<string>LSApplicationQueriesSchemes</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	<string>https</string>
+	<string>http</string>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need permission to get your location</string>
 	<key>NSLocationAlwaysUsageDescription</key>

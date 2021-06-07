@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttercontactpicker/fluttercontactpicker.dart' as picker;
 import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/providers/consts.dart';
@@ -18,6 +19,11 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Contact _newContact = Contact();
 
+  final _controllerFirstName = TextEditingController();
+  final _controllerEmail = TextEditingController();
+  final _controllerPhone = TextEditingController();
+  final _controllerLastName = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +33,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildFirstNameField() {
     return TextFormField(
+      controller: _controllerFirstName,
       decoration: DecorationLibrary.inputDecoration("First Name", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
@@ -38,6 +45,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildLastNameField() {
     return TextFormField(
+      controller: _controllerLastName,
       decoration: DecorationLibrary.inputDecoration("Last Name", context),
       keyboardType: TextInputType.text,
       onSaved: (val) {
@@ -49,6 +57,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildPhoneNumberField() {
     return TextFormField(
+      controller: _controllerPhone,
       decoration: DecorationLibrary.inputDecoration("Phone Number", context),
       keyboardType: TextInputType.phone,
       onSaved: (val) {
@@ -60,6 +69,7 @@ class _AddContactFormState extends State<AddContactForm> {
 
   Widget _buildEmailField() {
     return TextFormField(
+      controller: _controllerEmail,
       decoration: DecorationLibrary.inputDecoration("Email", context),
       keyboardType: TextInputType.emailAddress,
       onSaved: (val) {
@@ -91,22 +101,69 @@ class _AddContactFormState extends State<AddContactForm> {
             ),
             _buildPhoneNumberField(),
             _buildEmailField(),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: _uploading
-                  ? CircularProgressIndicator()
-                  : OutlinedButton(
-                      onPressed: _uploadContactDetails,
-                      child: Text(
-                        'Add Contact',
-                      ),
-                      style: outlinedButtonStyle,
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  child: _uploading
+                      ? CircularProgressIndicator()
+                      : OutlinedButton(
+                          onPressed: _uploadContactDetails,
+                          child: Text(
+                            'Add Contact',
+                          ),
+                          style: outlinedButtonStyle,
+                        ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  child: _uploading
+                      ? CircularProgressIndicator()
+                      : OutlinedButton(
+                          onPressed: _pickFromContacts,
+                          child: Text(
+                            'Pick Contact',
+                          ),
+                          style: outlinedButtonStyle,
+                        ),
+                ),
+              ],
             )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _pickFromContacts() async {
+    final picker.FullContact contact =
+        await picker.FlutterContactPicker.pickFullContact(
+            askForPermission: true);
+    if (contact != null) {
+      setState(() {
+        try {
+          _controllerFirstName.text = contact.name.firstName;
+        } on Exception catch (e) {
+          _controllerFirstName.text = '';
+        }
+        try {
+          _controllerLastName.text = contact.name.lastName;
+        } on Exception catch (e) {
+          _controllerLastName.text = '';
+        }
+        try {
+          _controllerPhone.text = contact.phones.first.number;
+        } on Exception catch (e) {
+          _controllerPhone.text = '';
+        }
+        try {
+          _controllerEmail.text = contact.emails.first.email;
+        } on Exception catch (e) {
+          _controllerEmail.text = '';
+        }
+      });
+    }
   }
 
   Future<void> _uploadContactDetails() async {
@@ -154,10 +211,12 @@ class _AddContactFormState extends State<AddContactForm> {
   }
 
   String _phoneValidator(String value) {
-    return null;
+    if (value.isEmpty) return null;
+    return phoneRegExp.hasMatch(value) ? null : 'Not a valid phone number';
   }
 
   String _emailValidator(String value) {
-    return null;
+    if (value.isEmpty) return null;
+    return emailRegExp.hasMatch(value) ? null : 'Not a valid email';
   }
 }

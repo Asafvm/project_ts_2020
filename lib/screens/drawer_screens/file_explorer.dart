@@ -18,8 +18,8 @@ class _FileExplorerState extends State<FileExplorer> {
   Future<Directory> currentPath;
   bool _multiSelect = false;
   List<bool> _selectedList = [];
-  static List<FileSystemEntity> files;
-  List<FileSystemEntity> filteredFiles;
+  List<FileSystemEntity> files;
+  List<FileSystemEntity> filteredFiles = [];
 
   String _textFilter = '';
 
@@ -109,13 +109,13 @@ class _FileExplorerState extends State<FileExplorer> {
                         context: context, hint: 'Search'),
                     onChanged: (value) => setState(() {
                       _textFilter = value;
-
-                      filteredFiles
-                          .where((element) => element.path
-                              .substring(element.path.lastIndexOf('/') + 1)
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                          .toList();
+                      _filterFilesList();
+                      // filteredFiles
+                      //     .where((element) => element.path
+                      //         .substring(element.path.lastIndexOf('/') + 1)
+                      //         .toLowerCase()
+                      //         .contains(value.toLowerCase()))
+                      //     .toList();
                     }),
                   ),
                   Expanded(
@@ -139,6 +139,12 @@ class _FileExplorerState extends State<FileExplorer> {
                                     (value) {
                                   setState(() {
                                     _selectedList[index] = value;
+
+                                    if (files[index].statSync().type ==
+                                        FileSystemEntityType.directory) {
+                                      _selectedList[index] = false;
+                                    }
+
                                     if (_selectedList
                                             .where((element) => element == true)
                                             .length ==
@@ -160,6 +166,8 @@ class _FileExplorerState extends State<FileExplorer> {
                                 onLongPress: () {
                                   _initSelectedList(files.length);
                                   setState(() {
+                                    if (files[index].statSync().type ==
+                                        FileSystemEntityType.directory) return;
                                     _multiSelect = true;
                                     _selectedList[index] =
                                         true; //mark first selected
@@ -186,7 +194,9 @@ class _FileExplorerState extends State<FileExplorer> {
                                     Navigator.of(context)
                                         .push(MaterialPageRoute(
                                       builder: (context) => PDFScreen(
-                                          viewOnly: true,
+                                          fields: [],
+                                          //instrumentID: "",
+                                          //onlyFields: true,
                                           pathPDF: files[index].path),
                                     ));
                                 },
@@ -245,5 +255,17 @@ class _FileExplorerState extends State<FileExplorer> {
             ),
           ));
     return false;
+  }
+
+  void _filterFilesList() {
+    filteredFiles = files;
+    if (_textFilter != '') {
+      filteredFiles = filteredFiles
+          .where((element) => element.path
+              .substring(element.path.lastIndexOf('/') + 1)
+              .toLowerCase()
+              .contains(_textFilter.toLowerCase()))
+          .toList();
+    }
   }
 }

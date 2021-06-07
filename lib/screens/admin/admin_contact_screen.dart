@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/widgets/forms/add_contact_form.dart';
+import 'package:teamshare/widgets/list_items/contact_list_tile.dart';
 
 class AdminContactScreen extends StatefulWidget {
   final String siteId;
@@ -32,12 +33,7 @@ class _AdminContactScreenState extends State<AdminContactScreen> {
           : ListView.builder(
               itemCount: contacts.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                      '${contacts[index].getFullName(soreByFirstName: _sortByFirstName)}'),
-                  subtitle: Text('${contacts[index].phone}'),
-                );
+                return ContactListTile(contact: contacts[index]);
               },
             ),
     );
