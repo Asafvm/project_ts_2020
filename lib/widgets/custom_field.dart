@@ -138,7 +138,7 @@ class _CustomFieldState extends State<CustomField> {
                   widget.field.offset = before;
                 },
                 onDragStarted: () => before = widget.field.offset,
-                dragAnchor: DragAnchor.pointer,
+                // dragAnchor: DragAnchor.pointer,
                 data: {
                   'index': widget.field.index,
                 },

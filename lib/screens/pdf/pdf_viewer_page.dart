@@ -15,6 +15,7 @@ import 'package:teamshare/providers/firebase_storage_provider.dart';
 import 'package:teamshare/widgets/forms/add_field_form.dart';
 import 'package:teamshare/widgets/custom_field.dart';
 import 'package:path/path.dart' as path;
+import 'package:vector_math/vector_math_64.dart' as vector;
 
 class PDFScreen extends StatefulWidget {
   final bool viewOnly;
@@ -66,7 +67,6 @@ class _PDFScreenState extends State<PDFScreen> {
         data: {'index': -1},
         dragAnchor: DragAnchor.pointer,
         onDragEnd: (details) => _addField(details.offset, type),
-        feedbackOffset: Offset(10, 10),
         child: Container(
             margin: const EdgeInsets.all(8),
             alignment: Alignment.center,
@@ -80,13 +80,18 @@ class _PDFScreenState extends State<PDFScreen> {
               title,
               textAlign: TextAlign.center,
             )),
-        feedback: Container(
-          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
-          decoration: BoxDecoration(border: Border.all(color: _getColor(type))),
-          child: Material(
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
+        feedback: Transform(
+          transform: Matrix4.translation(
+              vector.Vector3(-Field.defWidth / 2, -Field.defHeight / 2, 0)),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+            decoration:
+                BoxDecoration(border: Border.all(color: _getColor(type))),
+            child: Material(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
@@ -272,6 +277,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                         decoration: BoxDecoration(
                                             color: _boxColor,
                                             border: Border(
+                                                bottom: BorderSide(),
                                                 left: BorderSide(),
                                                 right: BorderSide())),
                                         child: Row(
