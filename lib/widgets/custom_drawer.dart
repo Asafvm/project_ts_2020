@@ -150,7 +150,7 @@ class CustomDrawer extends StatelessWidget {
                     context: context,
                     applicationIcon: Icon(Icons.group),
                     applicationName: 'TeamShare',
-                    applicationVersion: '1.0 Beta');
+                    applicationVersion: '1.01 Beta');
               },
             ),
           ],
