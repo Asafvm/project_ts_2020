@@ -29,6 +29,11 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
   @override
   void initState() {
     TeamProvider().setCurrentTeam(widget.team);
+    FirebaseFirestoreProvider.getInstruments();
+    FirebaseFirestoreProvider.getAllInstrumentsInstances();
+    FirebaseFirestoreProvider.getSites();
+    FirebaseFirestoreProvider.getTeamEntries();
+
     super.initState();
   }
 
@@ -153,8 +158,11 @@ class _TeamHomeScreenState extends State<TeamHomeScreen> {
                   ],
                 ),
                 Expanded(
-                  child: Consumer<List<Entry>>(
-                    builder: (context, entryList, child) => InfoCube(
+                  child: Consumer3<List<Entry>, List<Instrument>,
+                      List<InstrumentInstance>>(
+                    builder: (context, entryList, instrumentList, instanceList,
+                            child) =>
+                        InfoCube(
                       title: 'Recent Activity',
                       child: MediaQuery.removePadding(
                         context: context,
