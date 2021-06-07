@@ -52,6 +52,7 @@ class _PDFScreenState extends State<PDFScreen> {
   double _viewScale = 1.0;
 
   bool _dataRecieved = false;
+  bool _dragging = false;
   Offset _centerOffset = Offset(0, 0);
 
   var _transformController = TransformationController();
@@ -59,11 +60,13 @@ class _PDFScreenState extends State<PDFScreen> {
   double _maxScale = 3.0;
   double _minScale = 1.0;
 
+  var _boxColor;
+
   Widget _buildDraggable(String title, FieldType type) => Draggable(
-        data: 'field',
+        data: {'index': -1},
         dragAnchor: DragAnchor.pointer,
         onDragEnd: (details) => _addField(details.offset, type),
-        feedbackOffset: Offset(50, 50),
+        feedbackOffset: Offset(10, 10),
         child: Container(
             margin: const EdgeInsets.all(8),
             alignment: Alignment.center,
@@ -183,6 +186,7 @@ class _PDFScreenState extends State<PDFScreen> {
                                   transformationController:
                                       _transformController,
                                   child: DragTarget(
+                                    onWillAccept: (data) => true,
                                     builder: (context, candidateData,
                                             rejectedData) =>
                                         Stack(
@@ -212,9 +216,16 @@ class _PDFScreenState extends State<PDFScreen> {
                                                 onDrag: (Field field,
                                                     Offset dragDetails) {
                                                   setState(() {
+                                                    _dragging = false;
                                                     field.offset =
                                                         calculateFieldOffset(
-                                                            dragDetails);
+                                                            dragDetails,
+                                                            field.size);
+                                                  });
+                                                },
+                                                onDragUpdate: (details) {
+                                                  setState(() {
+                                                    _dragging = true;
                                                   });
                                                 },
                                                 pdfSizeOnScreen: pdfBox.size,
@@ -228,76 +239,113 @@ class _PDFScreenState extends State<PDFScreen> {
                               ),
                             ),
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    left: BorderSide(), right: BorderSide())),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                OutlinedButton.icon(
-                                    style: outlinedButtonStyle,
-                                    onPressed: _actualPageNumber == 1
-                                        ? null
-                                        : () {
-                                            if (_actualPageNumber > 1) {
-                                              setState(() {
-                                                _actualPageNumber--;
-                                              });
-                                            }
-                                          },
-                                    icon: Icon(Icons.chevron_left),
-                                    label: Text('Previous')),
-                                Text(
-                                    'Page $_actualPageNumber / ${images.length}'),
-                                OutlinedButton.icon(
-                                  style: outlinedButtonStyle,
-                                  onPressed: _actualPageNumber == images.length
-                                      ? null
-                                      : () {
-                                          if (_actualPageNumber <
-                                              images.length) {
-                                            setState(() {
-                                              _actualPageNumber++;
-                                            });
-                                          }
-                                        },
-                                  label: Text('Next'),
-                                  icon: Icon(Icons.chevron_right),
-                                )
-                              ],
-                            ),
-                          ),
                           if (!widget.viewOnly)
                             Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(border: Border.all()),
-                                child: DragTarget(builder:
-                                    (context, candidateData, rejectedData) {
-                                  return GridView.count(
-                                    crossAxisCount: 3,
-                                    physics: BouncingScrollPhysics(),
-                                    childAspectRatio: 2 / 1,
-                                    shrinkWrap: true,
-                                    mainAxisSpacing: 3,
-                                    crossAxisSpacing: 15,
-                                    children: [
-                                      _buildDraggable('Text', FieldType.Text),
-                                      _buildDraggable('123', FieldType.Num),
-                                      _buildDraggable('Date', FieldType.Date),
-                                      _buildDraggable(
-                                          'Signature', FieldType.Signature),
-                                      _buildDraggable(
-                                          'Checkbox', FieldType.Check),
-                                      // if (widget.site != null)
-                                      //   _buildDraggable('Site', FieldType.Text),
-                                      // if (widget.instrument != null)
-                                      //   _buildDraggable(
-                                      //       'Instrument', FieldType.Text)
-                                    ],
-                                  );
-                                }),
-                              ),
+                              child: _dragging
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(),
+                                          color: _boxColor),
+                                      child: DragTarget(onAccept: (data) {
+                                        setState(() {
+                                          if (data['index'] != -1)
+                                            _fields.removeWhere((element) =>
+                                                element.index == data['index']);
+                                          _boxColor = null;
+                                        });
+                                      }, onMove: (details) {
+                                        setState(() {
+                                          _boxColor = Colors.orangeAccent;
+                                        });
+                                      }, onLeave: (data) {
+                                        setState(() {
+                                          _boxColor = null;
+                                        });
+                                      }, builder: (context, candidateData,
+                                          rejectedData) {
+                                        return Center(
+                                          child: Icon(Icons.delete),
+                                        );
+                                      }),
+                                    )
+                                  : Column(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              color: _boxColor,
+                                              border: Border(
+                                                  left: BorderSide(),
+                                                  right: BorderSide())),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              OutlinedButton.icon(
+                                                  style: outlinedButtonStyle,
+                                                  onPressed:
+                                                      _actualPageNumber == 1
+                                                          ? null
+                                                          : () {
+                                                              if (_actualPageNumber >
+                                                                  1) {
+                                                                setState(() {
+                                                                  _actualPageNumber--;
+                                                                });
+                                                              }
+                                                            },
+                                                  icon:
+                                                      Icon(Icons.chevron_left),
+                                                  label: Text('Previous')),
+                                              Text(
+                                                  'Page $_actualPageNumber / ${images.length}'),
+                                              OutlinedButton.icon(
+                                                style: outlinedButtonStyle,
+                                                onPressed: _actualPageNumber ==
+                                                        images.length
+                                                    ? null
+                                                    : () {
+                                                        if (_actualPageNumber <
+                                                            images.length) {
+                                                          setState(() {
+                                                            _actualPageNumber++;
+                                                          });
+                                                        }
+                                                      },
+                                                label: Text('Next'),
+                                                icon: Icon(Icons.chevron_right),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: GridView.count(
+                                            crossAxisCount: 3,
+                                            physics: BouncingScrollPhysics(),
+                                            childAspectRatio: 2 / 1,
+                                            shrinkWrap: true,
+                                            mainAxisSpacing: 3,
+                                            crossAxisSpacing: 15,
+                                            children: [
+                                              _buildDraggable(
+                                                  'Text', FieldType.Text),
+                                              _buildDraggable(
+                                                  '123', FieldType.Num),
+                                              _buildDraggable(
+                                                  'Date', FieldType.Date),
+                                              _buildDraggable('Signature',
+                                                  FieldType.Signature),
+                                              _buildDraggable(
+                                                  'Checkbox', FieldType.Check),
+                                              // if (widget.site != null)
+                                              //   _buildDraggable('Site', FieldType.Text),
+                                              // if (widget.instrument != null)
+                                              //   _buildDraggable(
+                                              //       'Instrument', FieldType.Text)
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
                           if (widget.approveMode)
                             Expanded(
@@ -360,7 +408,8 @@ class _PDFScreenState extends State<PDFScreen> {
             type: type,
             index: _fieldIndex,
             page: _actualPageNumber,
-            initialPos: calculateFieldOffset(pos),
+            initialPos: calculateFieldOffset(
+                pos, _fields.isNotEmpty ? _fields.last.size : null),
             size: _fields.isNotEmpty
                 ? _fields.last.size
                 : null, //keep same size from the last field
@@ -373,20 +422,33 @@ class _PDFScreenState extends State<PDFScreen> {
     }
   }
 
-  Offset calculateFieldOffset(Offset pos) {
+  Offset calculateFieldOffset(Offset pos, [Size size]) {
     MediaQueryData mqd = MediaQuery.of(context);
 
-    return Offset(
+    double topOffset = mqd.viewInsets.top +
+        mqd.viewPadding.top +
+        AppBar().preferredSize.height;
+
+    Offset test = Offset(
         ((pos.dx - mqd.viewInsets.left - mqd.viewPadding.left) / _viewScale +
                 _centerOffset.dx) /
             pdfBox.size.width,
-        ((pos.dy -
-                        mqd.viewInsets.top -
-                        mqd.viewPadding.top -
-                        AppBar().preferredSize.height) /
-                    _viewScale +
-                _centerOffset.dy) /
+        ((pos.dy - topOffset) / _viewScale + _centerOffset.dy) /
             pdfBox.size.height);
+    double dx = test.dx.clamp(
+        0.0,
+        size != null
+            ? (pdfBox.size.width - size.width) / pdfBox.size.width
+            : (pdfBox.size.width - Field.defWidth) / pdfBox.size.width);
+    double dy = test.dy.clamp(
+        0.0,
+        size != null
+            ? ((pdfBox.size.height - size.height) / (pdfBox.size.height))
+                .toDouble()
+            : ((pdfBox.size.height - Field.defHeight) / (pdfBox.size.height))
+                .toDouble());
+
+    return Offset(dx, dy);
   }
 
   Future<Field> _editField(BuildContext context, Field field) async {

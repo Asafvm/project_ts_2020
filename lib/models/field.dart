@@ -5,10 +5,10 @@ import 'package:teamshare/providers/consts.dart';
 
 class Field {
   final FieldType type;
-  final double _minWidth = 10;
-  final double _minHeight = 10;
-  final double _defWidth = 40;
-  final double _defHeight = 15;
+  static final double minWidth = 10;
+  static final double minHeight = 10;
+  static final double defWidth = 50;
+  static final double defHeight = 30;
 
   String defaultValue;
   final int index;
@@ -36,12 +36,11 @@ class Field {
 
   set setSize(Offset o) {
     Size _tmp = this.size + o;
-    if (_tmp.width > _minWidth && _tmp.height > _minHeight)
+    if (_tmp.width > minWidth && _tmp.height > minHeight)
       this.size = _tmp;
     else {
-      if (_tmp.width < _minWidth) this.size = Size(_minWidth, this.size.height);
-      if (_tmp.height < _minHeight)
-        this.size = Size(this.size.width, _minHeight);
+      if (_tmp.width < minWidth) this.size = Size(minWidth, this.size.height);
+      if (_tmp.height < minHeight) this.size = Size(this.size.width, minHeight);
     }
   }
 
@@ -55,8 +54,8 @@ class Field {
     this.suffix = "";
     this.offset =
         Offset(initialPos.dx, initialPos.dy); // center around click point
-    this.size = Size(size == null ? _defWidth : size.width,
-        size == null ? _defHeight : size.height);
+    this.size = Size(size == null ? defWidth : size.width,
+        size == null ? defHeight : size.height);
     this.isMandatory = false;
   }
   Field.checkbox(
@@ -69,8 +68,8 @@ class Field {
     this.suffix = "";
     this.offset =
         Offset(initialPos.dx, initialPos.dy); // center around click point
-    this.size = Size(size == null ? _defHeight : size.height,
-        size == null ? _defHeight : size.height);
+    this.size = Size(size == null ? defHeight : size.height,
+        size == null ? defHeight : size.height);
     this.isMandatory = false;
   }
 

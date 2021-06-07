@@ -6,6 +6,7 @@ class CustomField extends StatefulWidget {
   final Field field;
   final Function onClick;
   final Function onDrag;
+  final Function onDragUpdate;
   final Size pdfSizeOnScreen;
   final double appbarHeight;
   final Offset centerOffset;
@@ -19,7 +20,8 @@ class CustomField extends StatefulWidget {
       this.centerOffset,
       this.scale,
       this.onDrag,
-      this.color});
+      this.color,
+      this.onDragUpdate});
 
   @override
   _CustomFieldState createState() => _CustomFieldState();
@@ -130,12 +132,17 @@ class _CustomFieldState extends State<CustomField> {
                 ),
               ])
             : Draggable(
+                feedbackOffset: Offset(-widget.field.size.width / 2,
+                    -widget.field.size.height / 2),
                 onDraggableCanceled: (velocity, offset) {
                   widget.field.offset = before;
                 },
                 onDragStarted: () => before = widget.field.offset,
                 dragAnchor: DragAnchor.pointer,
-                data: widget.field.index,
+                data: {
+                  'index': widget.field.index,
+                },
+                onDragUpdate: (details) => widget.onDragUpdate(details),
                 onDragEnd: (details) =>
                     widget.onDrag(widget.field, details.offset),
                 feedback: field,

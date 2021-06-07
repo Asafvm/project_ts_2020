@@ -168,7 +168,7 @@ exports.addInstrument = functions.https.onCall(async (data, context) => {
         var snapshot = await instruments.get();
         snapshot.forEach((doc) => {
           //check for duplicates
-          if (doc.data()["codeName"] === data["instrument"]["codeName"])
+          if (doc.data()["reference"] === data["instrument"]["reference"])
             //throw error message if found
             throw new functions.https.HttpsError(
               "already-exists",
