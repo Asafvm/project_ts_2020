@@ -36,7 +36,7 @@ class _SignatureHelperState extends State<SignatureHelper> {
               decoration: BoxDecoration(border: Border.all(width: 5)),
               child: Signature(
                 controller: _controller,
-                height: 300,
+                height: 150,
                 backgroundColor: Colors.white,
               ),
             ),

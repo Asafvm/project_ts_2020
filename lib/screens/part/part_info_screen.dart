@@ -103,6 +103,7 @@ class _PartInfoScreenState extends State<PartInfoScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CheckboxListTile(
                               title: Text("Track Serials"),
@@ -116,44 +117,39 @@ class _PartInfoScreenState extends State<PartInfoScreen>
                             ),
                           ],
                         ),
-                        Row(
+                        Table(
+                          border: TableBorder(horizontalInside: BorderSide()),
                           children: [
-                            Expanded(child: Text("Alternative Reference")),
-                            Expanded(child: Text(widget.part.altreference)),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(child: Text("Main Storage Minimum")),
-                            Expanded(
-                                child:
-                                    Text(widget.part.mainStockMin.toString())),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(child: Text("Personal Storage Minimum")),
-                            Expanded(
-                                child: Text(
-                                    widget.part.personalStockMin.toString())),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(child: Text("Manifacturer")),
-                            Expanded(child: Text(widget.part.manifacturer)),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(child: Text("Model")),
-                            Expanded(child: Text(widget.part.model)),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(child: Text("Price")),
-                            Expanded(child: Text(widget.part.price.toString())),
+                            TableRow(children: [
+                              Text("Alt. Reference"),
+                              Text(widget.part.altreference,
+                                  textAlign: TextAlign.center),
+                            ]),
+                            TableRow(children: [
+                              Text("Storage Min"),
+                              Text(widget.part.mainStockMin.toString(),
+                                  textAlign: TextAlign.center),
+                            ]),
+                            TableRow(children: [
+                              Text("Personal Min"),
+                              Text(widget.part.personalStockMin.toString(),
+                                  textAlign: TextAlign.center),
+                            ]),
+                            TableRow(children: [
+                              Text("Manifacturer"),
+                              Text(widget.part.manifacturer,
+                                  textAlign: TextAlign.center),
+                            ]),
+                            TableRow(children: [
+                              Text("Model"),
+                              Text(widget.part.model,
+                                  textAlign: TextAlign.center),
+                            ]),
+                            TableRow(children: [
+                              Text("Price"),
+                              Text(widget.part.price.toString(),
+                                  textAlign: TextAlign.center),
+                            ]),
                           ],
                         ),
                       ],

@@ -198,6 +198,7 @@ class _SearchInstrumentScreenState extends State<SearchInstrumentScreen> {
           .where((element) => element.instrumentId == _instrumentFilter)
           .toList();
     }
+    filteredInstances.sort((a, b) => a.instrumentId.compareTo(b.instrumentId));
     _statistics = '${filteredInstances.length} Matches Found';
   }
 }
