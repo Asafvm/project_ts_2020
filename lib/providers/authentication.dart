@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -123,7 +124,10 @@ class Authentication with ChangeNotifier {
     // Timer(Duration(seconds: timeToExpiry), logout);
   }
 
-  void forgotPassword(String email) {
-    FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+  Future<void> forgotPassword(String email, BuildContext context) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Reset password email sent to your account')),
+    );
   }
 }

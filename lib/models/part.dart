@@ -115,7 +115,7 @@ class Part {
       this.personalStockMin = 0,
       this.serialTracking = false,
       this.active = true,
-      this.imgUrl = ""});
+      this.imgUrl});
 
   Map<String, dynamic> toJson() => {
         'manifacturer': manifacturer ?? '',
@@ -146,7 +146,7 @@ class Part {
         personalStockMin = data['personalStockMin'] ?? 0,
         serialTracking = data['serialTracking'] ?? false,
         active = data['active'] ?? true,
-        imgUrl = data['imgUrl'] ?? null;
+        imgUrl = data['imgUrl'];
 
   factory Part.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Part.fromJson(documentSnapshot.data(), documentSnapshot.id);

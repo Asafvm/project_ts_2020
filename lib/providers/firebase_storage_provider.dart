@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
@@ -64,8 +65,7 @@ class FirebaseStorageProvider {
     final Directory systemTempDir = await dir;
 
     final File tempFile =
-        await File('${systemTempDir.path}/${basenameWithoutExtension(url)}.pdf')
-            .create();
+        await File('${systemTempDir.path}/${DateTime.now()}.pdf').create();
 
     if (tempFile.existsSync()) {
       tempFile.writeAsBytes((await ref.getData()));
