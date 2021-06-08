@@ -42,6 +42,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   var controllersArray = List<TextEditingController>.empty();
 
   bool _loading = false;
+
+  // final _genericFormKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -171,7 +173,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                   ),
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.allow(
-                        RegExp(r'^[0-9]+(\.([0-9])+)?'))
+                        RegExp(r'^[0-9]+(\.([0-9])+)?'),
+                        replacementString: ''),
                   ],
                   validator: (value) {
                     if (value.isEmpty && field.isMandatory)
@@ -190,7 +193,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                   ),
                 )
               else
-                Flexible(flex: 1, fit: FlexFit.tight, child: SizedBox()),
+                Flexible(flex: 1, fit: FlexFit.tight, child: Spacer()),
             ],
           ),
         );
@@ -238,7 +241,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       setState(() {
         _loading = true;
       });
-
+      // if (_genericFormKey.currentState.validate()) {
       //download report template
       String downloadedPdfPath = await FirebaseStorageProvider.downloadFile(
           '${FirebasePaths.instrumentReportTemplatePath(widget.instance.instrumentId)}/${widget.pdfId}');
@@ -331,10 +334,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           _loading = false;
         });
       }
+      // }
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
-      // Navigator.of(context).pop(false); //formFilled = false
-
     }
   }
 

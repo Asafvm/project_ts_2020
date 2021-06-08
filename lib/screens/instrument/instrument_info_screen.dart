@@ -395,18 +395,26 @@ class ReportGraph extends StatelessWidget {
                     report.instrumentId == widget.instance.instrumentId &&
                     report.instanceId == widget.instance.id)
                 .toList();
+            if (reports.isEmpty)
+              return Container(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  "No data recoreded for this instrument",
+                  textAlign: TextAlign.center,
+                ),
+              );
             List<String> labelX = List<String>.generate(
                 reports.length,
                 (index) =>
                     '${reports.elementAt(index).index}\n${formatter.format(DateTime.fromMillisecondsSinceEpoch(reports.elementAt(index).timestampOpen))}');
             labelX = labelX.sublist(
                 labelX.length > _dataLimit ? labelX.length - _dataLimit : 0);
-
             Map<String, List<String>> labelY = Map<String, List<String>>();
 
             //list graphable fields (feature titles)
             List<String> titles = reports.first.fields
                     .where((field) => field.type == FieldType.Num)
+                    .where((field) => field.hint.isNotEmpty)
                     .map((field) => field.hint)
                     .toList() ??
                 [];
@@ -417,15 +425,19 @@ class ReportGraph extends StatelessWidget {
                     data: [],
                     color: Theme.of(context).primaryColor))
                 .toList();
+
             //get feature data
+
             reports.forEach((report) {
               report.fields
                   .where((field) => titles.contains(field.hint))
                   .forEach((field) {
-                features
-                    .firstWhere((feature) => feature.title == field.hint)
-                    .data
-                    .add(double.parse(field.defaultValue));
+                try {
+                  features
+                      .firstWhere((feature) => feature.title == field.hint)
+                      .data
+                      .add(double.parse(field.defaultValue));
+                } catch (_) {}
               });
             });
             //scale data
