@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
@@ -50,8 +49,6 @@ class FirebaseStorageProvider {
 
     if (tempFile.existsSync()) {
       tempFile.writeAsBytes((await ref.getData()));
-      // final DownloadTask task = ref.writeToFile(tempFile);
-      // await task.whenComplete(() => null);
       return tempFile.path;
     }
     return null;

@@ -144,22 +144,22 @@ class _AddContactFormState extends State<AddContactForm> {
       setState(() {
         try {
           _controllerFirstName.text = contact.name.firstName;
-        } on Exception catch (e) {
+        } on Exception {
           _controllerFirstName.text = '';
         }
         try {
           _controllerLastName.text = contact.name.lastName;
-        } on Exception catch (e) {
+        } on Exception {
           _controllerLastName.text = '';
         }
         try {
           _controllerPhone.text = contact.phones.first.number;
-        } on Exception catch (e) {
+        } on Exception {
           _controllerPhone.text = '';
         }
         try {
           _controllerEmail.text = contact.emails.first.email;
-        } on Exception catch (e) {
+        } on Exception {
           _controllerEmail.text = '';
         }
       });

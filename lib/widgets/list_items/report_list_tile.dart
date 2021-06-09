@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/report.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/providers/firebase_storage_provider.dart';
@@ -13,9 +11,6 @@ class ReportListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<InstrumentInstance> instances =
-        Provider.of<List<InstrumentInstance>>(context);
-
     return ListTile(
       leading: report.status == 'Closed'
           ? Icon(

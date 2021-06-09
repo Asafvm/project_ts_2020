@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:teamshare/helpers/decoration_library.dart';
+import 'package:teamshare/widgets/searchbar.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/screens/pdf/pdf_viewer_page.dart';
 import 'package:share/share.dart';
@@ -104,19 +104,14 @@ class _FileExplorerState extends State<FileExplorer> {
 
               return Column(
                 children: [
-                  TextField(
-                    decoration: DecorationLibrary.searchDecoration(
-                        context: context, hint: 'Search'),
-                    onChanged: (value) => setState(() {
-                      _textFilter = value;
-                      _filterFilesList();
-                      // filteredFiles
-                      //     .where((element) => element.path
-                      //         .substring(element.path.lastIndexOf('/') + 1)
-                      //         .toLowerCase()
-                      //         .contains(value.toLowerCase()))
-                      //     .toList();
-                    }),
+                  SearchBar(
+                    label: 'Search',
+                    onChange: (value) {
+                      setState(() {
+                        _textFilter = value;
+                        _filterFilesList();
+                      });
+                    },
                   ),
                   Expanded(
                     child: ListView.builder(

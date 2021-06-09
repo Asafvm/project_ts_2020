@@ -7,13 +7,17 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData mqd = MediaQuery.of(context);
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.blueGrey[900],
         body: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal:
+                  (mqd.orientation == Orientation.portrait) ? 20.0 : 100.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[

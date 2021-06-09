@@ -58,7 +58,6 @@ class _SiteInfoScreenState extends State<SiteInfoScreen>
   Widget build(BuildContext context) {
     List<Contact> contactList = Provider.of<List<Contact>>(context);
     List<Room> roomList = Provider.of<List<Room>>(context);
-    List<Instrument> instrumentList = Provider.of<List<Instrument>>(context);
     mediaQuery = MediaQuery.of(context);
 
     return Scaffold(

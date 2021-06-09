@@ -5,6 +5,7 @@ import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/widgets/list_items/instrument_instance_list_item.dart';
+import 'package:teamshare/widgets/searchbar.dart';
 
 class SearchInstrumentScreen extends StatefulWidget {
   @override
@@ -12,26 +13,9 @@ class SearchInstrumentScreen extends StatefulWidget {
 }
 
 class _SearchInstrumentScreenState extends State<SearchInstrumentScreen> {
-  String _siteFilter = '';
-  String _roomFilter = '';
-  String _instrumentFilter = '';
-
-  List<Room> _roomList;
-
-  String _selectedSite;
-  String _selectedRoom;
-  String _selectedInstrument;
-
-  String _statistics = "Matches found";
   List<InstrumentInstance> filteredInstances = [];
-
-  @override
-  void initState() {
-    _siteFilter = '';
-    _roomFilter = '';
-    _instrumentFilter = '';
-    super.initState();
-  }
+  String _statistics = "Matches found";
+  String _filter = '';
 
   @override
   Widget build(BuildContext context) {
@@ -54,110 +38,16 @@ class _SearchInstrumentScreenState extends State<SearchInstrumentScreen> {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Flexible(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButton(
-                        hint: Text(_selectedSite ?? "Site"),
-                        items: sites
-                            .map((e) => DropdownMenuItem<String>(
-                                  value: e.id,
-                                  child: Text(e.name),
-                                ))
-                            .toList(),
-                        onChanged: (value) => {
-                          setState(() {
-                            _selectedSite = sites
-                                .where((element) => element.id == value)
-                                .first
-                                .name;
-                            _siteFilter = value;
-                            _roomFilter = '';
-                          })
-                        },
-                      ),
-                    ),
-                    if (_siteFilter != '')
-                      Expanded(
-                        child: StreamBuilder<List<Room>>(
-                          stream:
-                              FirebaseFirestoreProvider.getRooms(_siteFilter),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              _roomList = snapshot.data;
-
-                              return DropdownButton(
-                                hint: Text(_selectedRoom ?? "Room"),
-                                items: snapshot.data
-                                    .map((room) => DropdownMenuItem<String>(
-                                          value: room.id,
-                                          child: Text(room.roomTitle),
-                                        ))
-                                    .toList(),
-                                onChanged: (value) => {
-                                  setState(() {
-                                    _selectedRoom = _roomList
-                                        .where((element) => element.id == value)
-                                        .first
-                                        .roomTitle;
-                                    _roomFilter = value;
-                                    _instrumentFilter = '';
-                                  })
-                                },
-                              );
-                            } else
-                              return Container();
-                          },
-                        ),
-                      ),
-                    if (_siteFilter != '' && _roomFilter != '')
-                      Expanded(
-                        child: DropdownButton(
-                          hint: Text(_selectedInstrument ?? "Instrument"),
-                          items: instruments
-                              .map((e) => DropdownMenuItem<String>(
-                                    value: e.getCodeName(),
-                                    child: Text(e.getCodeName()),
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
-                            _selectedInstrument = instruments
-                                .where((element) => element.id == value)
-                                .first
-                                .codeName;
-                            _instrumentFilter = value;
-                          },
-                        ),
-                      ),
-                    if (_siteFilter != '' &&
-                        _roomFilter != '' &&
-                        _instrumentFilter != '')
-                      Expanded(
-                        child: DropdownButton(
-                          hint: Text("Serial"),
-                          items: instances
-                              .where((element) =>
-                                  (element.currentRoomId == _roomFilter) &&
-                                  (element.currentSiteId == _siteFilter) &&
-                                  (element.instrumentId == _instrumentFilter))
-                              .map((e) => DropdownMenuItem<String>(
-                                    value: e.serial,
-                                    child: Text(e.serial),
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
-                            _instrumentFilter = value;
-                          },
-                        ),
-                      ),
-                  ],
-                ),
+              SearchBar(
+                label: 'Search for instruments',
+                onChange: (value) {
+                  setState(() {
+                    _filter = value;
+                  });
+                },
               ),
-              Flexible(flex: 1, child: Text(_statistics)),
-              Flexible(
-                flex: 8,
+              Text(_statistics),
+              Expanded(
                 child: Container(
                     child: instruments.isNotEmpty
                         ? ListView.builder(
@@ -183,21 +73,24 @@ class _SearchInstrumentScreenState extends State<SearchInstrumentScreen> {
 
   void _filterInstanceList(List<InstrumentInstance> instances) {
     filteredInstances = instances;
-    if (_siteFilter != '') {
-      filteredInstances = filteredInstances
-          .where((element) => element.currentSiteId.contains(_siteFilter))
-          .toList();
-    }
-    if (_roomFilter != '') {
-      filteredInstances = filteredInstances
-          .where((element) => element.currentRoomId == _roomFilter)
-          .toList();
-    }
-    if (_instrumentFilter != '') {
-      filteredInstances = filteredInstances
-          .where((element) => element.instrumentId == _instrumentFilter)
-          .toList();
-    }
+    List<String> filters = _filter.split(" ");
+    filters.forEach((filter) {
+      if (filter != '')
+        filteredInstances = filteredInstances
+            .where((element) =>
+                FirebaseFirestoreProvider.getInstrumentById(
+                        element.instrumentId)
+                    .codeName
+                    .toLowerCase()
+                    .contains(filter.toLowerCase()) ||
+                FirebaseFirestoreProvider.getSiteById((element.currentSiteId))
+                    .name
+                    .toLowerCase()
+                    .contains(filter.toLowerCase()) ||
+                element.serial.toLowerCase().contains(filter.toLowerCase()))
+            .toList();
+    });
+
     filteredInstances.sort((a, b) => a.instrumentId.compareTo(b.instrumentId));
     _statistics = '${filteredInstances.length} Matches Found';
   }

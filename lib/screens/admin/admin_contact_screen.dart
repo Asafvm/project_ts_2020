@@ -13,7 +13,6 @@ class AdminContactScreen extends StatefulWidget {
 }
 
 class _AdminContactScreenState extends State<AdminContactScreen> {
-  bool _sortByFirstName = true;
   @override
   Widget build(BuildContext context) {
     List<Contact> contacts = Provider.of<List<Contact>>(context, listen: true);

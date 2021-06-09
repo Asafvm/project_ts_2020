@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
@@ -8,6 +7,7 @@ import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/team/team_home_screen.dart';
 import 'package:teamshare/widgets/list_items/part_list_item.dart';
+import 'package:teamshare/widgets/searchbar.dart';
 
 class InventoryScreen extends StatefulWidget {
   @override
@@ -80,19 +80,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: TextField(
-                      autofocus: false,
-                      onChanged: (value) {
-                        setState(() {
-                          _searchText = value;
-                        });
-                      },
-                      decoration: DecorationLibrary.searchDecoration(
-                          context: context,
-                          hint: 'Quick search by description or referance'),
-                    ),
+                  child: SearchBar(
+                    label: 'Quick search by description or referance',
+                    onChange: (value) {
+                      setState(() {
+                        _searchText = value;
+                      });
+                    },
                   ),
                 ),
                 if (_transfer)

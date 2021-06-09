@@ -34,7 +34,7 @@ class PdfFileHandler {
 
     try {
       file = await pdfRender.PdfDocument.openFile(path);
-    } on Exception catch (e) {
+    } on Exception {
       file = await pdfRender.PdfDocument.openFile(path);
     }
     int count = file.pagesCount;

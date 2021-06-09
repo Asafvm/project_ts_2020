@@ -88,12 +88,13 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
         : AnimatedContainer(
             duration: Duration(milliseconds: 300),
             curve: Curves.fastOutSlowIn,
-            height: signMode == AuthState.signup ? 350 : 280,
+            height: signMode == AuthState.signup ? 390 : 300,
             child: SingleChildScrollView(
               child: Form(
                 key: _loginKey,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  // mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     TextFormField(
                       style: textStyleWhite,
