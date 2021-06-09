@@ -245,8 +245,8 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                     return ListView.builder(
                                       shrinkWrap: true,
                                       itemBuilder: (ctx, index) {
-                                        String reportName =
-                                            snapshot.data[index]["reportName"];
+                                        String name =
+                                            snapshot.data[index]["name"];
                                         List<Field> reportFields =
                                             List<Field>.from(snapshot
                                                 .data[index]["fields"].values
@@ -254,7 +254,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
 
                                         return ListTile(
                                           leading: Icon(Icons.picture_as_pdf),
-                                          title: Text(reportName),
+                                          title: Text(name),
                                           trailing: SizedBox(
                                             width: 150,
                                             child: Row(
@@ -269,8 +269,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                     onPressed: () =>
                                                         setState(() {
                                                       _showGraph = !_showGraph;
-                                                      _selectedReport =
-                                                          reportName;
+                                                      _selectedReport = name;
                                                     }),
                                                   ),
                                                 ),
@@ -292,7 +291,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                               .reserveReportId(
                                                                   widget
                                                                       .instance,
-                                                                  reportName);
+                                                                  name);
 
                                                       await Navigator.of(
                                                               context)
@@ -302,7 +301,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                               GenericFormScreen(
                                                             fields:
                                                                 reportFields,
-                                                            pdfId: reportName,
+                                                            pdfId: name,
                                                             instance:
                                                                 widget.instance,
                                                             siteId: widget
@@ -311,9 +310,8 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                             reportId:
                                                                 reportData[
                                                                     "reportId"],
-                                                            reportIndex:
-                                                                reportData[
-                                                                    "reportIndex"],
+                                                            index: reportData[
+                                                                "index"],
                                                           ),
                                                         ),
                                                       );
@@ -350,7 +348,7 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                 child: ReportGraph(
                   widget: widget,
                   mqd: mqd,
-                  reportName: _selectedReport,
+                  name: _selectedReport,
                 ),
               ),
           ],
@@ -363,14 +361,14 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
 class ReportGraph extends StatelessWidget {
   const ReportGraph({
     Key key,
-    @required this.reportName,
+    @required this.name,
     @required this.widget,
     @required this.mqd,
   }) : super(key: key);
 
   final InstrumentInfoScreen widget;
   final MediaQueryData mqd;
-  final String reportName;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +389,7 @@ class ReportGraph extends StatelessWidget {
             List<Report> reports = snapshot.data
                 .where((report) =>
                     report.status == "Closed" && //ignore open reports
-                    report.reportName == reportName &&
+                    report.name == name &&
                     report.instrumentId == widget.instance.instrumentId &&
                     report.instanceId == widget.instance.id)
                 .toList();

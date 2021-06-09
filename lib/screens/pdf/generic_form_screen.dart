@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/helpers/firebase_paths.dart';
 import 'package:teamshare/helpers/pdf_helper.dart';
 import 'package:teamshare/helpers/signature.dart';
@@ -24,14 +25,14 @@ class GenericFormScreen extends StatefulWidget {
   final InstrumentInstance instance;
   final String siteId;
   final String reportId;
-  final String reportIndex;
+  final String index;
   const GenericFormScreen(
       {this.fields,
       this.pdfId,
       this.siteId,
       this.instance,
       this.reportId,
-      this.reportIndex});
+      this.index});
 
   @override
   _GenericFormScreenState createState() => _GenericFormScreenState();
@@ -60,17 +61,20 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  for (Field field in widget.fields) _buildGenericField(field),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              '${widget.pdfId} - ${widget.index}',
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 24),
             ),
           ),
-          SizedBox(
-            height: 10,
+          Expanded(
+            child: ListView(
+                children: List<Widget>.from(widget.fields
+                    .map((field) => _buildGenericField(field, context))
+                    .toList())),
           ),
           kIsWeb
               ? TextButton.icon(
@@ -91,7 +95,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     );
   }
 
-  _buildGenericField(Field field) {
+  _buildGenericField(Field field, BuildContext context) {
     switch (field.type) {
       case FieldType.Text:
         return Padding(
@@ -100,27 +104,22 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (field.prefix.isNotEmpty)
-                Flexible(
+                Expanded(
                     flex: 3,
-                    fit: FlexFit.tight,
                     child: Text(
                       field.prefix,
+                      maxLines: 2,
                       textAlign: TextAlign.start,
                     )),
-              Flexible(
+              Expanded(
                 flex: 2,
-                fit: FlexFit.tight,
                 child: TextFormField(
                   enabled: !_loading,
                   controller: controllersArray[widget.fields.indexOf(field)],
                   maxLength: (field.size.width / (field.size.height / 2.50))
                       .round(), //width of field / width of character
-                  decoration: InputDecoration(
-                    hintStyle: TextStyle(color: Colors.grey),
-                    hintText: field.defaultValue,
-                    labelText: field.hint,
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
+                  decoration:
+                      DecorationLibrary.inputDecoration(field.hint, context),
                   validator: (value) {
                     if (value.isEmpty && field.isMandatory)
                       return 'Cannot be empty';
@@ -129,16 +128,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 ),
               ),
               if (field.suffix.isNotEmpty)
-                Flexible(
+                Expanded(
                   flex: 1,
-                  fit: FlexFit.tight,
                   child: Text(
                     field.suffix,
                     textAlign: TextAlign.start,
                   ),
                 )
-              else
-                Flexible(flex: 1, fit: FlexFit.tight, child: SizedBox()),
             ],
           ),
         );
@@ -150,27 +146,23 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (field.prefix.isNotEmpty)
-                Flexible(
+                Expanded(
                     flex: 3,
-                    fit: FlexFit.tight,
                     child: Text(
                       field.prefix,
+                      maxLines: 2,
                       textAlign: TextAlign.start,
                     )),
-              Flexible(
+              Expanded(
                 flex: 2,
-                fit: FlexFit.tight,
                 child: TextFormField(
                   enabled: !_loading,
                   controller: controllersArray[widget.fields.indexOf(field)],
                   maxLength: (field.size.width / (field.size.height / 2.50))
                       .round(), //width of field / width of character
-                  decoration: InputDecoration(
-                    hintStyle: TextStyle(color: Colors.grey),
-                    hintText: field.defaultValue,
-                    labelText: field.hint,
-                    labelStyle: TextStyle(color: Colors.black),
-                  ),
+                  decoration:
+                      DecorationLibrary.inputDecoration(field.hint, context),
+
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.allow(
                         RegExp(r'^[0-9]+(\.([0-9])+)?'),
@@ -184,16 +176,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 ),
               ),
               if (field.suffix.isNotEmpty)
-                Flexible(
+                Expanded(
                   flex: 1,
-                  fit: FlexFit.tight,
                   child: Text(
                     field.suffix,
                     textAlign: TextAlign.start,
                   ),
                 )
-              else
-                Flexible(flex: 1, fit: FlexFit.tight, child: Spacer()),
             ],
           ),
         );
@@ -247,8 +236,9 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
           '${FirebasePaths.instrumentReportTemplatePath(widget.instance.instrumentId)}/${widget.pdfId}');
       if (downloadedPdfPath == null) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Could not download report. Please check your internet connection.')));
+          content: Text(
+              'Could not download report. Please check your internet connection.'),
+        ));
         return;
       }
 
@@ -288,12 +278,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
       //display result
       bool approved = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => PDFScreen(
-          viewOnly: true,
-          approveMode: true,
-          pathPDF: reportPath,
-        ),
-      ));
+            builder: (context) => PDFScreen(
+              viewOnly: true,
+              approveMode: true,
+              pathPDF: reportPath,
+            ),
+          )) ??
+          false;
 
       if (approved) {
         //submit file
@@ -304,14 +295,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
         Report report = Report(
           timestampClose: DateTime.now().millisecondsSinceEpoch,
-          index: widget.reportIndex,
+          index: widget.index,
           creatorId: Authentication().userEmail,
           fields: widget.fields,
           downloadUrl: uploadedReport,
           instanceId: widget.instance.id,
           instrumentId: widget.instance.instrumentId,
-          reportId: widget.reportId,
-          reportName: basenameWithoutExtension(widget.pdfId),
+          name: basenameWithoutExtension(widget.pdfId),
           status: 'Closed',
           siteId: widget.siteId,
         );
@@ -360,13 +350,12 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
     Report report = Report(
         timestampClose: DateTime.now().millisecondsSinceEpoch,
-        index: widget.reportIndex,
+        index: widget.index,
         creatorId: Authentication().userEmail,
         fields: widget.fields,
         instanceId: widget.instance.id,
         instrumentId: widget.instance.instrumentId,
-        reportId: widget.reportId,
-        reportName: basenameWithoutExtension(widget.pdfId),
+        name: basenameWithoutExtension(widget.pdfId),
         status: 'Closed',
         siteId: widget.siteId);
     //upload fields

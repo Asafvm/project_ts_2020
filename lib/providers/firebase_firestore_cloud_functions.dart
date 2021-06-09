@@ -31,7 +31,7 @@ class FirebaseFirestoreCloudFunctions {
         "name": name,
         "description": description,
         "creatorEmail": Authentication().userEmail.toLowerCase(),
-        "reportIndex": 0,
+        "index": 0,
       },
       "members": members,
     });
@@ -148,10 +148,13 @@ class FirebaseFirestoreCloudFunctions {
     var result = await FirebaseFunctions.instance
         .httpsCallable("reserveReportId")
         .call(<String, dynamic>{
+      "timestampOpen": DateTime.now().millisecondsSinceEpoch,
+      "creatorId": Authentication().userEmail,
       "teamId": FirebasePaths.teamId,
       "instrumentId": instance.instrumentId,
-      "instanceId": instance.serial,
-      "reportName": title,
+      "instanceId": instance.id,
+      "siteId": instance.currentSiteId,
+      "name": title,
     });
     return result.data;
   }

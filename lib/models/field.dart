@@ -45,8 +45,13 @@ class Field {
   }
 
   Field.basic(
-      {this.type, this.index, this.page, Offset initialPos, Size size}) {
-    this.hint = "";
+      {this.type,
+      this.index,
+      this.page,
+      Offset initialPos,
+      Size size,
+      this.hint = ""}) {
+    this.hint = hint;
 
     this.regexp = "";
     this.prefix = "";

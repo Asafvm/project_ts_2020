@@ -190,7 +190,10 @@ class _AddFieldFormState extends State<AddFieldForm> {
               keyboardType: TextInputType.text,
               validator: (value) => value.isEmpty ? 'Must not be empty' : null,
               onSaved: (val) {
-                widget.field.prefix = val ?? '';
+                if (val.isEmpty) return 'Must not be empty';
+                widget.field.hint = val;
+                widget.field.prefix = val;
+                return null;
               },
             ),
             Row(

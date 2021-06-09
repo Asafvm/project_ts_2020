@@ -14,6 +14,7 @@ import 'package:teamshare/screens/drawer_screens/admin_menu_screen.dart';
 import 'package:teamshare/screens/drawer_screens/inventory_screen.dart';
 import 'package:teamshare/screens/drawer_screens/map_screen.dart';
 import 'package:teamshare/screens/drawer_screens/reports_screen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class CustomDrawer extends StatelessWidget {
   @override
@@ -143,14 +144,17 @@ class CustomDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.info),
               title: Text('About'),
-              onTap: () {
+              onTap: () async {
+                PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
                 Navigator.of(context).pop();
 
                 showAboutDialog(
                     context: context,
                     applicationIcon: Icon(Icons.group),
                     applicationName: 'TeamShare',
-                    applicationVersion: '1.03 Beta');
+                    applicationVersion:
+                        'version: ${packageInfo.version} build: ${packageInfo.buildNumber}');
               },
             ),
           ],

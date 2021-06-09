@@ -229,7 +229,10 @@ exports.addInstrumentInstance = functions.https.onCall(
           var snapshot = await instruments.get();
           snapshot.forEach((doc) => {
             //check for duplicates
-            if (doc.data()["serial"] === data["instrument"]["serial"] && doc.data()["instrumentId"] === data["instrument"]["instrumentId"])
+            if (
+              doc.data()["serial"] === data["instrument"]["serial"] &&
+              doc.data()["instrumentId"] === data["instrument"]["instrumentId"]
+            )
               //throw error message if found
               throw new functions.https.HttpsError(
                 "already-exists",
@@ -238,15 +241,18 @@ exports.addInstrumentInstance = functions.https.onCall(
               );
           });
           var doc = await instruments.add(data["instrument"]);
-          await instruments.doc(doc.id).collection("entries").add({
-            type: 0,
-            timestamp: Date.now(),
-            details: {
-              title: "Instrument Created",
-              instrumentId: data["instrumentId"],
-              instanceId: doc.id,
-            },
-          });
+          await instruments
+            .doc(doc.id)
+            .collection("entries")
+            .add({
+              type: 0,
+              timestamp: Date.now(),
+              details: {
+                title: "Instrument Created",
+                instrumentId: data["instrumentId"],
+                instanceId: doc.id,
+              },
+            });
           break;
 
         case 1: //update
@@ -278,19 +284,17 @@ exports.addPart = functions.https.onCall(async (data, context) => {
   try {
     switch (data["operation"]) {
       case 0: //create
-
-      var snapshot = await parts.get();
-      snapshot.forEach((doc) => {
-        //check for duplicates
-        if (doc.data()["reference"] === data["part"]["reference"])
-          //throw error message if found
-          throw new functions.https.HttpsError(
-            "already-exists",
-            "Part already exists",
-            "Referance already in use"
-          );
-      });
-
+        var snapshot = await parts.get();
+        snapshot.forEach((doc) => {
+          //check for duplicates
+          if (doc.data()["reference"] === data["part"]["reference"])
+            //throw error message if found
+            throw new functions.https.HttpsError(
+              "already-exists",
+              "Part already exists",
+              "Referance already in use"
+            );
+        });
 
         await parts.add(partdata);
         break;
@@ -418,12 +422,12 @@ exports.addInstrumentReport = functions.https.onCall(async (data, context) => {
   try {
     if (data["reportId"] === null)
       await instrumentreports.add({
-        reportName: data["file"],
+        name: data["file"],
         fields: Object.assign({}, data["fields"]),
       });
     else
       await instrumentreports.doc(data["reportId"]).update({
-        reportName: data["file"],
+        name: data["file"],
         fields: Object.assign({}, data["fields"]),
       });
   } catch (e) {
@@ -438,14 +442,18 @@ exports.reserveReportId = functions.https.onCall(async (data, context) => {
 
   try {
     var currentIndex = (await teamRef.get()).data()["reportIndex"] + 1;
-    var reportIndex = currentIndex.toString();
-    while (reportIndex.length < 6) reportIndex = "0" + reportIndex; //6-digit report id
-    console.log("id=" + reportIndex);
+    var index = currentIndex.toString();
+    while (index.length < 6) index = "0" + index; //6-digit report id
+    console.log("id=" + index);
     var report = await teamRef.collection("reports").add({
-      timestampOpen: Date.now(),
-      reportName: data["reportName"],
-      reportIndex: reportIndex,
-      reportStatus: "Open",
+      timestampOpen: data["timestampOpen"],
+      name: data["name"],
+      index: index,
+      creatorId: data["creatorId"],
+      instrumentId: data["instrumentId"],
+      instanceId: data["instanceId"],
+      siteId: data["siteId"],
+      status: "Open",
     });
   } catch (e) {
     console.log("Error Creating Report :: " + e);
@@ -453,7 +461,7 @@ exports.reserveReportId = functions.https.onCall(async (data, context) => {
   }
   teamRef.update({ reportIndex: currentIndex }); //update the global index
 
-  return { status: "success", reportId: report.id, reportIndex: reportIndex };
+  return { status: "success", reportId: report.id, index: index.toString() };
 });
 
 exports.addInstanceReport = functions.https.onCall(async (data, context) => {
@@ -484,11 +492,11 @@ exports.addInstanceReport = functions.https.onCall(async (data, context) => {
       timestamp: Date.now(),
       details: {
         title: "Report Created " + report["index"],
-        reportName: report["reportName"],
+        name: report["name"],
         reportid: reportData["reportId"],
         instrumentId: report["instrumentId"],
         instanceId: report["instanceId"],
-        reportStatus: report["status"],
+        status: report["status"],
         link: reportData["reportFilePath"],
       },
     });

@@ -248,7 +248,7 @@ class "teamshare::models::report.dart::Report" {
   +String* id
   +int* timestamp
   +String* reportId
-  +String* reportName
+  +String* name
   +List<Field*>* fields
 }
 
@@ -658,7 +658,7 @@ class "teamshare::screens::instrument::instrument_info_screen.dart::_InstrumentI
 class "teamshare::screens::instrument::instrument_info_screen.dart::ReportGraph" {
   +InstrumentInfoScreen* widget
   +MediaQueryData* mqd
-  +String* reportName
+  +String* name
   +Widget* build()
 }
 

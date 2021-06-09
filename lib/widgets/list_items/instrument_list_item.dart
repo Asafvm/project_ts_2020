@@ -123,26 +123,34 @@ class _InstrumentListItemState extends State<InstrumentListItem> {
                       : 0, //50 = height of listtile
                   child: ListView.builder(
                     shrinkWrap: true,
-                    itemBuilder: (ctx, index) => ListTile(
-                      leading: Icon(Icons.picture_as_pdf),
-                      title: Text(
-                        snapshot.data[index]["reportName"],
-                        maxLines: 2,
-                      ),
-                      trailing: FittedBox(
-                        child: Row(
-                          children: <Widget>[
-                            IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () => _openPDF(
-                                  snapshot.data[index]["reportName"],
-                                  snapshot.data[index]["fields"],
-                                  snapshot.data[index]["id"]),
-                            ),
-                          ],
+                    itemBuilder: (ctx, index) {
+                      var reportTemplate = snapshot.data[index];
+
+                      Map<String, dynamic> fields = reportTemplate["fields"];
+
+                      return ListTile(
+                        leading: Icon(Icons.picture_as_pdf),
+                        title: Text(
+                          snapshot.data[index]["name"],
+                          maxLines: 2,
                         ),
-                      ),
-                    ),
+                        trailing: FittedBox(
+                          child: Row(
+                            children: <Widget>[
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => _openPDF(
+                                    reportTemplate.data()["name"],
+                                    fields.values
+                                        .map((e) => Field.fromJson(e))
+                                        .toList(),
+                                    reportTemplate.id),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                     itemCount: snapshot.data.length,
                   ),
                   duration: Duration(milliseconds: 300),

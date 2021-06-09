@@ -66,7 +66,9 @@ class _PDFScreenState extends State<PDFScreen> {
   Widget _buildDraggable(String title, FieldType type) => Draggable(
         data: {'index': -1},
         dragAnchor: DragAnchor.pointer,
-        onDragEnd: (details) => _addField(details.offset, type),
+        onDragEnd: (details) => _addField(
+            details.offset - Offset(Field.defWidth / 2, Field.defHeight / 2),
+            type),
         child: Container(
             margin: const EdgeInsets.all(8),
             alignment: Alignment.center,
@@ -84,13 +86,19 @@ class _PDFScreenState extends State<PDFScreen> {
           transform: Matrix4.translation(
               vector.Vector3(-Field.defWidth / 2, -Field.defHeight / 2, 0)),
           child: Container(
+            width:
+                _fields.isNotEmpty ? _fields.last.size.width : Field.defWidth,
+            height:
+                _fields.isNotEmpty ? _fields.last.size.height : Field.defHeight,
             padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
             decoration:
                 BoxDecoration(border: Border.all(color: _getColor(type))),
             child: Material(
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
+              child: Center(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -398,26 +406,71 @@ class _PDFScreenState extends State<PDFScreen> {
   }
 
   Future<void> _addField(Offset pos, FieldType type) async {
-    final Field f = type == FieldType.Check
-        ? Field.checkbox(
-            type: type,
-            index: _fieldIndex,
-            page: _actualPageNumber,
-            initialPos: calculateFieldOffset(pos),
-            size: _fields.isNotEmpty
-                ? _fields.last.size
-                : null, //keep same size from the last field
-          )
-        : Field.basic(
-            type: type,
-            index: _fieldIndex,
-            page: _actualPageNumber,
-            initialPos: calculateFieldOffset(
-                pos, _fields.isNotEmpty ? _fields.last.size : null),
-            size: _fields.isNotEmpty
-                ? _fields.last.size
-                : null, //keep same size from the last field
-          );
+    Field f;
+    switch (type) {
+      case FieldType.Text:
+        f = Field.basic(
+          type: type,
+          index: _fieldIndex,
+          page: _actualPageNumber,
+          initialPos: calculateFieldOffset(
+              pos, _fields.isNotEmpty ? _fields.last.size : null),
+          size: _fields.isNotEmpty
+              ? _fields.last.size
+              : null, //keep same size from the last field
+        );
+        break;
+      case FieldType.Num:
+        f = Field.basic(
+          type: type,
+          index: _fieldIndex,
+          page: _actualPageNumber,
+          initialPos: calculateFieldOffset(
+              pos, _fields.isNotEmpty ? _fields.last.size : null),
+          size: _fields.isNotEmpty
+              ? _fields.last.size
+              : null, //keep same size from the last field
+        );
+        break;
+      case FieldType.Date:
+        f = Field.basic(
+          hint: "Date",
+          type: type,
+          index: _fieldIndex,
+          page: _actualPageNumber,
+          initialPos: calculateFieldOffset(
+              pos, _fields.isNotEmpty ? _fields.last.size : null),
+          size: _fields.isNotEmpty
+              ? _fields.last.size
+              : null, //keep same size from the last field
+        );
+        break;
+      case FieldType.Check:
+        f = Field.checkbox(
+          type: type,
+          index: _fieldIndex,
+          page: _actualPageNumber,
+          initialPos: calculateFieldOffset(pos),
+          size: _fields.isNotEmpty
+              ? _fields.last.size
+              : null, //keep same size from the last field
+        );
+        break;
+      case FieldType.Signature:
+        f = Field.basic(
+          hint: "Signature",
+          type: type,
+          index: _fieldIndex,
+          page: _actualPageNumber,
+          initialPos: calculateFieldOffset(
+              pos, _fields.isNotEmpty ? _fields.last.size : null),
+          size: _fields.isNotEmpty
+              ? _fields.last.size
+              : null, //keep same size from the last field
+        );
+        break;
+    }
+
     if (f != null) {
       setState(() {
         _fields.add(f);
@@ -479,6 +532,11 @@ class _PDFScreenState extends State<PDFScreen> {
 
   Future<void> _savePDF() async {
     Applogger.consoleLog(MessegeType.info, "Saving");
+    if (_fields.where((element) => element.hint.isEmpty).length > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Some fields were not filled properly")));
+      return;
+    }
     _updateProgress(0);
     try {
       setState(() {

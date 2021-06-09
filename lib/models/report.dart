@@ -5,8 +5,7 @@ class Report {
   String id;
   final int timestampOpen;
   int timestampClose;
-  final String reportId;
-  final String reportName;
+  final String name;
   final String instrumentId;
   final String instanceId;
   final String siteId;
@@ -21,8 +20,7 @@ class Report {
       this.fields,
       this.timestampOpen,
       this.timestampClose,
-      this.reportId,
-      this.reportName,
+      this.name,
       this.downloadUrl,
       this.status,
       this.instrumentId,
@@ -36,15 +34,16 @@ class Report {
         timestampOpen = data['timestampOpen'],
         timestampClose = data['timestampClose'],
         downloadUrl = data['downloadUrl'],
-        reportId = data['reportid'],
-        reportName = data['reportName'],
+        name = data['name'],
         instrumentId = data['instrumentId'],
         instanceId = data['instanceId'],
         siteId = data['siteId'],
         creatorId = data['creatorId'],
         status = data['status'],
-        fields = List<Field>.from(
-            (data['fields'] as List).map((e) => Field.fromJson(e)));
+        fields = data['fields'] == null
+            ? List<Field>.empty()
+            : List<Field>.from(
+                (data['fields'] as List).map((e) => Field.fromJson(e)));
 
   factory Report.fromFirestore(DocumentSnapshot documentSnapshot) {
     return Report.fromJson(documentSnapshot.data(), documentSnapshot.id);
@@ -52,8 +51,7 @@ class Report {
 
   Map<String, dynamic> toJson() => {
         'timestampClose': timestampClose,
-        'reportId': reportId,
-        'reportName': reportName,
+        'name': name,
         'downloadUrl': downloadUrl,
         'instrumentId': instrumentId,
         'instanceId': instanceId,

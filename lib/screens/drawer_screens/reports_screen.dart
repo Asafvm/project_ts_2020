@@ -95,7 +95,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     .contains(filter.toLowerCase()) ||
                 report.creatorId.toLowerCase().contains(filter) ||
                 report.index.toLowerCase().contains(filter) ||
-                report.reportName.toLowerCase().contains(filter))
+                report.name.toLowerCase().contains(filter))
             .toList();
     });
 
