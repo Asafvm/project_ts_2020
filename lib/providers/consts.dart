@@ -40,8 +40,6 @@ const tabInstrument = TabBar(
 );
 
 final logoText = Container(
-  //margin: EdgeInsets.only(top: 40),
-  //padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
   child: RichText(
     textAlign: TextAlign.center,
     text: TextSpan(

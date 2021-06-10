@@ -3,6 +3,7 @@ import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/site.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/widgets/form_title.dart';
 
 class AddRoomForm extends StatefulWidget {
   final String siteId;
@@ -89,39 +90,42 @@ class _AddRoomFormState extends State<AddRoomForm> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-          left: 15,
-          top: 5,
-          right: 15,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
-      child: Form(
-        key: _roomForm,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            _buildTitleField(),
-            Row(
-              children: [
-                Expanded(flex: 3, child: _buildBuildingField()),
-                Spacer(),
-                Expanded(flex: 2, child: _buildfloorField()),
-                Spacer(),
-                Expanded(flex: 2, child: _buildRoomNumberField()),
-              ],
-            ),
-            _buildDescriptionField(),
-            Container(
-                margin: EdgeInsets.symmetric(vertical: 20),
-                child: _uploading
-                    ? CircularProgressIndicator()
-                    : OutlinedButton(
-                        onPressed: _uploadRoomDetails,
-                        child: Text(
-                          'Add Room',
-                        ),
-                        style: outlinedButtonStyle,
-                      ))
-          ],
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 5)),
+        padding: EdgeInsets.only(
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+        child: Form(
+          key: _roomForm,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              FormTitle(title: 'Add Room'),
+              _buildTitleField(),
+              Row(
+                children: [
+                  Expanded(flex: 3, child: _buildBuildingField()),
+                  Spacer(),
+                  Expanded(flex: 2, child: _buildfloorField()),
+                  Spacer(),
+                  Expanded(flex: 2, child: _buildRoomNumberField()),
+                ],
+              ),
+              _buildDescriptionField(),
+              Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  child: _uploading
+                      ? CircularProgressIndicator()
+                      : OutlinedButton(
+                          onPressed: _uploadRoomDetails,
+                          child: Text(
+                            'Add Room',
+                          ),
+                          style: outlinedButtonStyle,
+                        ))
+            ],
+          ),
         ),
       ),
     );

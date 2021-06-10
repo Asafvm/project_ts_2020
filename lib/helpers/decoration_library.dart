@@ -30,4 +30,22 @@ class DecorationLibrary {
       ),
     );
   }
+
+  static loginDecoration(
+      IconData icon, String label, String hint, BuildContext context,
+      [bool visible = true]) {
+    return InputDecoration(
+      prefixIcon: visible ? Icon(icon, color: Colors.white) : Container(),
+      hintStyle: TextStyle(color: Colors.grey[500]),
+      labelText: label,
+      labelStyle: TextStyle(color: Colors.white),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(
+            color: Theme.of(context).primaryColor,
+            width: 1,
+            style: BorderStyle.solid),
+      ),
+    );
+  }
 }

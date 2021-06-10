@@ -21,7 +21,7 @@ class _AdminPartScreenState extends State<AdminPartScreen> {
   bool _loading = false;
   bool _stockTaking = false;
 
-  var _filter;
+  String _filter = '';
 
   @override
   Widget build(BuildContext context) {

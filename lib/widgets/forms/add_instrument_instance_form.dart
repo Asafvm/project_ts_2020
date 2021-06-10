@@ -3,6 +3,7 @@ import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument_instance.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/widgets/form_title.dart';
 
 class AddInstrumentInstanceForm extends StatefulWidget {
   final String instrumentId;
@@ -33,32 +34,35 @@ class _AddInstrumentInstanceFormState extends State<AddInstrumentInstanceForm> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-          left: 15,
-          top: 5,
-          right: 15,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
-      child: Form(
-        key: _instrumentForm,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            _buildSerialField(),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: _uploading
-                  ? FittedBox(
-                      child: CircularProgressIndicator(),
-                    )
-                  : OutlinedButton(
-                      child: Text(
-                        'Add New Instrument',
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 5)),
+        padding: EdgeInsets.only(
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+        child: Form(
+          key: _instrumentForm,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              FormTitle(title: 'Add Instrument Details'),
+              _buildSerialField(),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: _uploading
+                    ? FittedBox(
+                        child: CircularProgressIndicator(),
+                      )
+                    : OutlinedButton(
+                        child: Text(
+                          'Add New Instrument',
+                        ),
+                        style: outlinedButtonStyle,
+                        onPressed: _uploadInstance,
                       ),
-                      style: outlinedButtonStyle,
-                      onPressed: _uploadInstance,
-                    ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

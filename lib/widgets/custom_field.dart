@@ -78,7 +78,10 @@ class _CustomFieldState extends State<CustomField> {
             _selected = false;
           })
         },
-        onLongPress: () => widget.onClick(widget.field),
+        onLongPress: widget.field.type == FieldType.Date ||
+                widget.field.type == FieldType.Signature
+            ? null
+            : () => widget.onClick(widget.field),
         child: _selected
             ? Stack(clipBehavior: Clip.none, children: [
                 field,

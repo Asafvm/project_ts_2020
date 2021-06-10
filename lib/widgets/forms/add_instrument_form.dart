@@ -4,6 +4,7 @@ import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/widgets/form_title.dart';
 
 class AddInstrumentForm extends StatefulWidget {
   @override
@@ -111,55 +112,58 @@ class _AddInstrumentFormState extends State<AddInstrumentForm>
     super.build(context);
 
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-          left: 25,
-          top: 5,
-          right: 25,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-      child: Form(
-        key: _instrumentForm,
-        child: DefaultTabController(
-          initialIndex: 0,
-          length: 2,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              tabbar, //defined in consts
-              Container(
-                height: 200,
-                child: TabBarView(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        _buildNameField(),
-                        _buildCodeField(),
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        _buildManifacturerField(),
-                        _buildModelField(),
-                        _buildPriceField(),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
-                child: _uploading
-                    ? CircularProgressIndicator()
-                    : OutlinedButton(
-                        onPressed: _uploadInstrument,
-                        child: Text(
-                          'Add New Instrument',
-                        ),
-                        style: outlinedButtonStyle,
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 5)),
+        padding: EdgeInsets.only(
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+        child: Form(
+          key: _instrumentForm,
+          child: DefaultTabController(
+            initialIndex: 0,
+            length: 2,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                FormTitle(title: 'Add New Instruemnt'),
+                tabbar, //defined in consts
+                Container(
+                  height: 200,
+                  child: TabBarView(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          _buildNameField(),
+                          _buildCodeField(),
+                        ],
                       ),
-              )
-            ],
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          _buildManifacturerField(),
+                          _buildModelField(),
+                          _buildPriceField(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  child: _uploading
+                      ? CircularProgressIndicator()
+                      : OutlinedButton(
+                          onPressed: _uploadInstrument,
+                          child: Text(
+                            'Add New Instrument',
+                          ),
+                          style: outlinedButtonStyle,
+                        ),
+                )
+              ],
+            ),
           ),
         ),
       ),

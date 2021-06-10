@@ -4,6 +4,7 @@ import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/models/contact.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/widgets/form_title.dart';
 
 class AddContactForm extends StatefulWidget {
   final String siteId;
@@ -82,55 +83,58 @@ class _AddContactFormState extends State<AddContactForm> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-          left: 15,
-          top: 5,
-          right: 15,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 10),
-      child: Form(
-        key: _contactForm,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Row(
-              children: [
-                Expanded(flex: 4, child: _buildFirstNameField()),
-                Spacer(),
-                Expanded(flex: 4, child: _buildLastNameField()),
-              ],
-            ),
-            _buildPhoneNumberField(),
-            _buildEmailField(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
-                  child: _uploading
-                      ? CircularProgressIndicator()
-                      : OutlinedButton(
-                          onPressed: _uploadContactDetails,
-                          child: Text(
-                            'Add Contact',
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 5)),
+        padding: EdgeInsets.only(
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+        child: Form(
+          key: _contactForm,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              FormTitle(title: 'Add Contact'),
+              Row(
+                children: [
+                  Expanded(flex: 4, child: _buildFirstNameField()),
+                  Spacer(),
+                  Expanded(flex: 4, child: _buildLastNameField()),
+                ],
+              ),
+              _buildPhoneNumberField(),
+              _buildEmailField(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 20),
+                    child: _uploading
+                        ? CircularProgressIndicator()
+                        : OutlinedButton(
+                            onPressed: _uploadContactDetails,
+                            child: Text(
+                              'Add Contact',
+                            ),
+                            style: outlinedButtonStyle,
                           ),
-                          style: outlinedButtonStyle,
-                        ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
-                  child: _uploading
-                      ? CircularProgressIndicator()
-                      : OutlinedButton(
-                          onPressed: _pickFromContacts,
-                          child: Text(
-                            'Pick Contact',
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 20),
+                    child: _uploading
+                        ? CircularProgressIndicator()
+                        : OutlinedButton(
+                            onPressed: _pickFromContacts,
+                            child: Text(
+                              'Pick Contact',
+                            ),
+                            style: outlinedButtonStyle,
                           ),
-                          style: outlinedButtonStyle,
-                        ),
-                ),
-              ],
-            )
-          ],
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

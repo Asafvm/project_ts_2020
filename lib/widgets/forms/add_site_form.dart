@@ -14,6 +14,7 @@ import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
 import 'package:teamshare/providers/firebase_firestore_provider.dart';
 import 'package:teamshare/screens/drawer_screens/map_screen.dart';
+import 'package:teamshare/widgets/form_title.dart';
 
 class AddSiteForm extends StatefulWidget {
   @override
@@ -115,86 +116,90 @@ class _AddSiteFormState extends State<AddSiteForm> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-          left: 5,
-          right: 5,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-      child: Form(
-        key: _siteForm,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(
-              height: 200,
-              child: Row(
-                children: [
-                  Flexible(
-                    flex: 2,
-                    fit: FlexFit.tight,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: _previewImageUrl == null
-                                ? Icon(Icons.location_off_sharp)
-                                : Image.network(
-                                    _previewImageUrl,
-                                    fit: BoxFit.fill,
-                                  ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.location_on),
-                              tooltip: 'Current Location',
-                              onPressed: _getCurrentLocation,
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.map),
-                              tooltip: 'Select On Map',
-                              onPressed: _selectOnMap,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    flex: 3,
-                    fit: FlexFit.tight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 5)),
+        padding: EdgeInsets.only(
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+        child: Form(
+          key: _siteForm,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              FormTitle(title: 'Add Site'),
+              SizedBox(
+                height: 200,
+                child: Row(
+                  children: [
+                    Flexible(
+                      flex: 2,
+                      fit: FlexFit.tight,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(flex: 2, child: _buildNameField()),
-                          Spacer(),
-                          Expanded(flex: 3, child: _buildAddressField())
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: _previewImageUrl == null
+                                  ? Icon(Icons.location_off_sharp)
+                                  : Image.network(
+                                      _previewImageUrl,
+                                      fit: BoxFit.fill,
+                                    ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.location_on),
+                                tooltip: 'Current Location',
+                                onPressed: _getCurrentLocation,
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.map),
+                                tooltip: 'Select On Map',
+                                onPressed: _selectOnMap,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                  )
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: _uploading
-                  ? CircularProgressIndicator()
-                  : OutlinedButton(
-                      onPressed: _addSite,
-                      child: Text(
-                        'Add New Site',
+                    Flexible(
+                      flex: 3,
+                      fit: FlexFit.tight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(flex: 2, child: _buildNameField()),
+                            Spacer(),
+                            Expanded(flex: 3, child: _buildAddressField())
+                          ],
+                        ),
                       ),
-                      style: outlinedButtonStyle,
-                    ),
-            ),
-          ],
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: _uploading
+                    ? CircularProgressIndicator()
+                    : OutlinedButton(
+                        onPressed: _addSite,
+                        child: Text(
+                          'Add New Site',
+                        ),
+                        style: outlinedButtonStyle,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,7 +1,9 @@
 import 'dart:core';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:teamshare/helpers/decoration_library.dart';
 import 'package:teamshare/providers/authentication.dart';
 import 'package:teamshare/providers/consts.dart';
 
@@ -17,7 +19,6 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
 
   AnimationController _animationContainerController;
   AnimationController _animationButtonController;
-  Animation<double> _opacityAnimation;
   Animation<double> _buttonAnimation;
   // Animation<Size> _heightAnimation;
 
@@ -43,10 +44,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
-    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-          parent: _animationContainerController, curve: Curves.easeInOut),
-    );
+
     _buttonAnimation =
         Tween(begin: screenWidth / 3, end: screenWidth / 3 * 2).animate(
       CurvedAnimation(
@@ -59,24 +57,6 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
     TextEditingController _passwordController = TextEditingController();
 
     const textStyleWhite = TextStyle(color: Colors.white);
-
-    InputDecoration _getInputDecoration(
-        IconData icon, String label, String hint) {
-      final inputDecoration = InputDecoration(
-        icon: Icon(icon, color: Colors.white),
-        hintStyle: textStyleWhite.copyWith(color: Colors.grey[500]),
-        labelText: label,
-        labelStyle: textStyleWhite,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(
-              color: Theme.of(context).primaryColor,
-              width: 1,
-              style: BorderStyle.solid),
-        ),
-      );
-      return inputDecoration;
-    }
 
     return _logging
         ? FittedBox(
@@ -98,8 +78,8 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                   children: <Widget>[
                     TextFormField(
                       style: textStyleWhite,
-                      decoration: _getInputDecoration(
-                          Icons.email, "Email", "Enter Email"),
+                      decoration: DecorationLibrary.loginDecoration(
+                          Icons.email, "Email", "Enter Email", context),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value.isEmpty || !emailRegExp.hasMatch(value))
@@ -114,8 +94,8 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                       style: textStyleWhite,
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: _getInputDecoration(
-                          Icons.lock, "Password", "Enter Password"),
+                      decoration: DecorationLibrary.loginDecoration(
+                          Icons.lock, "Password", "Enter Password", context),
                       validator: (value) {
                         if (value.isEmpty) return 'Password cannot be empty';
                         return null;
@@ -126,27 +106,26 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                     ),
                     AnimatedContainer(
                       duration: Duration(milliseconds: 300),
-                      constraints: BoxConstraints(
-                          minHeight: signMode == AuthState.signup ? 60 : 0,
-                          maxHeight: signMode == AuthState.signup ? 120 : 0),
-                      child: FadeTransition(
-                        opacity: _opacityAnimation,
-                        child: TextFormField(
-                          style: textStyleWhite,
-                          decoration: _getInputDecoration(
-                              Icons.lock, "Confirm Password", "Enter Password"),
-                          obscureText: true,
-                          validator: signMode == AuthState.signup
-                              ? (value) {
-                                  if (value.isEmpty)
-                                    return 'Password cannot be empty';
-                                  else if (_passwordController.text
-                                          .compareTo(value) !=
-                                      0) return 'Passwords do not match';
-                                  return null;
-                                }
-                              : null,
-                        ),
+                      height: signMode == AuthState.signup ? 60 : 0,
+                      child: TextFormField(
+                        style: textStyleWhite,
+                        decoration: DecorationLibrary.loginDecoration(
+                            Icons.lock,
+                            "Confirm Password",
+                            "Enter Password",
+                            context,
+                            signMode == AuthState.signup),
+                        obscureText: true,
+                        validator: signMode == AuthState.signup
+                            ? (value) {
+                                if (value.isEmpty)
+                                  return 'Password cannot be empty';
+                                else if (_passwordController.text
+                                        .compareTo(value) !=
+                                    0) return 'Passwords do not match';
+                                return null;
+                              }
+                            : null,
                       ),
                     ),
                     Padding(
@@ -185,9 +164,9 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
   }
 
   _setSigningMode() {
+    FormState formState = _loginKey.currentState;
+    if (formState != null) formState.reset();
     setState(() {
-      FormState formState = _loginKey.currentState;
-      if (formState != null) formState.reset();
       if (signMode == AuthState.signup)
         signMode = AuthState.signin;
       else
@@ -217,28 +196,49 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
           await Provider.of<Authentication>(context, listen: false)
               .authenticate(_authData['email'], _authData['password'],
                   signMode == AuthState.signup)
-              .then((value) => _setLogging());
-        } catch (error) {
+              .then((value) {
+            setState(() {
+              _logging = false;
+            });
+          });
+        } on FirebaseAuthException catch (error) {
           var errorMessage = 'Authentication failed';
-          if (error.toString().contains('EMAIL_EXISTS'))
-            errorMessage = 'Email already in use';
-          else if (error.toString().contains('ERROR_EMAIL_ALREADY_IN_USE'))
-            errorMessage = 'This email already registered';
-          else if (error.toString().contains('ERROR_WRONG_PASSWORD'))
-            errorMessage = 'Wrong password';
-          else if (error.toString().contains('INVALID_EMAIL'))
-            errorMessage = 'Please use a valid email';
-          else if (error.toString().contains('WEAK_PASSWORD'))
-            errorMessage = 'Your password is too weak';
-          else if (error.toString().contains('INVALID_PASSWORD'))
-            errorMessage = 'Wrong password';
-          else if (error.toString().contains('EMAIL_NOT_FOUND'))
-            errorMessage = 'This email is not registered';
-          else
-            errorMessage = 'Unknown problem occured. $error';
+          switch (error.code) {
+            case 'wrong-password':
+              errorMessage = 'There was a problem with your email or password';
+              break;
+            case 'user-not-found':
+              errorMessage = 'There was a problem with your email or password';
+              break;
+            case 'email-already-in-use':
+              errorMessage = 'There was a problem with your email or password';
+              break;
+            case 'account-exists-with-different-credential':
+              errorMessage = 'There was a problem with your email or password';
+              break;
+            case 'user-disabled':
+              errorMessage =
+                  'Your account has been disabled. Please contact an administrator.';
+              break;
+            case 'invalid-email':
+              errorMessage = 'Please enter a valid email address';
+              break;
+            case 'weak-password':
+              errorMessage = 'Your password is too weak';
+              break;
+            case 'too-many-requests':
+              errorMessage =
+                  'Your account is temporarily blocked due to consecutive failed login attempts';
+              break;
+            default:
+              errorMessage = 'Unknown problem occured. Please try again later.';
+          }
+
           showMessage(errorMessage);
-          _setLogging();
         }
+        setState(() {
+          _logging = false;
+        });
       }
     }
   }
@@ -290,30 +290,24 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
       animation: _buttonAnimation,
       builder: (context, ch) => Container(
         width: _buttonAnimation.value,
-        child: ch,
-      ),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          textStyle: TextStyle(
-            color: Colors.white,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            textStyle: TextStyle(
+              color: Colors.white,
+            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+            primary: signMode == AuthState.signup
+                ? Theme.of(context).accentColor
+                : Colors.blueGrey,
+            elevation: 12,
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-          primary: signMode == AuthState.signup
-              ? Theme.of(context).accentColor
-              : Colors.blueGrey,
-          elevation: 12,
+          child: Text('Signup'),
+          onPressed: signMode == AuthState.signup
+              ? () => _authUser(context)
+              : _setSigningMode,
         ),
-        child: Text('Signup'),
-        onPressed: signMode == AuthState.signup
-            ? () => _authUser(context)
-            : _setSigningMode,
       ),
     );
-  }
-
-  _setLogging() {
-    setState(() {
-      _logging = !_logging;
-    });
   }
 }

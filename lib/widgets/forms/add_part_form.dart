@@ -6,6 +6,7 @@ import 'package:teamshare/models/instrument.dart';
 import 'package:teamshare/models/part.dart';
 import 'package:teamshare/providers/consts.dart';
 import 'package:teamshare/providers/firebase_firestore_cloud_functions.dart';
+import 'package:teamshare/widgets/form_title.dart';
 
 class AddPartForm extends StatefulWidget {
   final Part part;
@@ -306,41 +307,52 @@ class _AddPartFormState extends State<AddPartForm>
     );
 
     return SingleChildScrollView(
-      child: Form(
-        key: _partForm,
-        child: DefaultTabController(
-          initialIndex: 0,
-          length: 2,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              tabbar, //defined in consts
-              Container(
-                padding: const EdgeInsets.all(10),
-                height: 250,
-                child: TabBarView(
-                  children: [
-                    //REQUIRED TAB
-                    reqTab,
-                    //OPTIONAL TAB
-                    optTab,
-                  ],
-                ),
-              ),
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 5)),
+        padding: EdgeInsets.only(
+            left: 5,
+            right: 5,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+        child: Form(
+          key: _partForm,
+          child: DefaultTabController(
+            initialIndex: 0,
+            length: 2,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                FormTitle(title: 'Add Part'),
 
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 20),
-                child: _uploading
-                    ? CircularProgressIndicator()
-                    : OutlinedButton(
-                        onPressed: _addPart,
-                        child: Text(
-                          widget.part == null ? 'Add New Part' : 'Update Part',
+                tabbar, //defined in consts
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  height: 250,
+                  child: TabBarView(
+                    children: [
+                      //REQUIRED TAB
+                      reqTab,
+                      //OPTIONAL TAB
+                      optTab,
+                    ],
+                  ),
+                ),
+
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  child: _uploading
+                      ? CircularProgressIndicator()
+                      : OutlinedButton(
+                          onPressed: _addPart,
+                          child: Text(
+                            widget.part == null
+                                ? 'Add New Part'
+                                : 'Update Part',
+                          ),
+                          style: outlinedButtonStyle,
                         ),
-                        style: outlinedButtonStyle,
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

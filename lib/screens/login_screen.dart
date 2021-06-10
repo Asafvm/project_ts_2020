@@ -17,12 +17,13 @@ class LoginScreen extends StatelessWidget {
               horizontal:
                   (mqd.orientation == Orientation.portrait) ? 20.0 : 100.0),
           child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              Flexible(child: logoText), //defined in consts
-              Flexible(child: AuthForm()),
+              Expanded(
+                  flex: 2, child: Center(child: logoText)), //defined in consts
+              Flexible(flex: 3, fit: FlexFit.tight, child: AuthForm()),
             ],
           ),
         ),
