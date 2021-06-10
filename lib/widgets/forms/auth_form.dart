@@ -78,6 +78,7 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                   children: <Widget>[
                     TextFormField(
                       style: textStyleWhite,
+                      onChanged: (value) => _authData['email'] = value,
                       decoration: DecorationLibrary.loginDecoration(
                           Icons.email, "Email", "Enter Email", context),
                       keyboardType: TextInputType.emailAddress,
@@ -149,11 +150,20 @@ class _AuthFormState extends State<AuthForm> with TickerProviderStateMixin {
                           "Forgot password?",
                           textAlign: TextAlign.start,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_authData["email"].isNotEmpty &&
-                              !emailRegExp.hasMatch(_authData["email"]))
-                            Authentication()
-                                .forgotPassword(_authData["email"], context);
+                              emailRegExp.hasMatch(_authData["email"])) {
+                            try {
+                              await Authentication()
+                                  .forgotPassword(_authData["email"], context);
+                            } on FirebaseAuthException {}
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'Reset password email sent to your account'),
+                            ));
+                          } else
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('Enter email to proceed')));
                         },
                       ),
                   ],

@@ -126,8 +126,5 @@ class Authentication with ChangeNotifier {
 
   Future<void> forgotPassword(String email, BuildContext context) async {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Reset password email sent to your account')),
-    );
   }
 }
