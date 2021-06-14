@@ -70,6 +70,9 @@ final RegExp emailRegExp = RegExp(
     multiLine: false);
 final RegExp phoneRegExp =
     RegExp(r"(^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$)0");
+
+final RegExp numberRegExp = RegExp(r"^[0-9]+(\.[0-9]+)?");
+
 final RegExp fileNameRegExp =
     RegExp(r"(^[a-zA-Z0-9_]+$)", caseSensitive: false, multiLine: false);
 

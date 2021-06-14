@@ -289,9 +289,10 @@ class _InstrumentInfoScreenState extends State<InstrumentInfoScreen> {
                                                           reportData =
                                                           await FirebaseFirestoreCloudFunctions
                                                               .reserveReportId(
-                                                                  widget
-                                                                      .instance,
-                                                                  name);
+                                                        widget.instance,
+                                                        name,
+                                                        reportFields,
+                                                      );
 
                                                       await Navigator.of(
                                                               context)

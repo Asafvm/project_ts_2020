@@ -144,13 +144,16 @@ class FirebaseFirestoreCloudFunctions {
   }
 
   static Future<Map<String, dynamic>> reserveReportId(
-      InstrumentInstance instance, String title) async {
+      InstrumentInstance instance,
+      String title,
+      List<Field> reportFields) async {
     var result = await FirebaseFunctions.instance
         .httpsCallable("reserveReportId")
         .call(<String, dynamic>{
       "timestampOpen": DateTime.now().millisecondsSinceEpoch,
       "creatorId": Authentication().userEmail,
       "teamId": FirebasePaths.teamId,
+      "fields": reportFields.map((e) => e.toJson()).toList(),
       "instrumentId": instance.instrumentId,
       "instanceId": instance.id,
       "siteId": instance.currentSiteId,

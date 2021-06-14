@@ -44,7 +44,7 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
 
   bool _loading = false;
 
-  // final _genericFormKey = GlobalKey<FormState>();
+  final _genericFormKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -71,10 +71,13 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
             ),
           ),
           Expanded(
-            child: ListView(
-                children: List<Widget>.from(widget.fields
-                    .map((field) => _buildGenericField(field, context))
-                    .toList())),
+            child: Form(
+              key: _genericFormKey,
+              child: ListView(
+                  children: List<Widget>.from(widget.fields
+                      .map((field) => _buildGenericField(field, context))
+                      .toList())),
+            ),
           ),
           kIsWeb
               ? TextButton.icon(
@@ -164,13 +167,17 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                       DecorationLibrary.inputDecoration(field.hint, context),
 
                   inputFormatters: <TextInputFormatter>[
+                    // DecimalTextInputFormatter(),
+
                     FilteringTextInputFormatter.allow(
-                        RegExp(r'^[0-9]+(\.([0-9])+)?'),
-                        replacementString: ''),
+                        RegExp(r'^[0-9]+\.?[0-9]{0,2}')),
                   ],
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value.isEmpty && field.isMandatory)
                       return 'Cannot be empty';
+                    if (!numberRegExp.hasMatch(value))
+                      return 'Not a valid input';
                     return null;
                   },
                 ),
@@ -230,101 +237,106 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
       setState(() {
         _loading = true;
       });
-      // if (_genericFormKey.currentState.validate()) {
-      //download report template
-      String downloadedPdfPath = await FirebaseStorageProvider.downloadFile(
-          '${FirebasePaths.instrumentReportTemplatePath(widget.instance.instrumentId)}/${widget.pdfId}');
-      if (downloadedPdfPath == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Could not download report. Please check your internet connection.'),
-        ));
-        return;
-      }
+      if (_genericFormKey.currentState.validate()) {
+        //download report template
+        String downloadedPdfPath = await FirebaseStorageProvider.downloadFile(
+            '${FirebasePaths.instrumentReportTemplatePath(widget.instance.instrumentId)}/${widget.pdfId}');
+        if (downloadedPdfPath == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Could not download report. Please check your internet connection.'),
+          ));
+          return;
+        }
 
-      //update default values
-      widget.fields
-          .where((field) =>
-              field.type == FieldType.Text || field.type == FieldType.Num)
-          .forEach((field) {
-        String userValue =
-            controllersArray.elementAt(widget.fields.indexOf(field)).text;
-        if (userValue.isNotEmpty)
-          field.defaultValue =
+        //update default values
+        widget.fields
+            .where((field) =>
+                field.type == FieldType.Text || field.type == FieldType.Num)
+            .forEach((field) {
+          String userValue =
               controllersArray.elementAt(widget.fields.indexOf(field)).text;
-        // else if (userValue.isEmpty &&
-        //     field.isMandatory &&
-        //     field.defaultValue.isEmpty)
-        //   controllersArray.elementAt(widget.fields.indexOf(field)).text =
-        //       'Error';
-      });
+          if (userValue.isNotEmpty)
+            field.defaultValue =
+                controllersArray.elementAt(widget.fields.indexOf(field)).text;
+          // else if (userValue.isEmpty &&
+          //     field.isMandatory &&
+          //     field.defaultValue.isEmpty)
+          //   controllersArray.elementAt(widget.fields.indexOf(field)).text =
+          //       'Error';
+        });
 
-      //get signature if needed
-      Uint8List imagedata;
-      if (widget.fields
-          .where((element) => element.type == FieldType.Signature)
-          .isNotEmpty)
-        imagedata = await Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
-      //compose pdf
-      String reportPath = await PdfHelper.createPdf(
-        fields: widget.fields,
-        instanceId: widget.instance.id,
-        instrumentId: widget.instance.instrumentId,
-        pdfPath: downloadedPdfPath,
-        siteName: FirebaseFirestoreProvider.getSiteById(widget.siteId).name,
-        signature: imagedata,
-      );
-
-      //display result
-      bool approved = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PDFScreen(
-              viewOnly: true,
-              approveMode: true,
-              pathPDF: reportPath,
-            ),
-          )) ??
-          false;
-
-      if (approved) {
-        //submit file
-        String uploadedReport = await FirebaseStorageProvider.uploadFile(
-            File(reportPath),
-            FirebasePaths.instanceReportPath(
-                widget.instance.instrumentId, widget.instance.serial));
-
-        Report report = Report(
-          timestampClose: DateTime.now().millisecondsSinceEpoch,
-          index: widget.index,
-          creatorId: Authentication().userEmail,
+        //get signature if needed
+        Uint8List imagedata;
+        if (widget.fields
+            .where((element) => element.type == FieldType.Signature)
+            .isNotEmpty)
+          imagedata = await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => SignatureHelper()));
+        //compose pdf
+        String reportPath = await PdfHelper.createPdf(
           fields: widget.fields,
-          downloadUrl: uploadedReport,
           instanceId: widget.instance.id,
           instrumentId: widget.instance.instrumentId,
-          name: basenameWithoutExtension(widget.pdfId),
-          status: 'Closed',
-          siteId: widget.siteId,
+          pdfPath: downloadedPdfPath,
+          siteName: FirebaseFirestoreProvider.getSiteById(widget.siteId).name,
+          signature: imagedata,
         );
-        //upload fields
-        var result = await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
-          report: report,
-          reportFilePath: uploadedReport,
-          reportId: widget.reportId,
-        );
-        setState(() {
-          _loading = false;
-        });
-        if (result.data["status"] == "success") {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Uploaded seccessfuly')));
+
+        //display result
+        bool approved = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => PDFScreen(
+                viewOnly: true,
+                approveMode: true,
+                pathPDF: reportPath,
+              ),
+            )) ??
+            false;
+
+        if (approved) {
+          //submit file
+          String uploadedReport = await FirebaseStorageProvider.uploadFile(
+              File(reportPath),
+              FirebasePaths.instanceReportPath(
+                  widget.instance.instrumentId, widget.instance.serial));
+
+          Report report = Report(
+            timestampClose: DateTime.now().millisecondsSinceEpoch,
+            index: widget.index,
+            creatorId: Authentication().userEmail,
+            fields: widget.fields,
+            downloadUrl: uploadedReport,
+            instanceId: widget.instance.id,
+            instrumentId: widget.instance.instrumentId,
+            name: basenameWithoutExtension(widget.pdfId),
+            status: 'Closed',
+            siteId: widget.siteId,
+          );
+          //upload fields
+          var result =
+              await FirebaseFirestoreCloudFunctions.uploadInstanceReport(
+            report: report,
+            reportFilePath: uploadedReport,
+            reportId: widget.reportId,
+          );
+          setState(() {
+            _loading = false;
+          });
+          if (result.data["status"] == "success") {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text('Uploaded seccessfuly')));
+          }
+          Navigator.of(context).pop();
+        } else {
+          setState(() {
+            _loading = false;
+          });
         }
-        Navigator.of(context).pop();
       } else {
         setState(() {
           _loading = false;
         });
       }
-      // }
     } catch (e, s) {
       Applogger.consoleLog(MessegeType.error, "Failed filling form\n$e\n$s");
     }

@@ -453,6 +453,7 @@ exports.reserveReportId = functions.https.onCall(async (data, context) => {
       instrumentId: data["instrumentId"],
       instanceId: data["instanceId"],
       siteId: data["siteId"],
+      fields:data["fields"],
       status: "Open",
     });
   } catch (e) {
